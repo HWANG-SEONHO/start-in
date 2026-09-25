@@ -6,6 +6,8 @@
 
 지역과 조건을 고르고, 지도를 보고, 공고를 확인하고, 필요하면 AI 검색을 이용합니다. 볼 것을 봤으면 오래 붙잡아두지 않는 화면을 지향합니다.
 
+🌐 **[STARTIN 사이트 바로가기](https://hwang-seonho.github.io/start-in/)**
+
 ## HOME · 1차 초안
 
 ![STARTIN HOME 1차 초안](assets/images/home-draft-20260919.png)

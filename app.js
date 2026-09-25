@@ -1,17 +1,31 @@
 (() => {
   'use strict';
-  const $ = (s, root = document) => root.querySelector(s);
-  const $$ = (s, root = document) => [...root.querySelectorAll(s)];
-  // Native 1920×1080 maximum. Uniform scaling only on smaller viewports.
-  const MASTER_WIDTH=1920, MASTER_HEIGHT=1080, DESIGN_WIDTH=1763.5555555556;
-  const fit=()=>{
-    const width=Math.min(MASTER_WIDTH,document.documentElement.clientWidth);
-    const scale=width/DESIGN_WIDTH;
-    $('#design-canvas').style.transform=`scale(${scale})`;
-    $('#viewport-frame').style.width=`${width}px`;
-    $('#viewport-frame').style.height=`${MASTER_HEIGHT*width/MASTER_WIDTH}px`;
+
+  /* --------------------------------------------------------------------------
+   * 01. DOM helpers / responsive master-canvas scaling
+   * ----------------------------------------------------------------------- */
+  const $ = (selector, root = document) => root.querySelector(selector);
+  const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+
+  const MASTER_WIDTH = 1920;
+  const MASTER_HEIGHT = 1080;
+  const DESIGN_WIDTH = 1763.5555555556;
+
+  const fitCanvas = () => {
+    const frameWidth = Math.min(MASTER_WIDTH, document.documentElement.clientWidth);
+    const scale = frameWidth / DESIGN_WIDTH;
+
+    $('#design-canvas').style.transform = `scale(${scale})`;
+    $('#viewport-frame').style.width = `${frameWidth}px`;
+    $('#viewport-frame').style.height = `${MASTER_HEIGHT * frameWidth / MASTER_WIDTH}px`;
   };
-  fit();window.addEventListener('resize',fit);
+
+  fitCanvas();
+  window.addEventListener('resize', fitCanvas);
+
+  /* --------------------------------------------------------------------------
+   * 02. Inline SVG icon set
+   * ----------------------------------------------------------------------- */
   const icons = {
     bell: '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4M11 2h2"/>',
     search: '<circle cx="10.5" cy="10.5" r="7.5"/><path d="m16 16 5 5"/>',
@@ -32,98 +46,355 @@
     chart: '<path d="M3 21V11q0-2 2-2h2v12ZM10 21V5q0-2 2-2h2v18ZM17 21V8q0-2 2-2h2v15Z" fill="currentColor" stroke="none"/>',
     navigation: '<path d="m3 10 18-7-7 18-3-8Z"/>'
   };
-  $$('[data-icon]').forEach(el => el.innerHTML = `<svg viewBox="0 0 24 ${el.dataset.icon === 'sparkles' ? 27 : 24}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[el.dataset.icon] || icons.briefcase}</svg>`);
+
+  $$('[data-icon]').forEach((element) => {
+    const viewBoxHeight = element.dataset.icon === 'sparkles' ? 27 : 24;
+    element.innerHTML = `<svg viewBox="0 0 24 ${viewBoxHeight}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[element.dataset.icon] || icons.briefcase}</svg>`;
+  });
+
+  /* --------------------------------------------------------------------------
+   * 03. General recruitment filters
+   * React 전환 시 이 배열을 API/상태 데이터로 교체하면 된다.
+   * ----------------------------------------------------------------------- */
   const groups = [
     {
       id: 'region', label: '지역', icon: 'building',
-      parts: [{ key: 'region', values: ['부산','서울','경기','인천','대구','광주','대전','울산','세종','강원','충북','충남','전북','전남','경북','경남','제주'], selected: ['부산'] }]
+      parts: [{
+        key: 'region',
+        values: ['부산', '서울', '경기', '인천', '대구', '광주', '대전', '울산', '세종', '강원', '충북', '충남', '전북', '전남', '경북', '경남', '제주'],
+        selected: ['부산']
+      }]
     },
     {
       id: 'role', label: '직무', icon: 'briefcase',
-      parts: [{ key: 'role', values: ['경영·사무','영업·판매','IT·개발','마케팅·광고','디자인','생산·제조','물류·운송','교육','의료·보건','건설·시설','금융·보험','서비스','연구·R&D','미디어·문화','기타'], selected: ['경영·사무'] }]
+      parts: [{
+        key: 'role',
+        values: ['경영·사무', '영업·판매', 'IT·개발', '마케팅·광고', '디자인', '생산·제조', '물류·운송', '교육', '의료·보건', '건설·시설', '금융·보험', '서비스', '연구·R&D', '미디어·문화', '기타'],
+        selected: ['경영·사무']
+      }]
     },
     {
-      id: 'tech', label: '학력', icon: 'layers',
+      id: 'education', label: '학력', icon: 'layers',
       parts: [
-        { key: 'education', values: ['무관','고졸 이상','초대졸 이상','대졸 이상','석사 이상','박사 이상'], selected: ['무관'] },
-        { key: 'qualification', label: '지원조건', values: ['전공무관','관련전공','자격증 우대','외국어 우대','컴퓨터활용 우대'], selected: ['전공무관'] }
+        {
+          key: 'education',
+          values: ['무관', '고졸 이상', '초대졸 이상', '대졸 이상', '석사 이상', '박사 이상'],
+          selected: ['무관']
+        },
+        {
+          key: 'qualification', label: '지원조건',
+          values: ['전공무관', '관련전공', '자격증 우대', '외국어 우대', '컴퓨터활용 우대'],
+          selected: ['전공무관']
+        }
       ]
     },
     {
       id: 'career', label: '경력', icon: 'person',
       parts: [
-        { key: 'career', values: ['경력무관','신입','1~3년','3~5년','5~10년','10년 이상'], selected: ['경력무관'] },
-        { key: 'employment', label: '고용형태', values: ['정규직','계약직','인턴','아르바이트','프리랜서'], selected: ['정규직'] },
-        { key: 'workplace', label: '근무형태', values: ['오피스','재택근무','하이브리드'], selected: ['오피스'] }
+        {
+          key: 'career',
+          values: ['경력무관', '신입', '1~3년', '3~5년', '5~10년', '10년 이상'],
+          selected: ['경력무관']
+        },
+        {
+          key: 'employment', label: '고용형태',
+          values: ['정규직', '계약직', '인턴', '아르바이트', '프리랜서'],
+          selected: ['정규직']
+        },
+        {
+          key: 'workplace', label: '근무형태',
+          values: ['오피스', '재택근무', '하이브리드'],
+          selected: ['오피스']
+        }
       ]
     },
     {
       id: 'salary', label: '급여', icon: 'clock',
       parts: [
-        { key: 'salary', values: ['전체','회사내규','3천만원 이상','4천만원 이상','5천만원 이상','7천만원 이상','1억원 이상'], selected: ['전체'] },
-        { key: 'payType', label: '급여형태', values: ['연봉','월급','시급','일급'], selected: ['연봉'] }
+        {
+          key: 'salary',
+          values: ['전체', '회사내규', '3천만원 이상', '4천만원 이상', '5천만원 이상', '7천만원 이상', '1억원 이상'],
+          selected: ['전체']
+        },
+        {
+          key: 'payType', label: '급여형태',
+          values: ['연봉', '월급', '시급', '일급'],
+          selected: ['연봉']
+        }
       ]
     },
     {
-      id: 'remote', label: '근무조건', icon: 'remote',
+      id: 'workCondition', label: '근무조건', icon: 'remote',
       parts: [
-        { key: 'workCondition', values: ['무관','주5일','유연근무','재택가능','교대근무','주말근무 없음'], selected: ['무관'] },
-        { key: 'size', label: '기업형태', values: ['스타트업','중소기업','중견기업','대기업','공기업','외국계'], selected: [] }
+        {
+          key: 'workCondition',
+          values: ['무관', '주5일', '유연근무', '재택가능', '교대근무', '주말근무 없음'],
+          selected: ['무관']
+        },
+        {
+          key: 'size', label: '기업형태',
+          values: ['스타트업', '중소기업', '중견기업', '대기업', '공기업', '외국계'],
+          selected: []
+        }
       ]
     },
     {
       id: 'welfare', label: '복리후생', icon: 'gift',
       parts: [
-        { key: 'welfare', values: ['유연근무','식대지원','재택근무','교육비지원','건강검진','성과급','휴가비','경조사지원'], selected: [] },
-        { key: 'industry', label: '산업군', values: ['IT·정보통신','제조','금융','유통·서비스','건설','의료'], selected: [] }
+        {
+          key: 'welfare',
+          values: ['유연근무', '식대지원', '재택근무', '교육비지원', '건강검진', '성과급', '휴가비', '경조사지원'],
+          selected: []
+        },
+        {
+          key: 'industry', label: '산업군',
+          values: ['IT·정보통신', '제조', '금융', '유통·서비스', '건설', '의료'],
+          selected: []
+        }
       ]
     }
   ];
+
   let inputIndex = 0;
-  $('#filters').innerHTML = groups.map(row => `<div class="filter-row" data-row="${row.id}"><span class="filter-label"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[row.icon]}</svg></i>${row.label}</span>${row.parts.map(g => `<div class="filter-group" data-group="${g.key}" role="group" aria-label="${g.label || row.label}">${g.label ? `<strong>${g.label}</strong>` : ''}${g.values.map(v => `<label class="filter-chip"><input id="filter-${inputIndex++}" type="checkbox" name="${g.key}" value="${v}" ${g.selected.includes(v) ? 'checked' : ''}><span class="check-mark" aria-hidden="true"></span>${v}</label>`).join('')}${g.more ? `<button type="button" class="filter-more" data-more="${g.key}">+ 더보기</button>` : ''}</div>`).join('')}</div>`).join('');
-  const toast = message => { const el=$('#toast'); el.textContent=message; el.classList.add('show'); clearTimeout(toast.timer); toast.timer=setTimeout(()=>el.classList.remove('show'),3000); };
-  const dialog = (title, text) => { $('#dialog-title').textContent=title; $('#dialog-body').textContent=text; $('#info-dialog').showModal(); };
-  $('.dialog-confirm').addEventListener('click',()=>$('#info-dialog').close());
-  $('#info-dialog').addEventListener('click', e => { if(e.target===$('#info-dialog')) {const r=e.target.getBoundingClientRect(); if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom) e.target.close();} });
-  const jobs=$$('.job-row');
-  jobs.forEach((row,i)=>{row.dataset.initialOrder=i;});
-  const headingCount=$('#jobs-title strong');
-  const search = () => {
-    const q=$('#search-input').value.trim().toLowerCase();
-    const tokens=q.split(/\s+/).filter(Boolean);
-    let n=0;
-    jobs.forEach(row=>{const text=row.textContent.toLowerCase(); const show=!tokens.length||tokens.some(t=>text.includes(t)); row.hidden=!show; row.style.display=show?'':'none'; if(show)n++;});
-    headingCount.textContent=q?`${n}건`:'1,248건';
-    toast(q?`시안에 있는 예시 공고 ${n}건을 검색했습니다.`:'전체 예시 공고를 표시했습니다.');
+  $('#filters').innerHTML = groups.map((row) => `
+    <div class="filter-row" data-row="${row.id}">
+      <span class="filter-label">
+        <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[row.icon]}</svg></i>
+        ${row.label}
+      </span>
+      ${row.parts.map((group) => `
+        <div class="filter-group" data-group="${group.key}" role="group" aria-label="${group.label || row.label}">
+          ${group.label ? `<strong>${group.label}</strong>` : ''}
+          ${group.values.map((value) => `
+            <label class="filter-chip">
+              <input id="filter-${inputIndex++}" type="checkbox" name="${group.key}" value="${value}" ${group.selected.includes(value) ? 'checked' : ''}>
+              <span class="check-mark" aria-hidden="true"></span>${value}
+            </label>
+          `).join('')}
+        </div>
+      `).join('')}
+    </div>
+  `).join('');
+
+  /* --------------------------------------------------------------------------
+   * 04. Shared feedback helpers
+   * ----------------------------------------------------------------------- */
+  const toast = (message) => {
+    const element = $('#toast');
+    element.textContent = message;
+    element.classList.add('show');
+    clearTimeout(toast.timer);
+    toast.timer = setTimeout(() => element.classList.remove('show'), 3000);
   };
-  $('#search-form').addEventListener('submit', e=>{e.preventDefault();search();});
-  $$('.suggestions [data-query]').forEach(b=>b.addEventListener('click',()=>{ $('#search-input').value=b.dataset.query; $('#search-input').focus(); }));
-  $('#filters').addEventListener('change',()=>{const n=$$('#filters input:checked').length; toast(`선택한 조건 ${n}개 · 시안의 선택 상태가 변경되었습니다.`);});
-  $('#reset-filters').addEventListener('click',()=>{$('#filters').reset();$('#search-input').value='';jobs.forEach(j=>{j.hidden=false;j.style.display='';});headingCount.textContent='1,248건';toast('처음 시안의 조건으로 돌아왔습니다.');});
-  $$('[data-more]').forEach(b=>b.addEventListener('click',()=>dialog('상세 조건 더보기','이 HTML은 화면 시안입니다.\n추가 조건과 실제 공고 필터링은 서비스 데이터를 연결하면 사용할 수 있습니다.')));
-  $$('[data-sort]').forEach(b=>b.addEventListener('click',()=>{
-    if(!['salary','latest'].includes(b.dataset.sort)){dialog(b.textContent,'해당 정렬에는 실제 조회수·지원자 수·매칭 점수 데이터가 필요합니다. 현재 파일은 시안에 있는 예시 공고 5건을 포함합니다.');return;}
-    $$('[data-sort]').forEach(x=>{x.classList.toggle('is-active',x===b);x.setAttribute('aria-pressed',String(x===b));});
-    const ordered=[...jobs].sort((a,z)=>b.dataset.sort==='salary'?Number(z.dataset.salary)-Number(a.dataset.salary):Number(a.dataset.initialOrder)-Number(z.dataset.initialOrder));
-    ordered.forEach(row=>$('.jobs-list').append(row));
-  }));
-  let saved=[];try{saved=JSON.parse(localStorage.getItem('startin-saved')||'[]');if(!Array.isArray(saved))saved=[];}catch{}
-  $$('[data-bookmark]').forEach(b=>{
-    b.setAttribute('aria-pressed',String(saved.includes(b.dataset.bookmark)));
-    b.addEventListener('click',()=>{const active=b.getAttribute('aria-pressed')!=='true';b.setAttribute('aria-pressed',String(active));saved=active?[...new Set([...saved,b.dataset.bookmark])]:saved.filter(id=>id!==b.dataset.bookmark);try{localStorage.setItem('startin-saved',JSON.stringify(saved));}catch{}toast(active?'관심 공고에 저장했습니다.':'관심 공고에서 해제했습니다.');});
+
+  const dialog = (title, text) => {
+    $('#dialog-title').textContent = title;
+    $('#dialog-body').textContent = text;
+    $('#info-dialog').showModal();
+  };
+
+  $('.dialog-confirm').addEventListener('click', () => $('#info-dialog').close());
+  $('#info-dialog').addEventListener('click', (event) => {
+    if (event.target !== $('#info-dialog')) return;
+    const rect = event.target.getBoundingClientRect();
+    const outside = event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom;
+    if (outside) event.target.close();
   });
-  const districts=[['강서구',18,69,100,72,52],['북구',24,294,33,72,48],['금정구',48,402,20,73,44],['동래구',121,516,46,77,48],['해운대구',186,641,60,94,56],['사상구',36,197,78,75,47],['연제구',72,381,90,83,48],['수영구',95,553,118,79,48],['서구',28,255,146,72,49],['중구',30,356,151,73,49],['남구',47,463,142,76,48],['사하구',52,124,169,79,50],['영도구',29,495,204,77,48]];
-  $('.district-hotspots').innerHTML=districts.map(([name,count,x,y,w,h])=>`<button data-district="${name}" aria-label="${name}, 공고 ${count}건" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px">${name} ${count}건</button>`).join('');
-  $('#district-list').innerHTML=districts.map(([name,count])=>`<button data-district="${name}">${name}<strong>${count}건</strong></button>`).join('');
-  $$('[data-district]').forEach(b=>b.addEventListener('click',()=>{$$('.district-hotspots button').forEach(x=>x.classList.toggle('is-selected',x.dataset.district===b.dataset.district));toast(`${b.dataset.district} · ${districts.find(d=>d[0]===b.dataset.district)[1]}건 (시안 기준)`);}));
-  $$('[data-map-tab]').forEach(b=>b.addEventListener('click',()=>{const list=b.dataset.mapTab==='list';$('#map-view').hidden=list;$('#district-list').hidden=!list;$$('[data-map-tab]').forEach(x=>{x.classList.toggle('is-active',x===b);x.setAttribute('aria-pressed',String(x===b));});}));
-  let zoom=1;
-  $$('[data-map-zoom]').forEach(b=>b.addEventListener('click',()=>{const delta=Number(b.dataset.mapZoom);zoom=delta===0?1:Math.max(1,Math.min(1.6,zoom+delta*.15));$('.map-art').style.transform=`scale(${zoom})`;$('.district-hotspots').style.transform=`scale(${zoom})`;}));
-  $$('[data-dialog]').forEach(b=>b.addEventListener('click',()=>{
-    const title=b.dataset.dialog;
-    const msg=title.includes('검색')?'희망 지역, 직무, 기술, 연봉 등을 검색창에 입력해 보세요.\n현재 파일에서는 시안의 공고 5건을 대상으로 키워드 검색을 체험할 수 있습니다. 실제 AI 서비스는 연결되어 있지 않습니다.':`${title} 화면으로 연결할 버튼입니다.\n현재 파일은 제공받은 메인 화면을 HTML로 구현한 시안입니다.`;
-    dialog(title,msg);
-  }));
-  $('.jobs-explain').addEventListener('click',()=>dialog('AI 추천 결과란?','시안에 표시된 기업명·공고·연봉·건수는 디자인 예시입니다.\n현재 채용 중인 실제 정보나 AI 분석 결과가 아닙니다.'));
-  $('[data-action="more-jobs"]').addEventListener('click',()=>dialog('채용공고','현재 HTML에는 시안의 예시 공고 5건이 포함되어 있습니다. 추가 공고는 서비스 데이터 연결 후 제공할 수 있습니다.'));
+
+  /* --------------------------------------------------------------------------
+   * 05. Search / filter prototype interactions
+   * ----------------------------------------------------------------------- */
+  const jobs = $$('.job-row');
+  jobs.forEach((row, index) => { row.dataset.initialOrder = index; });
+  const headingCount = $('#jobs-title strong');
+
+  const searchJobs = () => {
+    const query = $('#search-input').value.trim().toLowerCase();
+    const tokens = query.split(/\s+/).filter(Boolean);
+    let visibleCount = 0;
+
+    jobs.forEach((row) => {
+      const text = row.textContent.toLowerCase();
+      const visible = !tokens.length || tokens.some((token) => text.includes(token));
+      row.hidden = !visible;
+      row.style.display = visible ? '' : 'none';
+      if (visible) visibleCount += 1;
+    });
+
+    headingCount.textContent = query ? `${visibleCount}건` : '1,248건';
+    toast(query ? `시안에 있는 예시 공고 ${visibleCount}건을 검색했습니다.` : '전체 예시 공고를 표시했습니다.');
+  };
+
+  $('#search-form').addEventListener('submit', (event) => {
+    event.preventDefault();
+    searchJobs();
+  });
+
+  $$('.suggestions [data-query]').forEach((button) => {
+    button.addEventListener('click', () => {
+      $('#search-input').value = button.dataset.query;
+      $('#search-input').focus();
+    });
+  });
+
+  $('#filters').addEventListener('change', () => {
+    const selectedCount = $$('#filters input:checked').length;
+    toast(`선택한 조건 ${selectedCount}개 · 시안의 선택 상태가 변경되었습니다.`);
+  });
+
+  $('#reset-filters').addEventListener('click', () => {
+    $('#filters').reset();
+    $('#search-input').value = '';
+    jobs.forEach((job) => {
+      job.hidden = false;
+      job.style.display = '';
+    });
+    headingCount.textContent = '1,248건';
+    toast('처음 시안의 조건으로 돌아왔습니다.');
+  });
+
+  /* --------------------------------------------------------------------------
+   * 06. Job result prototype interactions
+   * ----------------------------------------------------------------------- */
+  $$('[data-sort]').forEach((button) => {
+    button.addEventListener('click', () => {
+      if (!['salary', 'latest'].includes(button.dataset.sort)) {
+        dialog(button.textContent, '해당 정렬에는 실제 조회수·지원자 수·매칭 점수 데이터가 필요합니다. 현재 파일은 시안에 있는 예시 공고 5건을 포함합니다.');
+        return;
+      }
+
+      $$('[data-sort]').forEach((item) => {
+        item.classList.toggle('is-active', item === button);
+        item.setAttribute('aria-pressed', String(item === button));
+      });
+
+      const ordered = [...jobs].sort((a, b) => {
+        if (button.dataset.sort === 'salary') return Number(b.dataset.salary) - Number(a.dataset.salary);
+        return Number(a.dataset.initialOrder) - Number(b.dataset.initialOrder);
+      });
+
+      ordered.forEach((row) => $('.jobs-list').append(row));
+    });
+  });
+
+  let savedJobs = [];
+  try {
+    savedJobs = JSON.parse(localStorage.getItem('startin-saved') || '[]');
+    if (!Array.isArray(savedJobs)) savedJobs = [];
+  } catch {
+    savedJobs = [];
+  }
+
+  $$('[data-bookmark]').forEach((button) => {
+    button.setAttribute('aria-pressed', String(savedJobs.includes(button.dataset.bookmark)));
+    button.addEventListener('click', () => {
+      const active = button.getAttribute('aria-pressed') !== 'true';
+      button.setAttribute('aria-pressed', String(active));
+      savedJobs = active
+        ? [...new Set([...savedJobs, button.dataset.bookmark])]
+        : savedJobs.filter((id) => id !== button.dataset.bookmark);
+
+      try {
+        localStorage.setItem('startin-saved', JSON.stringify(savedJobs));
+      } catch {
+        // localStorage가 차단된 환경에서는 현재 세션의 버튼 상태만 유지한다.
+      }
+
+      toast(active ? '관심 공고에 저장했습니다.' : '관심 공고에서 해제했습니다.');
+    });
+  });
+
+  /* --------------------------------------------------------------------------
+   * 07. Busan map prototype
+   * x/y는 map-body 기준 퍼센트 좌표. React 전환 시 API 좌표 데이터로 교체 가능.
+   * ----------------------------------------------------------------------- */
+  const districts = [
+    ['강서구', 18, 14, 42],
+    ['북구', 24, 44, 19],
+    ['금정구', 48, 59, 15],
+    ['동래구', 121, 73, 24],
+    ['해운대구', 186, 87, 31],
+    ['사상구', 36, 31, 35],
+    ['연제구', 72, 55, 38],
+    ['수영구', 95, 78, 47],
+    ['서구', 28, 39, 57],
+    ['중구', 30, 52, 58],
+    ['남구', 47, 67, 55],
+    ['사하구', 52, 22, 65],
+    ['영도구', 29, 71, 75]
+  ];
+
+  const levelClass = (count) => {
+    if (count >= 121) return 'is-high';
+    if (count >= 71) return 'is-mid';
+    return 'is-low';
+  };
+
+  $('.district-hotspots').innerHTML = districts.map(([name, count, x, y]) => `
+    <button
+      type="button"
+      class="${levelClass(count)}"
+      data-district="${name}"
+      aria-label="${name}, 공고 ${count}건"
+      style="left:${x}%;top:${y}%"
+    >
+      <span>${name}</span><strong>${count}</strong>
+    </button>
+  `).join('');
+
+  $('#district-list').innerHTML = districts.map(([name, count]) => `
+    <button type="button" data-district="${name}">${name}<strong>${count}건</strong></button>
+  `).join('');
+
+  $$('[data-district]').forEach((button) => {
+    button.addEventListener('click', () => {
+      $$('[data-district]').forEach((item) => item.classList.toggle('is-selected', item.dataset.district === button.dataset.district));
+      const count = districts.find(([name]) => name === button.dataset.district)[1];
+      toast(`${button.dataset.district} · ${count}건 (시안 기준)`);
+    });
+  });
+
+  $$('[data-map-tab]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const showList = button.dataset.mapTab === 'list';
+      $('#map-view').hidden = showList;
+      $('#district-list').hidden = !showList;
+
+      $$('[data-map-tab]').forEach((item) => {
+        item.classList.toggle('is-active', item === button);
+        item.setAttribute('aria-pressed', String(item === button));
+      });
+    });
+  });
+
+  let mapZoom = 1;
+  $$('[data-map-zoom]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const delta = Number(button.dataset.mapZoom);
+      mapZoom = delta === 0 ? 1 : Math.max(1, Math.min(1.6, mapZoom + delta * 0.15));
+      $('.map-art').style.transform = `scale(${mapZoom})`;
+      $('.district-hotspots').style.transform = `scale(${mapZoom})`;
+    });
+  });
+
+  /* --------------------------------------------------------------------------
+   * 08. Placeholder dialogs for features that move to React/API later
+   * ----------------------------------------------------------------------- */
+  $$('[data-dialog]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const title = button.dataset.dialog;
+      const message = title.includes('검색')
+        ? '희망 지역, 직무, 경력, 급여 등을 검색창에 입력해 보세요.\n현재 파일에서는 시안의 공고 5건을 대상으로 키워드 검색을 체험할 수 있습니다. 실제 AI 서비스는 연결되어 있지 않습니다.'
+        : `${title} 화면으로 연결할 버튼입니다.\n현재 파일은 메인 화면을 HTML/CSS/JavaScript로 구현한 React 전 단계 시안입니다.`;
+      dialog(title, message);
+    });
+  });
+
+  $('.jobs-explain').addEventListener('click', () => {
+    dialog('AI 추천 결과란?', '시안에 표시된 기업명·공고·연봉·건수는 디자인 예시입니다.\n현재 채용 중인 실제 정보나 AI 분석 결과가 아닙니다.');
+  });
+
+  $('[data-action="more-jobs"]').addEventListener('click', () => {
+    dialog('채용공고', '현재 HTML에는 시안의 예시 공고 5건이 포함되어 있습니다. 추가 공고는 서비스 데이터 연결 후 제공할 수 있습니다.');
+  });
 })();
