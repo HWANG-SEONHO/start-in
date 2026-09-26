@@ -8,6 +8,16 @@
 
 🌐 **[STARTIN 사이트 바로가기](https://hwang-seonho.github.io/start-in/)**
 
+<<<<<<< Updated upstream
+=======
+### 풀스택 확장 버전
+
+메인 디자인 버전과 별도로 기능 확장 버전을 관리합니다.
+
+- **[codex-latest 소스 보기](https://github.com/HWANG-SEONHO/start-in/tree/codex-latest)**
+
+
+>>>>>>> Stashed changes
 ## HOME · 1차 초안
 
 ![STARTIN HOME 1차 초안](assets/images/home-draft-20260919.png)
