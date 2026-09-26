@@ -1,0 +1,51 @@
+.service-page { max-width: 1220px; margin: 32px auto; padding: 32px; border: 1px solid #dcebe5; border-radius: 16px; background: white; line-height: 1.7; }
+.service-page h1 { font-size: 28px; margin: 12px 0; }
+.service-page h2 { font-size: 21px; margin: 20px 0 12px; }
+.service-page a { color: #007c60; }
+.service-page label { display: block; font-size: 14px; font-weight: 700; margin-top: 14px; }
+.service-page input, .service-page select, .service-page textarea, .page-search-heading input { display: block; width: 100%; padding: 10px 12px; border: 1px solid #bfcdc7; border-radius: 7px; font: inherit; background: white; color: #182e28; }
+.service-page textarea { min-height: 85px; resize: vertical; }
+.service-page button:not(.job-bookmark), .request-status button, .page-search-heading button { border: 1px solid #c3ded3; border-radius: 7px; padding: 8px 15px; background: #eff9f5; }
+.service-page .primary-action { display: inline-block; background: #008e6b !important; color: white; border-radius: 8px; padding: 10px 20px; margin: 18px 0; border: 0; }
+.service-page [role='alert'] { color: #a22c38; margin: 12px 0; }
+.auth-page { max-width: 460px; }
+.auth-page form { margin: 20px 0; }
+.auth-page form .primary-action { width: 100%; }
+.demo-notice { padding: 10px 14px; border-radius: 8px; background: #f0f7f4; color: #536c61; margin: 14px 0; font-size: 14px; }
+.detail-heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.detail-heading .job-bookmark { flex-shrink: 0; width: 30px; height: 30px; }
+.job-facts { display: grid; grid-template-columns: repeat(2, 1fr); border-block: 1px solid #dfebe5; padding: 20px 0; gap: 14px; }
+.job-facts > div { display: grid; grid-template-columns: 85px 1fr; }
+.job-facts dt { color: #62768a; }
+.job-facts dd { margin: 0; font-weight: 700; }
+.detail-description { white-space: pre-wrap; margin: 24px 0; }
+.my-tabs { display: flex; gap: 8px; margin: 20px 0; }
+.my-tabs button[aria-pressed='true'] { background: #008e6b; color: white; }
+.application-item { border: 1px solid #dcebe5; border-radius: 10px; margin-top: 16px; padding: 20px; }
+.action-row { display: flex; gap: 10px; margin-top: 14px; }
+.delete-confirm { display: flex; align-items: center; gap: 10px; margin-top: 12px; color: #a22c38; }
+.company-directory { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.company-directory > a { border: 1px solid #dcebe5; padding: 20px; border-radius: 10px; }
+.company-directory h2 { margin-top: 0; }
+.company-directory p { color: #62768a; margin-bottom: 16px; }
+.service-toast { position: fixed; z-index: 10; bottom: 24px; left: 50%; transform: translateX(-50%); max-width: min(640px, 90vw); padding: 16px 20px; background: #183c33; color: white; border-radius: 10px; box-shadow: 0 6px 20px #12372933; }
+.service-toast button { color: white; background: transparent; border: 0; margin-left: 12px; font-size: 20px; }
+.request-status { padding: 28px 42px; background: white; border-radius: 10px; margin: 10px 0; }
+.request-status button { margin-left: 15px; }
+.empty-results { min-height: 240px; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; padding: 24px; color: #62768a; }
+.page-search-heading { display: flex; align-items: center; justify-content: space-between; padding: 22px 42px; background: white; }
+.page-search-heading h1 { font-size: 26px; }
+.page-search-heading form { display: flex; gap: 10px; width: 550px; }
+.page-search-heading button { flex-shrink: 0; }
+.full-job-list { max-width: 1300px; margin: 18px auto; }
+.pagination { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 8px; font-size: 13px; color: #62768a; }
+.pagination button { border: 1px solid #c3ded3; border-radius: 7px; padding: 5px 12px; background: #eff9f5; color: #007c60; }
+.resume-panel { max-width: 720px; }
+.resume-current { margin: 18px 0; padding: 16px; border: 1px solid #dcebe5; border-radius: 8px; overflow-wrap: anywhere; }
+.resume-current a, .resume-current button { margin-left: 12px; }
+@media (max-width: 700px) {
+  .service-page { margin: 15px 8px; padding: 20px; }
+  .job-facts, .company-directory { grid-template-columns: 1fr; }
+  .page-search-heading { display: block; padding: 20px; }
+  .page-search-heading form { width: 100%; margin-top: 10px; }
+}

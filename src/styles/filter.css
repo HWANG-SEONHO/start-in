@@ -1,0 +1,196 @@
+.filter-panel {
+  height: 304px;
+  padding: 8px 41px 7px;
+  border: 1px solid #e5efee;
+  background: #fff;
+}
+
+.filter-heading {
+  display: flex;
+  align-items: center;
+  height: 39px;
+  gap: 15px;
+  position: relative;
+}
+
+.filter-location-icon {
+  width: 25px;
+  height: 30px;
+  margin-left: 3px;
+  flex-shrink: 0;
+  color: #008e68;
+}
+
+.filter-heading h2 {
+  margin: 0;
+  color: #151c30;
+  font-size: 21px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  white-space: nowrap;
+}
+
+.filter-heading p {
+  max-width: 850px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0 0 0 1px;
+  color: #8798b6;
+  font-size: 13.5px;
+  letter-spacing: -.4px;
+  white-space: nowrap;
+}
+
+.filter-reset {
+  position: absolute;
+  right: 0;
+  bottom: -19px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 36px;
+  padding: 0 15px;
+  border: 1px solid #e1e9f4;
+  border-radius: 11px;
+  background: #fff;
+  color: #222a40;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.filter-reset svg {
+  width: 21px;
+  height: 21px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.filter-row {
+  display: flex;
+  align-items: center;
+  height: 35px;
+  border-top: 1px solid #f0f3f8;
+  white-space: nowrap;
+}
+
+.filter-row-label {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex: 0 0 110px;
+  color: #20283e;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -.7px;
+}
+
+.filter-row-label svg {
+  width: 19px;
+  height: 21px;
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.65;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.filter-options {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+
+/* 선택 조건은 URL에 유지하며 같은 그룹 안에서는 복수 선택합니다. */
+.filter-option {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  height: 29px;
+  padding: 0 8px;
+  border: 1px solid #e7edf7;
+  border-radius: 6px;
+  color: #7a8aa8;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -.6px;
+  white-space: nowrap;
+}
+
+.filter-option::before {
+  content: '';
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+  border: 1px solid #d7e1f1;
+  border-radius: 4px;
+}
+
+.filter-option.is-selected {
+  border-color: #e0f5ee;
+  color: #009372;
+  background: #e0f6ef;
+}
+
+.filter-row:first-child .filter-option {
+  padding-right: 7.5px;
+  padding-left: 7.5px;
+}
+
+.filter-option.is-selected::before {
+  content: '✓';
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-color: #009774;
+  border-radius: 50%;
+  color: #fff;
+  background: #009774;
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.filter-group-label {
+  display: inline-flex;
+  align-items: center;
+  height: 27px;
+  margin-left: 8px;
+  padding: 0 7px 0 13px;
+  border-left: 1px solid #edf1f7;
+  color: #20283e;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -.7px;
+}
+
+@media (max-width: 1600px) {
+  .filter-panel { height: auto; padding: 8px 25px; }
+  .filter-row { height: auto; min-height: 35px; padding: 3px 0; }
+  .filter-options { flex-wrap: wrap; }
+  .filter-option { height: 27px; padding: 0 7px; font-size: 12px; }
+  .filter-row-label { flex-basis: 104px; }
+  .filter-reset { position: static; margin-left: auto; }
+}
+
+@media (max-width: 900px) {
+  .filter-panel { padding: 12px 16px; }
+  .filter-heading { height: auto; min-height: 44px; gap: 8px; flex-wrap: wrap; padding-bottom: 10px; }
+  .filter-heading h2 { font-size: 18px; }
+  .filter-heading p { flex-basis: 100%; padding-left: 35px; font-size: 12px; }
+  .filter-reset { height: 30px; padding: 0 8px; font-size: 12px; }
+  .filter-row { align-items: flex-start; padding: 7px 0; }
+  .filter-row-label { flex-basis: 94px; padding-top: 4px; font-size: 14px; }
+  .filter-group-label { margin-left: 0; }
+}

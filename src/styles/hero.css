@@ -1,0 +1,98 @@
+.hero-section { position: relative; height: 304px; }
+.hero-introduction { position: absolute; top: 14px; left: 6%; }
+.hero-eyebrow { font-size: 19px; line-height: 27px; font-weight: 800; color: #00795b; letter-spacing: -.7px; }
+.hero-introduction h1 { font-size: 47px; line-height: 48px; font-weight: 900; letter-spacing: -3.3px; color: #081421; transform: scaleX(.92); transform-origin: left center; -webkit-text-stroke: .9px currentColor; }
+.hero-introduction h1 span { color: #007052; }
+.hero-description { margin-top: 5px; color: #6d7e95; font-size: 16px; line-height: 23px; letter-spacing: -.65px; }
+.hero-statistics { display: flex; align-items: center; gap: 15px; margin-top: 11px; margin-left: -15px; }
+.hero-stat { display: flex; gap: 6px; align-items: center; }
+.hero-stat svg { color: #008f6b; width: 27px; height: 31px; }
+.hero-stat:last-child svg { width: 35px; }
+.hero-stat strong { display: block; font-size: 23px; line-height: 26px; font-weight: 700; letter-spacing: -.7px; -webkit-text-stroke: .25px currentColor; }
+.hero-stat span { display: block; font-size: 12px; color: #77889f; line-height: 16px; letter-spacing: -.25px; }
+
+/* 원본 배경 속 인물을 가리지 않도록 검색 패널의 폭과 위치를 고정한다. */
+.ai-search-panel { position: absolute; top: 16px; left: 28.7%; width: 43.15%; height: 266px; padding: 21px; border: 1px solid #e5f3eb; border-radius: 21px; background: #fff; box-shadow: 0 8px 25px #40896d08; }
+.search-panel-heading { display: flex; align-items: center; height: 39px; gap: 9px; margin-bottom: 14px; }
+.search-panel-title { display: flex; align-items: center; gap: 9px; flex-shrink: 0; }
+.sparkle-icon { width: 32px; height: 36px; color: #009673; }
+.search-panel-title h2 { font-size: 25px; font-weight: 800; letter-spacing: -1px; white-space: nowrap; }
+.search-panel-heading > p { font-size: 14px; color: #8190ae; line-height: 21px; letter-spacing: -.35px; white-space: nowrap; }
+.search-help { margin-left: auto; display: flex; align-items: center; gap: 7px; flex-shrink: 0; padding: 8px 12px; color: #3285ff; font-size: 12px; font-weight: 700; border: 1px solid #e1ecff; border-radius: 14px; background: #f8fbff; white-space: nowrap; }
+.search-help span { display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: #00936f; color: white; font-size: 15px; font-weight: 800; }
+.ai-search-field { height: 57px; display: flex; align-items: center; gap: 15px; padding: 4px 4px 4px 17px; border: 1px solid #7ecfb8; border-radius: 12px; }
+.search-icon { width: 27px; height: 27px; fill: none; stroke: #008b69; stroke-width: 2.3; stroke-linecap: round; }
+.search-placeholder { font: inherit; font-size: 17px; letter-spacing: -.6px; color: #283a4d; white-space: nowrap; border: 0; outline: none; min-width: 0; flex: 1; width: 100%; background: transparent; }
+.search-placeholder::placeholder { color: #a3a6ad; }
+.ai-search-field:focus-within { box-shadow: 0 0 0 2px #b6e7d9; }
+.search-help-panel { position: absolute; z-index: 3; top: 66px; right: 21px; width: 330px; padding: 16px; background: white; border: 1px solid #a4d9c9; border-radius: 10px; font-size: 14px; line-height: 1.7; box-shadow: 0 6px 20px #12372922; }
+.search-help-panel button { display: block; margin-top: 8px; border: 0; background: #e0f6ef; padding: 5px 12px; border-radius: 5px; }
+.ask-ai-button { display: flex; align-items: center; justify-content: center; gap: 9px; margin-left: auto; padding: 0 12px; height: 48px; width: 186px; flex-shrink: 0; background: linear-gradient(110deg, #009e78, #007151); color: white; border: 1px solid #6ccbb1; border-radius: 9px; font-size: 17px; font-weight: 800; letter-spacing: -.4px; white-space: nowrap; box-shadow: inset 0 0 2px #ffffff80; }
+.ask-ai-button > span { font-size: 26px; font-family: Arial, sans-serif; font-weight: 400; line-height: 1; }
+.search-guidance { display: flex; align-items: center; gap: 9px; margin-top: 10px; margin-bottom: 11px; font-size: 13px; color: #8492af; line-height: 19px; letter-spacing: -.2px; }
+.search-guidance svg { width: 17px; height: 19px; color: #00936e; }
+.search-suggestions { position: relative; padding-right: 35px; }
+.suggestion-row { display: flex; gap: 6px; margin-top: 6px; }
+.suggestion-row button { height: 32px; padding: 0 15px; border: 1px solid #e0e7f3; border-radius: 18px; font-size: 13px; color: #586786; background: white; white-space: nowrap; letter-spacing: -.35px; }
+.suggestion-row button > span { font-size: 23px; vertical-align: -1px; line-height: 0; margin-left: 9px; }
+.suggestion-row .suggestion-highlight { color: #00a17e; background: #f8fffc; }
+.more-suggestions { position: absolute; right: -5px; top: 20px; display: grid; place-items: center; width: 34px; height: 34px; border: 1px solid #e0e7f3; border-radius: 50%; background: #fff; color: #009d7b; font-size: 29px; line-height: 1; padding: 0 0 3px; }
+
+@media (max-width: 1700px) and (min-width: 1001px) {
+  .hero-introduction { left: 3%; }
+  .hero-introduction h1 { font-size: 40px; line-height: 45px; }
+  .hero-description { font-size: 13px; }
+  .hero-statistics { gap: 12px; margin-left: 0; }
+  .hero-stat strong { font-size: 20px; }
+  .hero-stat span { font-size: 10px; }
+  .ai-search-panel { left: 31%; width: 47%; padding: 18px; }
+  .search-panel-heading { gap: 10px; }
+  .search-panel-title h2 { font-size: 21px; }
+  .search-panel-heading > p { font-size: 10px; }
+  .search-help { font-size: 10px; padding: 7px; }
+  .search-placeholder { font-size: 14px; }
+  .ask-ai-button { width: 155px; font-size: 15px; }
+  .suggestion-row button { font-size: 11px; padding: 0 10px; }
+}
+@media (max-width: 1250px) and (min-width: 1001px) {
+  .hero-introduction h1 { font-size: 34px; }
+  .hero-description { font-size: 11px; }
+  .hero-statistics { gap: 6px; }
+  .hero-stat { gap: 4px; }
+  .hero-stat strong { font-size: 17px; }
+  .hero-stat svg { width: 20px; }
+  .hero-stat:last-child svg { width: 25px; }
+  .ai-search-panel { width: 53%; }
+  .search-panel-heading > p { display: none; }
+}
+@media (max-width: 1000px) {
+  .hero-section { height: auto; padding: 22px 3%; }
+  .hero-introduction { position: relative; top: auto; left: auto; }
+  .hero-introduction h1 { font-size: 42px; line-height: 46px; }
+  .hero-description { max-width: 440px; }
+  .hero-statistics { margin-left: 0; }
+  .ai-search-panel { position: relative; top: auto; left: auto; width: 100%; height: auto; margin-top: 22px; }
+  .search-panel-heading > p { font-size: 11px; }
+  .search-placeholder { overflow: hidden; text-overflow: ellipsis; }
+  .suggestion-row { flex-wrap: wrap; }
+}
+@media (max-width: 650px) {
+  .hero-description { font-size: 12px; }
+  .hero-statistics { gap: 10px; }
+  .hero-stat { gap: 5px; }
+  .hero-stat strong { font-size: 18px; }
+  .hero-stat span { font-size: 10px; }
+  .hero-stat svg { width: 22px; }
+  .hero-stat:last-child svg { width: 28px; }
+  .ai-search-panel { padding: 15px; }
+  .search-panel-heading > p { display: none; }
+  .search-panel-title h2 { font-size: 20px; }
+  .search-help { font-size: 10px; padding: 7px; }
+  .search-icon { width: 20px; }
+  .ai-search-field { gap: 8px; padding-left: 9px; }
+  .search-placeholder { font-size: 12px; }
+  .ask-ai-button { width: 117px; font-size: 12px; gap: 3px; }
+  .ask-ai-button > span { font-size: 23px; }
+  .search-guidance { font-size: 10px; }
+  .suggestion-row button { padding: 0 10px; font-size: 11px; }
+}

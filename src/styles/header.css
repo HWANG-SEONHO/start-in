@@ -1,0 +1,35 @@
+.site-header { height: 58px; background: #f4faf548; border-bottom: 1px solid #ffffff59; }
+.header-inner { width: 88%; height: 100%; margin: auto; display: grid; grid-template-columns: 28% 44% 28%; align-items: center; }
+.brand { display: flex; align-items: center; gap: 9px; width: max-content; border: 0; padding: 0; background: transparent; text-align: left; }
+.brand-symbol { width: 38px; height: 40px; color: #175f4b; }
+.brand-wordmark { padding-top: 2px; }
+.brand-name { font-size: 25px; font-weight: 700; line-height: 27px; letter-spacing: -1.4px; -webkit-text-stroke: .3px currentColor; }
+.brand-name span { color: #008e6b; }
+.brand-korean { margin-left: 36px; font-size: 11px; line-height: 15px; font-weight: 700; letter-spacing: 4px; color: #788990; }
+.header-nav { display: flex; justify-content: space-between; align-items: center; gap: 22px; white-space: nowrap; }
+.header-nav button { padding: 0; border: 0; background: none; font-size: 16px; font-weight: 800; letter-spacing: -.4px; }
+.header-nav .header-nav-highlight { color: #008f6b; }
+.header-actions { display: flex; align-items: center; justify-content: flex-end; gap: 12px; }
+.header-actions button { height: 40px; border-radius: 9px; font-size: 14px; font-weight: 800; }
+.notification-button { width: 46px; display: grid; place-items: center; color: #285e53; background: #fff; border: 1px solid #d4ece5; }
+.notification-button svg { width: 27px; height: 27px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.login-button { width: 82px; border: 1px solid #66baaf; background: white; color: #2e6862; }
+.join-button { width: 97px; background: linear-gradient(135deg, #009f7d, #00775d); color: white; border: 1px solid #63b8a6; box-shadow: inset 0 0 2px #ffffff70; }
+
+@media (max-width: 1700px) {
+  .header-inner { width: 94%; grid-template-columns: 20% 57% 23%; }
+  .header-nav { gap: 12px; }
+  .header-nav button { font-size: 14px; }
+  .header-actions { gap: 7px; }
+}
+@media (max-width: 1000px) {
+  .site-header { height: auto; min-height: 64px; }
+  .header-inner { grid-template-columns: 1fr auto; gap: 14px; padding: 9px 0; }
+  .header-nav { grid-row: 2; grid-column: 1 / -1; flex-wrap: wrap; justify-content: flex-start; padding-bottom: 5px; }
+  .header-actions { grid-column: 2; grid-row: 1; }
+}
+@media (max-width: 480px) {
+  .notification-button { display: none; }
+  .header-actions .login-button { width: 60px; }
+  .header-actions .join-button { width: 72px; }
+}

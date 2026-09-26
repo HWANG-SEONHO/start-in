@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: startin
+      POSTGRES_USER: startin
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD before starting PostgreSQL}
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - ./.runtime/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U startin -d startin"]
+      interval: 5s
+      timeout: 3s
+      retries: 10

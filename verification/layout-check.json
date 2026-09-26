@@ -1,0 +1,47 @@
+{
+  "viewport": {
+    "width": 1920,
+    "height": 1080
+  },
+  "document": {
+    "width": 1920,
+    "height": 1080
+  },
+  "horizontalOverflow": false,
+  "headerOneLine": true,
+  "hero": {
+    "x": 0,
+    "y": 0,
+    "width": 1920,
+    "height": 362
+  },
+  "searchPanel": {
+    "x": 551.03125,
+    "y": 74,
+    "width": 828.46875,
+    "height": 266
+  },
+  "filter": {
+    "x": 0,
+    "y": 362,
+    "width": 1920,
+    "height": 304
+  },
+  "map": {
+    "x": 0,
+    "y": 676,
+    "width": 955,
+    "height": 388
+  },
+  "jobs": {
+    "x": 965,
+    "y": 676,
+    "width": 955,
+    "height": 388
+  },
+  "jobCount": 5,
+  "overflowing": [],
+  "clippedText": [],
+  "imagesLoaded": true,
+  "errors": []
+}

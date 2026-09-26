@@ -1,0 +1,47 @@
+:root {
+  font-family: Arial, 'Malgun Gothic', sans-serif;
+  color: #141c32;
+  background: #edf9f6;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  --brand-green: #008e6b;
+  --muted-text: #7b8bac;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:disabled { cursor: not-allowed; opacity: .55; }
+a { color: inherit; text-decoration: none; }
+a:hover { text-decoration: underline; }
+.site-shell { max-width: 1920px; margin: 0 auto; }
+button:focus-visible { outline: 2px solid #168b73; outline-offset: 2px; }
+h1, h2, h3, p { margin: 0; }
+h2 { -webkit-text-stroke: .2px currentColor; }
+button, img, svg { -webkit-tap-highlight-color: transparent; }
+img { display: block; max-width: 100%; }
+svg { flex-shrink: 0; }
+
+/* 시안의 1920px 화면에서 상단은 362px, 하단 두 영역은 같은 폭이다. */
+.hero-background {
+  height: 362px;
+  position: relative;
+  background: url('/images/hero-main.png') center center / cover no-repeat;
+}
+.results-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px;
+  padding-top: 10px;
+}
+.results-layout > section { min-width: 0; min-height: 388px; }
+.results-layout > .map-section { height: 388px; align-self: start; }
+
+@media (max-width: 1400px) {
+  .results-layout { grid-template-columns: 1fr; }
+}
+@media (max-width: 1000px) {
+  .hero-background { height: auto; background-position: 65% top; }
+}
