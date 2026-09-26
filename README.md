@@ -1,8 +1,8 @@
 # START IN
 
-React + 일반 CSS / FastAPI / SQLAlchemy 기반 채용 탐색 학습 프로젝트입니다.
+React + 일반 CSS / FastAPI / SQLAlchemy 기반 채용 탐색 웹 프로젝트입니다.
 승인된 1920×1080 메인 구성을 유지하며 4K에서는 콘텐츠 폭을 1920px로 유지합니다.
-범위는 [V4](docs/STARTIN_SCOPE_V4.txt), 판단 근거는 [코드 분류](docs/SCOPE_REVIEW.md), 인계는 [CODEX_HANDOFF.md](CODEX_HANDOFF.md)를 참고하세요.
+범위는 [V4](docs/STARTIN_SCOPE_V4.txt), 판단 근거는 [코드 분류](docs/SCOPE_REVIEW.md), 진행 상태는 [CODEX_HANDOFF.md](CODEX_HANDOFF.md)를 참고하세요.
 
 ## 현재 기능
 
@@ -21,21 +21,20 @@ AI가 해석한 조건은 화면과 URL에 남습니다. 상충하는 조건은 
 ## 실행
 
 검증 환경: Windows, Node 24.20, Python 3.12.10. 프로젝트 루트에서 실행합니다.
-현재 PC에서는 `.runtime/python/python.exe`를 사용할 수 있습니다.
-다른 PC에서는 Python 3.12 가상환경을 만들고 아래 명령의 Python 경로를 `.venv/Scripts/python.exe`로 바꾸세요.
+Python 3.12 가상환경을 만들어 실행하는 방식을 권장합니다.
 
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r backend/requirements.lock.txt
 ```
 
-현재 PC 백엔드 (기본 SQLite):
+백엔드 (기본 SQLite):
 
 ```powershell
-.\.runtime\python\python.exe -m pip install -r backend/requirements.lock.txt
-.\.runtime\python\python.exe -m alembic upgrade head
-.\.runtime\python\python.exe -m backend.app.import_jobs data/demo-jobs.json
-.\.runtime\python\python.exe -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8000
+.\.venv\Scripts\python.exe -m pip install -r backend/requirements.lock.txt
+.\.venv\Scripts\python.exe -m alembic upgrade head
+.\.venv\Scripts\python.exe -m backend.app.import_jobs data/demo-jobs.json
+.\.venv\Scripts\python.exe -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8000
 ```
 
 별도 터미널에서 프론트:
@@ -52,7 +51,7 @@ DB 구조는 서버 시작 시 자동 변경하지 않으므로 코드 갱신 �
 ## PostgreSQL
 
 Docker Desktop 엔진이 실행되어 있어야 합니다. 현재 프로젝트의 PostgreSQL은 5433번 포트를 사용합니다.
-현재 PC의 로컬 비밀번호 파일은 `.cache/postgres.env`에 있으며 버전 관리에서 제외됩니다.
+로컬 비밀번호 파일은 `.cache/postgres.env`에 두며 버전 관리에서 제외합니다.
 새 환경에서만 다음과 같이 생성합니다. 기존 파일을 덮어쓰지 마세요.
 
 ```powershell
@@ -64,9 +63,9 @@ if (-not (Test-Path .cache/postgres.env)) {
 docker compose --env-file .cache/postgres.env up -d --wait
 $dbPassword = (Get-Content .cache/postgres.env).Split('=', 2)[1]
 $env:DATABASE_URL = "postgresql+psycopg://startin:$dbPassword@127.0.0.1:5433/startin"
-.\.runtime\python\python.exe -m alembic upgrade head
-.\.runtime\python\python.exe -m backend.app.import_jobs data/demo-jobs.json
-.\.runtime\python\python.exe -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8000
+.\.venv\Scripts\python.exe -m alembic upgrade head
+.\.venv\Scripts\python.exe -m backend.app.import_jobs data/demo-jobs.json
+.\.venv\Scripts\python.exe -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8000
 ```
 
 DB 데이터는 `.runtime/postgres`에 유지됩니다. SQLite와 PostgreSQL의 계정/저장 정보는 서로 별개입니다.
@@ -93,8 +92,8 @@ AI 요청은 [OpenAI 공식 Structured Outputs 문서](https://developers.openai
 
 ```powershell
 .\.runtime\python\python.exe -m alembic current
-.\.runtime\python\python.exe -m alembic upgrade head
-.\.runtime\python\python.exe -m backend.app.import_jobs data/demo-jobs.json
+.\.venv\Scripts\python.exe -m alembic upgrade head
+.\.venv\Scripts\python.exe -m backend.app.import_jobs data/demo-jobs.json
 ```
 
 이력: `0001` 기존 6개 테이블 → `0002` 공고 중복 판별 키 → `0003` 사용자 PDF.
@@ -108,16 +107,16 @@ import JSON은 `companies`/`jobs` 배열이며 샘플은 `data/demo-jobs.json`�
 
 ```powershell
 npm run build
-.\.runtime\python\python.exe -m pytest backend/tests -q -p no:cacheprovider --basetemp=E:\Project\.cache\pytest-check
-.\.runtime\python\python.exe verification/check_postgres.py
-.\.runtime\python\python.exe verification/check_migrations.py
-.\.runtime\python\python.exe verification/check_migrations.py --postgres
+.\.venv\Scripts\python.exe -m pytest backend/tests -q -p no:cacheprovider --basetemp=.cache/pytest-check
+.\.venv\Scripts\python.exe verification/check_postgres.py
+.\.venv\Scripts\python.exe verification/check_migrations.py
+.\.venv\Scripts\python.exe verification/check_migrations.py --postgres
 $env:PLAYWRIGHT_BROWSERS_PATH = "$PWD\.cache\ms-playwright"
 npx playwright install chromium
 npm run test:e2e
 ```
 
-다른 PC에서는 pytest의 임시 경로도 프로젝트 경로로 바꾸고 E2E 실행 전에 `$env:PYTHON = "$PWD\.venv\Scripts\python.exe"`를 설정합니다.
+E2E 실행 전 `$env:PYTHON = "$PWD\.venv\Scripts\python.exe"`를 설정합니다.
 E2E는 별도 SQLite DB와 8001/5174 포트를 사용하며 외부 AI 키를 비활성화합니다.
 PostgreSQL API 검사는 생성한 임시 스키마만 정리하며 프로젝트 데이터를 지우지 않습니다.
 최신 결과: SQLite 16개, PostgreSQL 16개, 핵심 브라우저 8개 통과. 추천검색어 전용 검사는 이전 통과본을 유지하고 이번에는 재실행하지 않았습니다.
@@ -135,4 +134,3 @@ PostgreSQL API 검사는 생성한 임시 스키마만 정리하며 프로젝트
 - `verification/`: API/브라우저/초기화 검증과 캡처
 
 원본 히어로/지도만 이미지로 사용하며 시안 전체 이미지나 외부 프로젝트 소스는 사용하지 않았습니다.
-내장 Python의 `python312._pth`는 현재 `E:\Project`에 맞춰져 있으므로 폴더 이동 시 변경하거나 일반 가상환경을 사용하세요.
