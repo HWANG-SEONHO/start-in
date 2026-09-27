@@ -55,3 +55,46 @@ def test_demo1000_import_search_pagination_and_map(tmp_path):
     finally:
         main.app.dependency_overrides.pop(get_db, None)
         engine.dispose()
+
+
+def test_demo_sync_removes_old_fixture_without_touching_current_demo(tmp_path):
+    """예전 37건 데모가 있어도 최신 1000건으로 자동 정리되는지 확인합니다."""
+    old_data = json.loads(
+        (Path('backend/tests/fixtures/demo-jobs.json')).read_text(encoding='utf-8')
+    )
+    new_data = json.loads(Path('data/demo-jobs.json').read_text(encoding='utf-8'))
+
+    engine = create_engine(
+        f'sqlite:///{(tmp_path / "sync-demo.db").as_posix()}',
+        connect_args={'check_same_thread': False},
+    )
+    Base.metadata.create_all(engine)
+    factory = sessionmaker(bind=engine)
+
+    try:
+        from sqlalchemy import func, select
+        from backend.app.import_jobs import sync_demo_data
+        from backend.app.models import Company, Job
+
+        with factory() as db:
+            import_data(db, old_data)
+            result = sync_demo_data(db, new_data)
+
+            assert result['sync'] == {
+                'jobs_deleted': 37,
+                'companies_deleted': 5,
+            }
+            assert db.scalar(select(func.count()).select_from(Job)) == 1000
+            assert db.scalar(select(func.count()).select_from(Company)) == 150
+            assert db.scalar(select(func.count()).select_from(Job).where(Job.is_demo.is_(True))) == 1000
+
+            # 같은 데이터를 다시 동기화하면 아무것도 지우지 않습니다.
+            second = sync_demo_data(db, new_data)
+            assert second['sync'] == {
+                'jobs_deleted': 0,
+                'companies_deleted': 0,
+            }
+            assert db.scalar(select(func.count()).select_from(Job)) == 1000
+            assert db.scalar(select(func.count()).select_from(Company)) == 150
+    finally:
+        engine.dispose()

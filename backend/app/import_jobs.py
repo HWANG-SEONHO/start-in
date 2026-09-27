@@ -10,7 +10,7 @@ import json
 from pathlib import Path
 
 from pydantic import BaseModel, Field, ValidationError
-from sqlalchemy import select
+from sqlalchemy import or_, select
 from sqlalchemy.exc import IntegrityError
 
 from .database import SessionLocal
@@ -78,6 +78,9 @@ def import_companies(db, raw_companies, summary):
                 )
 
                 if company:
+                    # 이름이 같은 기업은 같은 기업으로 보고 설명/규모는 최신 JSON 값으로 맞춥니다.
+                    company.description = row.description
+                    company.size = row.size
                     action = 'skipped'
                 else:
                     # JSON의 id를 DB id로 억지로 쓰지 않고 DB가 새 id를 만들게 합니다.
@@ -117,7 +120,9 @@ def make_job_source_key(values):
 
 
 def import_jobs(db, raw_jobs, company_ids, summary):
-    """공고를 검사하고 기업과 연결한 뒤, 중복이 아니면 DB에 저장합니다."""
+    """공고를 검사하고 기업과 연결한 뒤 DB를 최신 JSON 값으로 맞춥니다."""
+    source_keys = set()
+
     for index, raw_job in enumerate(raw_jobs, start=1):
         try:
             row = JobFields.model_validate(clean(raw_job))
@@ -130,9 +135,10 @@ def import_jobs(db, raw_jobs, company_ids, summary):
             values['company_id'] = company_ids[row.company_id]
 
             source_key, identity = make_job_source_key(values)
+            source_keys.add(source_key)
 
             with db.begin_nested():
-                # 1순위: 이미 계산해 둔 source_key로 빠르게 중복을 찾습니다.
+                # 1순위: 이미 계산해 둔 source_key로 빠르게 같은 공고를 찾습니다.
                 existing = db.scalar(
                     select(Job).where(Job.source_key == source_key)
                 )
@@ -144,6 +150,9 @@ def import_jobs(db, raw_jobs, company_ids, summary):
                     )
 
                 if existing:
+                    # 같은 공고면 새 행을 만들지 않고 급여/설명/마감일 같은 값을 최신 JSON으로 갱신합니다.
+                    for field, value in values.items():
+                        setattr(existing, field, value)
                     existing.source_key = source_key
                     action = 'skipped'
                 else:
@@ -158,6 +167,67 @@ def import_jobs(db, raw_jobs, company_ids, summary):
             summary['errors'].append(
                 f'jobs[{index}]: 필수 필드, 급여 범위, 날짜 또는 기업 연결을 확인하세요.'
             )
+
+    return source_keys
+
+
+def sync_demo_data(db, data):
+    """배포용 데모 JSON과 DB의 데모 공고를 자동으로 같은 상태로 맞춥니다.
+
+    기존과 같은 공고는 id를 유지해 즐겨찾기/지원 기록을 보존합니다.
+    JSON에서 사라진 데모 공고만 삭제하고, 그 공고 때문에 생겼던 빈 기업도 정리합니다.
+    """
+    validate_root(data)
+    summary = empty_summary()
+
+    company_ids = import_companies(db, data['companies'], summary)
+    desired_source_keys = import_jobs(
+        db,
+        data['jobs'],
+        company_ids,
+        summary,
+    )
+
+    # 현재 JSON에 없는 데모 공고만 찾습니다. source_key가 없는 옛 데모 공고도 정리 대상입니다.
+    if desired_source_keys:
+        stale_condition = or_(
+            Job.source_key.is_(None),
+            Job.source_key.not_in(desired_source_keys),
+        )
+    else:
+        stale_condition = Job.source_key.is_(None)
+
+    stale_jobs = db.scalars(
+        select(Job).where(
+            Job.is_demo.is_(True),
+            stale_condition,
+        )
+    ).all()
+    stale_company_ids = {job.company_id for job in stale_jobs}
+
+    for job in stale_jobs:
+        db.delete(job)
+
+    db.flush()
+
+    # 방금 없앤 데모 공고 외에 다른 공고가 하나도 없는 기업만 함께 정리합니다.
+    deleted_companies = 0
+    for company_id in stale_company_ids:
+        still_used = db.scalar(
+            select(Job.id).where(Job.company_id == company_id).limit(1)
+        )
+        if still_used is None:
+            company = db.get(Company, company_id)
+            if company is not None:
+                db.delete(company)
+                deleted_companies += 1
+
+    db.commit()
+    summary['sync'] = {
+        'jobs_deleted': len(stale_jobs),
+        'companies_deleted': deleted_companies,
+    }
+    return summary
 
 
 def import_data(db, data):
@@ -196,7 +266,14 @@ def main():
     try:
         data = read_json_file(args.file)
         with SessionLocal() as db:
-            summary = import_data(db, data)
+            # Render가 배포 때 실행하는 공식 demo-jobs.json은 단순 추가가 아니라 자동 동기화합니다.
+            # 그래서 JSON에서 없어진 예전 데모 공고가 DB에 계속 남지 않습니다.
+            if args.file.name == 'demo-jobs.json' and all(
+                job.get('is_demo') is True for job in data.get('jobs', [])
+            ):
+                summary = sync_demo_data(db, data)
+            else:
+                summary = import_data(db, data)
     except (OSError, ValueError) as error:
         parser.exit(1, f'가져오기 실패: {error}\n')
 
