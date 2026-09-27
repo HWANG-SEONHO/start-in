@@ -1,0 +1,58 @@
+/* 학습용 설명: header.css는 화면의 모양을 정하는 파일입니다.
+   HTML/React가 '무엇을 보여줄지' 정하면 CSS는 '크기·간격·배치·글꼴을 어떻게 보일지' 정합니다. */
+
+/* 모든 페이지에서 공유하는 흰색 반투명 메뉴 바 */
+.site-header { height: 58px; background: rgb(255 255 255 / 20%); border-bottom: 1px solid rgb(255 255 255 / 30%); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); }
+.header-inner { width: 88%; height: 100%; margin: auto; display: grid; grid-template-columns: 28% 44% 28%; align-items: center; }
+.brand { display: flex; align-items: center; gap: 10px; width: max-content; border: 0; padding: 0; background: transparent; text-align: left; }
+.brand-symbol { width: 38px; height: 40px; object-fit: contain; flex-shrink: 0; }
+.brand-wordmark { padding-top: 1px; }
+.brand-name { color: #142c2a; font-size: 24px; font-weight: 850; line-height: 25px; letter-spacing: -.85px; }
+.brand-name span { color: #008e6b; }
+.brand-korean { margin-top: 1px; text-align: right; font-size: 10px; line-height: 13px; font-weight: 600; letter-spacing: 2.1px; color: #82908d; }
+.header-nav { display: flex; justify-content: space-between; align-items: center; gap: 22px; white-space: nowrap; }
+.header-nav button { position: relative; padding: 17px 0 16px; border: 0; background: none; color: #253937; font-size: 15px; font-weight: 650; line-height: 1; letter-spacing: -.25px; }
+.header-nav button:hover { color: #007b60; }
+.header-nav .header-nav-highlight { color: #007f62; font-weight: 750; }
+.header-nav .nav-qa { font-family: Arial, sans-serif; font-weight: 700; letter-spacing: 0; }
+.header-actions { display: flex; align-items: center; justify-content: flex-end; gap: 12px; }
+.header-actions button { height: 40px; border-radius: 9px; font-size: 14px; font-weight: 700; letter-spacing: -.2px; }
+.notification-button { width: 46px; display: grid; place-items: center; color: #285e53; background: #fff; border: 1px solid #d4ece5; }
+.notification-button svg { width: 27px; height: 27px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.login-button { width: 82px; border: 1px solid #66baaf; background: white; color: #2e6862; }
+.join-button { width: 97px; background: linear-gradient(135deg, #009f7d, #00775d); color: white; border: 1px solid #63b8a6; box-shadow: inset 0 0 2px #ffffff70; }
+
+@media (max-width: 1700px) {
+  .header-inner { width: 94%; grid-template-columns: 20% 57% 23%; }
+  .header-nav { gap: 12px; }
+  .header-nav button { font-size: 14px; }
+  .header-actions { gap: 7px; }
+}
+@media (max-width: 1000px) {
+  .site-header { height: auto; min-height: 64px; }
+  .header-inner { grid-template-columns: 1fr auto; gap: 14px; padding: 9px 0; }
+  .header-nav { grid-row: 2; grid-column: 1 / -1; flex-wrap: wrap; justify-content: flex-start; padding-bottom: 5px; }
+  .header-nav button { padding: 5px 0; }
+  .header-actions { grid-column: 2; grid-row: 1; }
+}
+@media (max-width: 480px) {
+  .notification-button { display: none; }
+  .header-actions .login-button { width: 60px; }
+  .header-actions .join-button { width: 72px; }
+}
+
+/* 로그아웃과 지원현황 확인창은 같은 기본 dialog 스타일을 공유합니다. */
+.logout-dialog { width: min(420px, calc(100vw - 40px)); max-height: calc(100dvh - 40px); padding: 0; border: 1px solid #e0ebe5; border-radius: 22px; background: #fff; color: #20372f; box-shadow: 0 24px 80px #153c3433; }
+.logout-dialog::backdrop { background: rgb(18 37 31 / 32%); backdrop-filter: blur(4px); }
+.logout-dialog-content { padding: 32px; text-align: center; }
+.logout-dialog-icon { display: grid; place-items: center; width: 58px; height: 58px; margin: 0 auto 20px; border-radius: 18px; background: #edf7f2; color: #008e6b; }
+.logout-dialog-icon svg { width: 30px; height: 30px; }
+.logout-dialog h2 { font-size: 22px; line-height: 1.4; letter-spacing: -.6px; }
+.logout-dialog p { margin-top: 12px; color: #75857e; font-size: 14px; line-height: 1.8; word-break: keep-all; }
+.logout-dialog .logout-dialog-error { color: #b33f3f; }
+.logout-dialog-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 28px; }
+.logout-dialog-actions button { min-height: 46px; border-radius: 10px; font-size: 15px; font-weight: 700; }
+.logout-cancel { border: 1px solid #dce7e1; background: #f6f9f7; color: #586d62; }
+.logout-confirm { border: 1px solid #008462; background: #008e6b; color: #fff; }
+.logout-confirm:hover:not(:disabled) { background: #00795c; }
+.logout-cancel:hover:not(:disabled) { background: #ecf2ee; }

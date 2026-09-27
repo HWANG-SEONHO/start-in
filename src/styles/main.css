@@ -1,0 +1,50 @@
+/* 학습용 설명: main.css는 화면의 모양을 정하는 파일입니다.
+   HTML/React가 '무엇을 보여줄지' 정하면 CSS는 '크기·간격·배치·글꼴을 어떻게 보일지' 정합니다. */
+
+:root {
+  font-family: 'Pretendard', 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', Arial, sans-serif;
+  color: #141c32;
+  background: #f5f8f6;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  --brand-green: #008e6b;
+  --muted-text: #7b8bac;
+}
+
+* { box-sizing: border-box; }
+html { overflow-y: scroll; scrollbar-gutter: stable; }
+body { margin: 0; min-width: 0; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:disabled { cursor: not-allowed; opacity: .55; }
+a { color: inherit; text-decoration: none; }
+a:hover { text-decoration: underline; }
+.site-shell { max-width: 1920px; margin: 0 auto; }
+button:focus-visible { outline: 2px solid #168b73; outline-offset: 2px; }
+h1, h2, h3, p { margin: 0; }
+button, img, svg { -webkit-tap-highlight-color: transparent; }
+img { display: block; max-width: 100%; }
+svg { flex-shrink: 0; }
+
+/* 시안의 1920px 화면에서 상단은 362px, 하단 두 영역은 같은 폭이다. */
+.hero-background {
+  height: 362px;
+  position: relative;
+  background: url('/images/hero-main.png') center center / cover no-repeat;
+}
+.results-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px;
+  padding-top: 10px;
+}
+.results-layout > section { min-width: 0; min-height: 388px; }
+.results-layout > .map-section { height: auto; align-self: stretch; }
+
+@media (max-width: 1400px) {
+  .results-layout { grid-template-columns: 1fr; }
+}
+@media (max-width: 1000px) {
+  .hero-background { height: auto; background-position: 65% top; }
+}

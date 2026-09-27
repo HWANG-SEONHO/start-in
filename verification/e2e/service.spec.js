@@ -1,0 +1,255 @@
+// 학습용 설명: 브라우저를 실제로 움직여 검색·지도·스크롤·페이지 이동을 확인하는 E2E 테스트입니다.
+// 아래 코드는 기능을 바꾸지 않으면서, 처음 읽는 사람도 흐름을 따라갈 수 있게 주석을 붙였습니다.
+
+import { test, expect } from '@playwright/test';
+
+test('메인 필터, 다중 지역, 지도 연결, 검색과 뒤로가기', async ({ page }) => {
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await page.goto('/');
+  await expect(page.locator('.job-card')).toHaveCount(5);
+  await page.getByRole('button', { name: '서울', exact: true }).click();
+  await expect(page.locator('.results-layout')).toHaveCount(2);
+  await expect(page.locator('[data-region="서울"] .job-card')).toHaveCount(2);
+  await expect(page.locator('[data-region="서울"]')).toContainText('지도 원본이 없어');
+  await page.reload();
+  await expect(page.getByRole('button', { name: '서울', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  await page.getByRole('button', { name: 'IT·개발', exact: true }).click();
+  await expect(page.locator('.job-card')).toHaveCount(6);
+  await page.getByRole('button', { name: '7천만원 이상', exact: true }).click();
+  await expect(page.locator('.job-card')).toHaveCount(1);
+  await page.goBack();
+  await expect(page.locator('.job-card')).toHaveCount(6);
+  await page.getByRole('button', { name: '조건 초기화' }).click();
+  await expect(page.locator('.job-card')).toHaveCount(5);
+  await expect(page.locator('.results-layout')).toHaveCount(1);
+  await page.getByRole('button', { name: '해운대구 1건' }).click();
+  await expect(page.locator('.job-card')).toHaveCount(1);
+  await expect(page.locator('.job-list-title-group')).toContainText('해운대구');
+  await page.locator('.job-description a').first().click();
+  await expect(page).toHaveURL(/\/jobs\/1$/);
+  await page.goBack();
+  await expect(page.locator('.job-card')).toHaveCount(1);
+  await expect(page.locator('.job-list-title-group')).toContainText('해운대구');
+  await page.getByRole('link', { name: '공고 목록에서 보기' }).click();
+  await expect(page.locator('.job-card')).toHaveCount(1);
+  await page.goBack();
+  await expect(page.locator('.job-list-title-group')).toContainText('해운대구');
+  await page.getByRole('button', { name: '지도와 지역 선택 초기화' }).click();
+  await expect(page.locator('.job-card')).toHaveCount(5);
+  await page.getByRole('button', { name: '연봉 높은순', exact: true }).click();
+  await expect(page.locator('.job-card').first()).toContainText('LINE PLUS');
+  await page.getByRole('textbox', { name: '공고 검색어' }).fill('존재하지않는키워드');
+  await page.getByRole('button', { name: '공고 검색', exact: true }).click();
+  await expect(page.locator('.empty-results')).toBeVisible();
+  await page.getByRole('button', { name: '조건 초기화' }).click();
+  await expect(page.locator('.job-card')).toHaveCount(5);
+  await page.locator('.job-description a').first().click();
+  await expect(page).toHaveURL(/\/jobs\/1$/);
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('LLM 응용');
+  await page.reload();
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('LLM 응용');
+  await expect(page.locator('.job-facts')).toContainText('해운대구');
+  expect(errors).toEqual([]);
+});
+
+test('가입, 저장 지속성, 지원현황 CRUD, 계정 분리', async ({ page, browser }) => {
+  const email = `browser-${Date.now()}@example.com`;
+  const password = 'browser-password-123';
+  await page.goto('/jobs/1');
+  await page.getByRole('button', { name: /LLM.* 저장$/ }).click();
+  await expect(page).toHaveURL(/\/login$/);
+  await page.getByRole('link', { name: /회원가입/ }).click();
+  await page.getByLabel('이름', { exact: true }).fill('브라우저 사용자');
+  await page.getByLabel('이메일', { exact: true }).fill(email);
+  await page.getByLabel('비밀번호', { exact: true }).fill(password);
+  await page.getByRole('button', { name: '가입하기' }).click();
+  await expect(page).toHaveURL(/\/jobs\/1$/);
+  await page.getByRole('button', { name: /LLM.* 저장$/ }).click();
+  await expect(page.getByRole('button', { name: /LLM.* 저장 취소$/ })).toHaveAttribute('aria-pressed', 'true');
+  await page.reload();
+  await expect(page.getByRole('button', { name: /LLM.* 저장 취소$/ })).toHaveAttribute('aria-pressed', 'true');
+  await page.getByRole('button', { name: 'MY 지원현황에 추가' }).click();
+  await expect(page).toHaveURL(/\/my\?tab=applications$/);
+  await expect(page.locator('.application-number')).toHaveText('1');
+  await page.getByLabel('지원 상태').selectOption('면접');
+  await page.getByLabel('메모').fill('화요일 면접 준비');
+  await page.getByRole('button', { name: '변경 저장' }).click();
+  await expect(page.getByRole('heading', { name: '저장하시겠습니까?' })).toBeVisible();
+  await page.getByRole('button', { name: '저장', exact: true }).click();
+  await expect(page.getByRole('alert')).toContainText('저장되었습니다.');
+  await expect(page.getByLabel('지원 상태')).toHaveValue('면접');
+  await page.reload();
+  await expect(page.getByLabel('메모')).toHaveValue('화요일 면접 준비');
+  await page.getByRole('button', { name: '로그아웃', exact: true }).click();
+  await expect(page).toHaveURL(/\/login$/);
+  await page.getByLabel('이메일', { exact: true }).fill(email);
+  await page.getByLabel('비밀번호', { exact: true }).fill(password);
+  await page.getByRole('button', { name: '로그인하기' }).click();
+  await expect(page.locator('.job-card')).toHaveCount(1);
+
+  const isolated = await browser.newContext();
+  const other = await isolated.newPage();
+  await other.goto('http://127.0.0.1:5174/register');
+  await other.getByLabel('이름', { exact: true }).fill('다른 사용자');
+  await other.getByLabel('이메일', { exact: true }).fill(`other-${Date.now()}@example.com`);
+  await other.getByLabel('비밀번호', { exact: true }).fill(password);
+  await other.getByRole('button', { name: '가입하기' }).click();
+  await expect(other.locator('.empty-results')).toContainText('저장한 공고가 없습니다');
+  await isolated.close();
+
+  await page.getByRole('button', { name: /LLM.* 저장 취소$/ }).click();
+  await expect(page.locator('.empty-results')).toContainText('저장한 공고가 없습니다');
+  await page.getByRole('button', { name: /지원현황 1/ }).click();
+  await page.getByRole('button', { name: '지원 취소', exact: true }).click();
+  await expect(page.getByRole('heading', { name: '지원을 취소하시겠습니까?' })).toBeVisible();
+  await page.getByRole('button', { name: '지원 취소', exact: true }).last().click();
+  await expect(page.getByRole('alert')).toContainText('취소되었습니다.');
+  await expect(page.locator('.empty-results')).toContainText('지원 기록이 없습니다');
+});
+
+test('기업 이동과 공고 연결, 없는 페이지 안내', async ({ page }) => {
+  await page.goto('/companies');
+  await expect(page.locator('.company-directory > a')).toHaveCount(5);
+  await page.locator('.company-directory > a').first().click();
+  await expect(page).toHaveURL(/\/companies\/1$/);
+  await expect(page.locator('.job-card')).toHaveCount(10);
+  await expect(page.getByRole('heading', { name: '이 기업의 채용공고 17건' })).toBeVisible();
+  await page.getByRole('button', { name: '다음', exact: true }).click();
+  await expect(page.locator('.job-card')).toHaveCount(7);
+  await expect(page).toHaveURL(/page=2/);
+  await page.reload();
+  await expect(page.locator('.job-card')).toHaveCount(7);
+  await page.locator('.job-description a').first().click();
+  await expect(page.locator('.job-facts')).toBeVisible();
+  await page.goto('/jobs/999999');
+  await expect(page.getByRole('alert')).toContainText('공고를 찾을 수 없습니다');
+  await page.goto('/not-a-page');
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('페이지를 찾을 수 없습니다');
+});
+
+test('1920 기준 유지, 4K에서 확대 금지, 모든 결과 노출', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('.job-card')).toHaveCount(5);
+  const before = await page.locator('.hero-background').boundingBox();
+  const map = await page.locator('.map-section').boundingBox();
+  const font = await page.locator('#hero-title').evaluate(el => getComputedStyle(el).fontSize);
+  expect(before.width).toBe(1920);
+  expect(before.height).toBe(362);
+  expect(map.width).toBe(955);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.screenshot({ path: 'verification/service-1920x1080.png', fullPage: true });
+  await page.setViewportSize({ width: 3840, height: 2160 });
+  const after = await page.locator('.hero-background').boundingBox();
+  expect(after.width).toBe(before.width);
+  expect(after.height).toBe(before.height);
+  expect(after.x).toBe(960);
+  expect((await page.locator('.map-section').boundingBox()).width).toBe(map.width);
+  expect(await page.locator('#hero-title').evaluate(el => getComputedStyle(el).fontSize)).toBe(font);
+  await page.screenshot({ path: 'verification/service-3840x2160.png', fullPage: true });
+  await page.getByRole('button', { name: '부산', exact: true }).click();
+  await expect(page.locator('.results-layout')).toHaveCount(17);
+  await expect(page.locator('.job-card')).toHaveCount(37);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});
+
+test('요청 중 표시, 오류 안내와 재시도', async ({ page }) => {
+  await page.route('**/api/jobs?**', async route => { await new Promise(resolve => setTimeout(resolve, 700)); await route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ detail: '일시적인 서버 오류입니다.' }) }); });
+  await page.goto('/');
+  await expect(page.getByRole('status')).toContainText('불러오는 중');
+  await expect(page.getByRole('alert')).toContainText('일시적인 서버 오류');
+  await expect(page.locator('.empty-results')).toHaveCount(0);
+  await page.unroute('**/api/jobs?**');
+  await page.getByRole('button', { name: '다시 시도' }).click();
+  await expect(page.locator('.job-card')).toHaveCount(5);
+});
+
+test('서버 페이지 이동, URL 복원, 조건 변경 시 첫 페이지', async ({ page }) => {
+  const responses = [];
+  page.on('response', async response => {
+    if (new URL(response.url()).pathname === '/api/jobs' && response.ok()) responses.push(await response.json());
+  });
+  await page.goto('/jobs?filters=%7B%7D');
+  await expect(page.locator('.job-card')).toHaveCount(10);
+  await expect(page.locator('.job-list-title-group')).toContainText('37건');
+  const first = await page.locator('.job-description a').first().getAttribute('href');
+  await page.getByRole('button', { name: '다음', exact: true }).click();
+  await expect(page.locator('.pagination')).toContainText('2 / 4');
+  await expect(page).toHaveURL(/page=2/);
+  expect(await page.locator('.job-description a').first().getAttribute('href')).not.toBe(first);
+  await page.reload();
+  await expect(page.locator('.pagination')).toContainText('2 / 4');
+  await page.locator('.job-description a').first().click();
+  await expect(page.locator('.job-facts')).toBeVisible();
+  await page.goBack();
+  await expect(page.locator('.pagination')).toContainText('2 / 4');
+  await page.getByRole('button', { name: '연봉 높은순', exact: true }).click();
+  await expect(page.locator('.pagination')).toContainText('1 / 4');
+  await page.getByRole('button', { name: '다음', exact: true }).click();
+  await expect(page.locator('.pagination')).toContainText('2 / 4');
+  await page.getByRole('button', { name: '부산', exact: true }).click();
+  await expect(page.locator('.job-card')).toHaveCount(5);
+  await expect(page.locator('.pagination')).toHaveCount(0);
+  expect(responses.length).toBeGreaterThan(2);
+  expect(responses.every(result => result.items.length <= result.page_size)).toBe(true);
+});
+
+test('다중 지역에서 정렬해도 현재 스크롤 위치를 유지', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: '서울', exact: true }).click();
+  await expect(page.locator('.results-layout')).toHaveCount(2);
+
+  const seoul = page.locator('[data-region="서울"]');
+  const salarySort = seoul.getByRole('button', { name: '연봉 높은순', exact: true });
+  await salarySort.scrollIntoViewIfNeeded();
+  const before = await page.evaluate(() => window.scrollY);
+  expect(before).toBeGreaterThan(500);
+
+  await salarySort.click();
+  await expect(salarySort).toHaveAttribute('aria-pressed', 'true');
+  await expect(seoul.locator('.job-card')).toHaveCount(2);
+  await page.waitForTimeout(250);
+
+  const after = await page.evaluate(() => window.scrollY);
+  expect(after).toBeGreaterThan(before - 150);
+});
+
+
+test('지도 목록은 구·군 복수 선택이 가능하고 위치를 유지', async ({ page }) => {
+  await page.goto('/');
+  const busan = page.locator('[data-region="부산"]');
+  await busan.getByRole('button', { name: '목록', exact: true }).click();
+  const haeundae = busan.getByRole('button', { name: /해운대구.*1건/ });
+  const suyeong = busan.getByRole('button', { name: /수영구.*1건/ });
+  await haeundae.click();
+  await expect(haeundae).toHaveAttribute('aria-pressed', 'true');
+  await suyeong.click();
+  await expect(suyeong).toHaveAttribute('aria-pressed', 'true');
+  await expect(busan.locator('.job-card')).toHaveCount(2);
+  await expect(busan.locator('.job-list-title-group')).toContainText('2개 구');
+});
+
+test('필터·지도 초기화·페이지 이동도 스크롤 위치를 불필요하게 초기화하지 않음', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 600 });
+  await page.goto('/');
+  await page.getByRole('button', { name: '서울', exact: true }).click();
+  const seoul = page.locator('[data-region="서울"]');
+  await seoul.scrollIntoViewIfNeeded();
+  const beforeFilter = await page.evaluate(() => scrollY);
+  await page.getByRole('button', { name: 'IT·개발', exact: true }).click();
+  await page.waitForTimeout(250);
+  expect(await page.evaluate(() => scrollY)).toBeGreaterThan(beforeFilter - 180);
+
+  await seoul.getByRole('button', { name: '지도 확대' }).click();
+  const beforeReset = await page.evaluate(() => scrollY);
+  await seoul.getByRole('button', { name: '지도와 지역 선택 초기화' }).click();
+  await page.waitForTimeout(150);
+  expect(await page.evaluate(() => scrollY)).toBeGreaterThan(beforeReset - 180);
+
+  await page.goto('/jobs?filters=%7B%7D');
+  await page.evaluate(() => scrollTo(0, document.body.scrollHeight));
+  const beforeNext = await page.evaluate(() => scrollY);
+  await page.getByRole('button', { name: '다음', exact: true }).click();
+  await expect(page.locator('.pagination')).toContainText('2 / 4');
+  expect(await page.evaluate(() => scrollY)).toBeGreaterThan(beforeNext - 180);
+});

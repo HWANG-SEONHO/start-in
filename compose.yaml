@@ -1,0 +1,28 @@
+# 학습용 설명: Docker Compose로 PostgreSQL 한 개를 쉽게 켜기 위한 설정입니다.
+# `docker compose up -d`를 실행하면 아래 postgres 서비스가 만들어집니다.
+
+services:
+  postgres:
+    # PostgreSQL 16 공식 이미지를 사용합니다.
+    image: postgres:16
+
+    # 컨테이너 안에서 만들 DB 이름/사용자/비밀번호입니다.
+    environment:
+      POSTGRES_DB: startin
+      POSTGRES_USER: startin
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD before starting PostgreSQL}
+
+    # 내 PC의 5433번 포트를 컨테이너의 기본 5432번 포트에 연결합니다.
+    ports:
+      - "127.0.0.1:5433:5432"
+
+    # 컨테이너를 껐다 켜도 DB 데이터가 남도록 프로젝트 폴더에 저장합니다.
+    volumes:
+      - ./.runtime/postgres:/var/lib/postgresql/data
+
+    # PostgreSQL이 정말 요청을 받을 준비가 됐는지 5초마다 확인합니다.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U startin -d startin"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
