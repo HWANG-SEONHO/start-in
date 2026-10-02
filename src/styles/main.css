@@ -33,6 +33,14 @@ svg { flex-shrink: 0; }
   position: relative;
   background: url('/images/hero-main.png') center center / cover no-repeat;
 }
+.search-page-main {
+  width: min(1792px, calc(100% - 128px));
+  margin: 0 auto;
+}
+
+.search-page-main-home {
+  margin-top: 0;
+}
 .results-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -47,4 +55,5 @@ svg { flex-shrink: 0; }
 }
 @media (max-width: 1000px) {
   .hero-background { height: auto; background-position: 65% top; }
+  .search-page-main { width: min(100%, calc(100% - 32px)); }
 }

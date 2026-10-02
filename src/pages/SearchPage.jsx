@@ -117,7 +117,7 @@ export default function SearchPage({ home = false }) {
         </div>
       )}
 
-      <main>
+      <main className={home ? "search-page-main search-page-main-home" : "search-page-main"}>
         {/* 일반 /jobs 화면에서는 AI가 해석한 조건을 따로 알려줍니다. */}
         {!home && search.aiDescription && (
           <p className="demo-notice">

@@ -56,11 +56,7 @@ export default function Header() {
             aria-label="STARTIN 홈"
             onClick={() => navigate('/')}
           >
-            <img className="brand-symbol" src="/images/startin-symbol.png" alt="" />
-            <div className="brand-wordmark">
-              <div className="brand-name">START <span>IN</span></div>
-              <div className="brand-korean">스타트인</div>
-            </div>
+            <img className="brand-logo" src="/images/startin-logo-horizontal.png" alt="스타트인 START IN" />
           </button>
 
           {/* 준비중 기능은 /coming-soon으로 보내고 feature 이름을 query string으로 전달합니다. */}

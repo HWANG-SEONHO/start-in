@@ -39,7 +39,7 @@ React 화면 뒤에 FastAPI와 DB가 연결되고, 로그인한 사용자마다 
 이 과정에서 초기 디자인판과 기능 개발판을 따로 관리하던 시기도 있었지만, 현재는 그 구분을 끝내고 **최신 통합본을 `main` 기준**으로 사용합니다.
 
 현재 저장소의 기업·채용공고 데이터는 기능 검증을 위한 **가상 데모 데이터**이며 실제 기업이나 실제 채용공고가 아닙니다.
-Render 배포 시 `data/demo-jobs.json`과 DB의 데모 공고를 자동 동기화해, JSON에서 제거된 예전 데모 공고가 운영 DB에 남지 않도록 했습니다.
+Render API는 DB 마이그레이션 후 서버를 바로 실행합니다. 콜드 스타트마다 데모 데이터를 다시 검사하지 않으며, `data/demo-jobs.json`이 변경된 경우에만 `python -m backend.app.import_jobs data/demo-jobs.json`으로 수동 동기화합니다. 운영 시작 명령은 [Render 설정 안내](RENDER_COLD_START_FIX.md)를 참고하세요.
 
 ---
 

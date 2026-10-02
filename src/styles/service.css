@@ -41,11 +41,11 @@
 .request-status { padding: 28px 42px; background: white; border-radius: 10px; margin: 10px 0; }
 .request-status button { margin-left: 15px; }
 .empty-results { min-height: 240px; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; padding: 24px; color: #62768a; }
-.page-search-heading { display: flex; align-items: center; justify-content: space-between; padding: 22px 42px; background: white; }
+.page-search-heading { display: flex; align-items: center; justify-content: space-between; padding: 22px 42px; background: white; border: 1px solid #e5efee; border-radius: 16px; }
 .page-search-heading h1 { font-size: 26px; }
 .page-search-heading form { display: flex; gap: 10px; width: 550px; }
 .page-search-heading button { flex-shrink: 0; }
-.full-job-list { max-width: 1300px; margin: 18px auto; }
+.full-job-list { max-width: 100%; margin: 18px auto; }
 .pagination { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 8px; font-size: 13px; color: #62768a; }
 .pagination button { border: 1px solid #c3ded3; border-radius: 7px; padding: 5px 12px; background: #eff9f5; color: #007c60; }
 .resume-panel { max-width: 720px; }
