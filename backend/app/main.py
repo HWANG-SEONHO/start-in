@@ -692,6 +692,9 @@ def list_jobs(
         company.id: company
         for company in db.scalars(select(Company))
     }
+    jobs = list(db.scalars(statement))
+    # 읽기가 끝나면 연결을 먼저 반환하고, 필터·지도 집계는 메모리에서 처리합니다.
+    db.close()
 
     # AI 검색이면 AI keywords, 일반 검색이면 사용자가 입력한 공백단어를 씁니다.
     words = (
@@ -703,7 +706,7 @@ def list_jobs(
     # 3) JSON 배열/급여/키워드처럼 Python에서 확인하기 쉬운 조건을 적용합니다.
     matched_jobs = []
 
-    for job in db.scalars(statement):
+    for job in jobs:
         if not matches_list_filters(job, selected):
             continue
 

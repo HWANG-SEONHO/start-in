@@ -2,6 +2,8 @@
 // 화면은 api('/jobs')처럼 요청하고, 이 파일이 실제 fetch 요청과 오류 처리를 맡습니다.
 
 // 개발 중에는 /api를 쓰고, 배포 환경에서 주소를 따로 주면 그 주소를 씁니다.
+import { queueJobRequest } from './jobRequestQueue';
+
 const baseUrl = import.meta.env.VITE_API_BASE_URL || '/api';
 
 // 이력서 PDF는 브라우저가 직접 내려받을 수 있도록 완성된 주소를 따로 내보냅니다.
@@ -118,5 +120,5 @@ export function getJobs({
     ...(ai ? { ai: JSON.stringify(ai) } : {}),
   });
 
-  return api(`/jobs?${params}`, { signal });
+  return queueJobRequest(() => api(`/jobs?${params}`, { signal }), signal);
 }

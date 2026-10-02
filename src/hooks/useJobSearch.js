@@ -168,38 +168,46 @@ export function useJobSearch({ home = false } = {}) {
 
     // 메인 화면은 부산/서울처럼 지역별 카드가 따로 있으므로 지역마다 요청을 하나씩 만듭니다.
     // /jobs 일반 화면은 전체 결과 하나만 요청합니다.
-    const requests = request.home
-      ? selectedRegions.map(region => getJobs({
-          ...request,
-          sort: request.regionSorts[region] || request.sort,
-          filters: { ...request.filters, region: [region] },
-          districts: request.districts[region]
-            ? { [region]: request.districts[region] }
-            : {},
-          page: request.pages[region] || 1,
-          pageSize: 5,
-          signal: controller.signal,
-        }))
-      : [getJobs({ ...request, pageSize: 10, signal: controller.signal })];
+    // 빠르게 연속 선택하면 마지막 조건만 조회합니다. 체크 표시와 URL은 즉시 바뀝니다.
+    const timer = setTimeout(() => {
+      const requests = request.home
+        ? selectedRegions.map(region => getJobs({
+            ...request,
+            sort: request.regionSorts[region] || request.sort,
+            filters: { ...request.filters, region: [region] },
+            districts: request.districts[region]
+              ? { [region]: request.districts[region] }
+              : {},
+            page: request.pages[region] || 1,
+            pageSize: 5,
+            signal: controller.signal,
+          }))
+        : [getJobs({ ...request, pageSize: 10, signal: controller.signal })];
 
-    Promise.all(requests)
-      .then(results => {
-        setState({
-          results,
-          error: '',
-          key: requestKey,
-          regions: selectedRegions,
+      Promise.all(requests)
+        .then(results => {
+          if (controller.signal.aborted) return;
+          setState({
+            results,
+            error: '',
+            key: requestKey,
+            regions: selectedRegions,
+          });
+        })
+        .catch(error => {
+          // 새 검색 때문에 취소된 요청은 오류로 표시하지 않습니다.
+          if (!controller.signal.aborted && error.name !== 'AbortError') {
+            setState({ results: [], error: error.message, key: requestKey, regions: [] });
+            controller.abort();
+          }
         });
-      })
-      .catch(error => {
-        // 새 검색 때문에 이전 요청을 취소한 AbortError는 사용자에게 오류로 보여주지 않습니다.
-        if (error.name !== 'AbortError') {
-          setState({ results: [], error: error.message, key: requestKey, regions: [] });
-        }
-      });
+    }, 250);
 
     // 조건이 또 바뀌면 이전 요청을 취소해 오래된 결과가 늦게 덮어쓰지 못하게 합니다.
-    return () => controller.abort();
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
   }, [requestKey]);
 
   // AI 해석 요청을 멈추고 관련 표시도 초기화합니다.
