@@ -1,5 +1,9 @@
 import { test, expect } from '@playwright/test';
 
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => sessionStorage.setItem('startin-cover-seen', '1'));
+});
+
 test('최신본: 다중 지역, URL 복원과 상세 이동', async ({ page }) => {
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));

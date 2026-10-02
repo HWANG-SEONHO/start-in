@@ -1,5 +1,9 @@
 import { test, expect } from '@playwright/test';
 
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => sessionStorage.setItem('startin-cover-seen', '1'));
+});
+
 test('빠른 지역 연속 선택 후 전국 17개 지역도 멈추지 않는다', async ({ page }) => {
   let active = 0;
   let peak = 0;

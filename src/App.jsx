@@ -9,11 +9,13 @@ import JobDetailPage from './pages/JobDetailPage';
 import AuthPage from './pages/AuthPage';
 import MyPage from './pages/MyPage';
 import CompaniesPage from './pages/CompaniesPage';
+import CoverPage from './pages/CoverPage';
 import './styles/service.css';
 
 export default function App() {
   // pathname은 현재 주소의 길 부분입니다. 예: /jobs/123 → /jobs/123
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
+  const showCover = pathname === '/intro' || (pathname === '/' && !search && sessionStorage.getItem('startin-cover-seen') !== '1');
 
   // 완전히 다른 페이지로 이동했을 때만 맨 위에서 시작합니다.
   // 검색 조건/정렬처럼 같은 페이지 안에서 query string만 바뀔 때는 스크롤을 건드리지 않습니다.
@@ -21,14 +23,17 @@ export default function App() {
     window.scrollTo(0, 0);
   }, [pathname]);
 
+  if (showCover) return <CoverPage />;
+
   return (
     <div className="site-shell">
       {/* 메인(/)에는 자체 상단 구성이 있어서 공통 Header를 숨깁니다. */}
-      {pathname !== '/' && <Header />}
+      {pathname !== '/' && pathname !== '/main' && <Header />}
 
       {/* Routes는 "주소 → 화면" 연결표입니다. */}
       <Routes>
         <Route path="/" element={<SearchPage home />} />
+        <Route path="/main" element={<SearchPage home />} />
         <Route path="/jobs" element={<SearchPage />} />
         <Route path="/jobs/:id" element={<JobDetailPage />} />
         <Route path="/companies" element={<CompaniesPage />} />
