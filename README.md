@@ -129,6 +129,8 @@ ChatGPT가 1인칭 화자로 쓰되, 사용자의 생각이나 감정을 임의�
 - [POST 06 · 채용공고를 구하러 갔다가 내가 천 개를 만들었다](docs/AI_DEVLOG_06.md)
 - [POST 07 · 테스트는 통과했는데 서버는 두 번 죽었다](docs/AI_DEVLOG_07.md)
 - [POST 08 · 고칠수록 체크리스트가 길어졌다](docs/AI_DEVLOG_08.md)
+- [POST 09 · 썩세스라는데 왜 멈추는데?](docs/AI_DEVLOG_09.md)
+- [POST 10 · 인주가 없는 줄 알았다](docs/AI_DEVLOG_10.md)
 
 ---
 
