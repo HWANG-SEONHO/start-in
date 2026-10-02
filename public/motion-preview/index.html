@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>STARTIN · 모션 비교실</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #f5f7f6; color: #17251e; font-family: Arial, 'Malgun Gothic', sans-serif; }
+    button, input { font: inherit; }
+    button, .import { cursor: pointer; }
+    header { height: 82px; padding: 0 32px; display: flex; align-items: center; justify-content: space-between; background: white; border-bottom: 1px solid #e2e8e4; }
+    .brand { font-size: 24px; font-weight: 900; letter-spacing: -1px; }
+    .brand span { color: #008d5e; }
+    .subtitle { margin-left: 18px; font-size: 14px; color: #738078; }
+    .import, .control { display: inline-flex; align-items: center; padding: 11px 16px; border: 1px solid #d9e2dd; border-radius: 9px; background: white; text-decoration: none; color: #24372c; font-size: 13px; }
+    .import { background: #008d5e; color: white; border-color: #008d5e; }
+    input[type=file] { display: none; }
+    main { display: grid; grid-template-columns: 280px minmax(0,1fr); min-height: calc(100vh - 82px); }
+    aside { padding: 25px 18px; background: white; border-right: 1px solid #e2e8e4; }
+    .group-title { margin: 22px 10px 10px; color: #86948b; font-size: 11px; letter-spacing: 1px; font-weight: 700; }
+    .group-title:first-child { margin-top: 0; }
+    .item { display: block; width: 100%; text-align: left; padding: 13px 12px; margin-bottom: 5px; border: 1px solid transparent; border-radius: 9px; background: transparent; color: #35473d; }
+    .item:hover { background: #f3f8f5; }
+    .item.active { background: #e9f8ef; border-color: #c2e7d1; color: #007b50; }
+    .item strong { display: block; font-size: 13px; margin-bottom: 6px; }
+    .item small { color: #8b978f; font-size: 11px; }
+    .item.loaded small { color: #008d5e; }
+    .content { padding: 30px; min-width: 0; }
+    .eyebrow { color: #008d5e; font-size: 11px; font-weight: 700; letter-spacing: 2px; }
+    h1 { margin: 10px 0; font-size: 28px; letter-spacing: -1px; }
+    .description { color: #76847b; font-size: 13px; line-height: 1.7; }
+    .toolbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 24px 0 14px; }
+    .size { margin-left: auto; color: #829087; font-size: 12px; }
+    .screen { position: relative; width: 100%; aspect-ratio: 16/9; overflow: hidden; background: white; border: 1px solid #dfe7e1; border-radius: 12px; box-shadow: 0 16px 50px #1435240a; }
+    iframe { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; border: 0; transform-origin: top left; }
+    .empty { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 28px; background: radial-gradient(ellipse at center,#f1fbf5,white 70%); }
+    .empty b { font-size: 23px; margin-bottom: 12px; }
+    .empty p { max-width: 490px; color: #7a897f; font-size: 14px; line-height: 1.8; }
+    .hidden { display: none; }
+    .note { color: #829087; font-size: 12px; line-height: 1.8; margin-top: 16px; }
+    .screen:fullscreen { border: 0; border-radius: 0; background: white; width: 100vw; height: 100vh; }
+    .status { margin-top: 12px; font-size: 13px; color: #008d5e; }
+    body.dragging .screen { outline: 3px solid #008d5e; }
+    @media(max-width:800px) { header { padding: 0 16px; } .subtitle { display: none; } main { grid-template-columns: 1fr; } aside { display: flex; overflow-x: auto; gap: 8px; padding: 12px; } .group-title { display: none; } .item { min-width: 175px; } .content { padding: 18px; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div><span class="brand">START<span>IN</span></span><span class="subtitle">모션 비교실 · 12가지 원본</span></div>
+    <label class="import">ZIP / HTML 가져오기<input id="files" type="file" accept=".zip,.html" multiple></label>
+  </header>
+  <main>
+    <aside id="list" aria-label="모션 선택"></aside>
+    <section class="content">
+      <div class="eyebrow" id="category"></div>
+      <h1 id="title"></h1>
+      <div class="description" id="description"></div>
+      <div class="toolbar">
+        <button class="control" id="replay">↻ 처음부터 재생</button>
+        <button class="control" id="full">전체 화면</button>
+        <button class="control" id="open">원본 크기로 새 창</button>
+        <span class="size">1920 × 1080 · 비율 유지</span>
+      </div>
+      <div class="screen" id="screen">
+        <iframe id="preview" title="선택한 모션" sandbox="allow-scripts allow-same-origin allow-popups" class="hidden"></iframe>
+        <div class="empty" id="empty"><b>모션 파일을 여기에 끌어 넣으세요</b><p>첨부했던 ZIP 2개와 HTML 2개를 한 번에 선택하면<br>12종을 자동으로 분류합니다.</p><label class="import">파일 선택<input id="empty-files" type="file" accept=".zip,.html" multiple></label></div>
+      </div>
+      <div class="status" id="status" role="status">12 / 12종 준비됨 · 프로젝트에 원본 저장 완료</div>
+      <p class="note">선택한 모션만 재생합니다. 화면은 원본 1920 × 1080 비율로 축소하며, 전체 화면에서 크게 볼 수 있습니다.<br>원본 HTML의 모션 코드는 그대로 사용합니다. GSAP·Motion CDN을 불러오려면 인터넷 연결이 필요합니다. 추가로 가져온 파일은 현재 탭에서만 유지됩니다.</p>
+    </section>
+  </main>
+  <script>
+    const motions = [
+      { group:'롱 커버 · 4종', name:'01 · 키네틱 타이포그래피', detail:'15초 · 타이포 중심', match:'KineticTypography', path:'long/01_STARTIN_KineticTypography_15s_CDN/index.html' },
+      { group:'롱 커버 · 4종', name:'02 · 에디토리얼 키네틱', detail:'15초 · 에디토리얼 구성', match:'EditorialKinetic', path:'long/02_STARTIN_EditorialKinetic_15s_CDN/index.html' },
+      { group:'롱 커버 · 4종', name:'03 · 4가지 스타일 믹스', detail:'16초 · 스타일 혼합', match:'4StyleMix', path:'long/03_STARTIN_4StyleMix_16s_CDN/index.html' },
+      { group:'롱 커버 · 4종', name:'04 · 메인 화면 브리지', detail:'17초 · 커버에서 메인으로', match:'KineticToMainBridge', path:'long/04_STARTIN_KineticToMainBridge_17s_CDN/index.html' },
+      { group:'기본 모션 · 6종', name:'01 · 키네틱 인트로', detail:'타이포 인트로', match:'01_kinetic_intro', path:'six/01_kinetic_intro_gsap_motion.html' },
+      { group:'기본 모션 · 6종', name:'02 · 트렌드 타입', detail:'트렌드 타이포', match:'02_trend_type', path:'six/02_trend_type_gsap_motion.html' },
+      { group:'기본 모션 · 6종', name:'03 · 스위스 미니멀', detail:'에디토리얼 · 미니멀', match:'03_editorial_swiss', path:'six/03_editorial_swiss_minimal_gsap_motion.html' },
+      { group:'기본 모션 · 6종', name:'04 · 시네마틱 타이틀', detail:'시네마틱 타이틀 시퀀스', match:'04_cinematic_title', path:'six/04_cinematic_title_sequence_gsap_motion.html' },
+      { group:'기본 모션 · 6종', name:'05 · 지오메트릭 마스크', detail:'도형 마스크 · 타이포', match:'05_geometric_mask', path:'six/05_geometric_mask_typography_gsap_motion.html' },
+      { group:'기본 모션 · 6종', name:'06 · 롱 커버 마스크', detail:'롱 커버 · 브리지', match:'06_long_cover', path:'six/06_long_cover_mask_bridge_gsap_motion.html' },
+      { group:'개별 원본 · 2종', name:'커버 모션 v5', detail:'Editorial Kinetic Cover v5', match:'STARTIN_cover_motion', path:'editorial-v5.html' },
+      { group:'개별 원본 · 2종', name:'START IN 로고', detail:'GSAP + Motion 로고', match:'START_IN_GSAP_Motion_logo', path:'logo.html' }
+    ];
+    motions.forEach(motion => { motion.url = 'originals/' + motion.path; });
+    const list = document.querySelector('#list');
+    const frame = document.querySelector('#preview');
+    const screen = document.querySelector('#screen');
+    let selected = 0;
+    function renderList() {
+      list.replaceChildren();
+      let previous = '';
+      motions.forEach((motion, index) => {
+        if (motion.group !== previous) {
+          const heading = document.createElement('div');
+          heading.className = 'group-title'; heading.textContent = motion.group;
+          list.append(heading); previous = motion.group;
+        }
+        const button = document.createElement('button');
+        button.className = 'item' + (index === selected ? ' active' : '') + (motion.url ? ' loaded' : '');
+        button.setAttribute('aria-pressed', index === selected);
+        const title = document.createElement('strong'); title.textContent = motion.name;
+        const detail = document.createElement('small'); detail.textContent = motion.url ? motion.detail + ' · 준비됨' : motion.detail;
+        button.append(title, detail); button.onclick = () => select(index); list.append(button);
+      });
+    }
+    function resize() {
+      const scale = Math.min(screen.clientWidth / 1920, screen.clientHeight / 1080);
+      frame.style.transform = `scale(${scale})`;
+      frame.style.left = `${(screen.clientWidth - 1920 * scale) / 2}px`;
+      frame.style.top = `${(screen.clientHeight - 1080 * scale) / 2}px`;
+    }
+    function select(index) {
+      selected = index;
+      const motion = motions[index];
+      document.querySelector('#category').textContent = motion.group;
+      document.querySelector('#title').textContent = motion.name;
+      document.querySelector('#description').textContent = motion.detail;
+      frame.classList.toggle('hidden', !motion.url);
+      document.querySelector('#empty').classList.toggle('hidden', !!motion.url);
+      if (motion.url) frame.src = motion.url; else frame.removeAttribute('src');
+      ['replay','open'].forEach(id => document.getElementById(id).disabled = !motion.url);
+      renderList(); resize();
+    }
+    // ZIP 안의 HTML을 추출하고, 내부 ZIP도 재귀적으로 읽는다.
+    async function unpack(buffer, prefix = '', depth = 0) {
+      if (depth > 3) throw new Error('ZIP 폴더 단계가 너무 깊습니다');
+      const view = new DataView(buffer);
+      let end = view.byteLength - 22;
+      while (end >= Math.max(0, view.byteLength - 65557) && view.getUint32(end, true) !== 0x06054b50) end--;
+      if (end < Math.max(0, view.byteLength - 65557)) throw new Error('ZIP 파일 형식을 확인해 주세요');
+      const count = view.getUint16(end + 10, true);
+      let offset = view.getUint32(end + 16, true);
+      const entries = [];
+      for (let i = 0; i < count; i++) {
+        if (view.getUint32(offset, true) !== 0x02014b50) throw new Error('ZIP 데이터가 손상되었습니다');
+        const method = view.getUint16(offset + 10, true);
+        const length = view.getUint32(offset + 20, true);
+        const nameLength = view.getUint16(offset + 28, true);
+        const extra = view.getUint16(offset + 30, true);
+        const comment = view.getUint16(offset + 32, true);
+        const local = view.getUint32(offset + 42, true);
+        const name = new TextDecoder().decode(new Uint8Array(buffer, offset + 46, nameLength));
+        offset += 46 + nameLength + extra + comment;
+        if (!/\.(html|zip)$/i.test(name)) continue;
+        if (view.getUint32(local, true) !== 0x04034b50) throw new Error('ZIP 헤더가 올바르지 않습니다');
+        const start = local + 30 + view.getUint16(local + 26, true) + view.getUint16(local + 28, true);
+        const bytes = buffer.slice(start, start + length);
+        let data = bytes;
+        if (method === 8) data = await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).arrayBuffer();
+        else if (method !== 0) throw new Error('지원하지 않는 ZIP 압축 방식입니다');
+        if (/\.zip$/i.test(name)) entries.push(...await unpack(data, prefix + name + '/', depth + 1));
+        else entries.push({ name: prefix + name, data });
+      }
+      return entries;
+    }
+    async function importFiles(files) {
+      const status = document.querySelector('#status');
+      status.textContent = '파일을 불러오는 중…';
+      let loaded = 0;
+      const errors = [];
+      for (const file of files) {
+        try {
+          const data = await file.arrayBuffer();
+          const entries = /\.zip$/i.test(file.name) ? await unpack(data, file.name + '/') : [{name:file.name,data}];
+          for (const entry of entries) {
+            const motion = motions.find(item => entry.name.includes(item.match));
+            if (!motion) continue;
+            if (motion.url?.startsWith('blob:')) URL.revokeObjectURL(motion.url);
+            motion.url = URL.createObjectURL(new Blob([entry.data], {type:'text/html;charset=utf-8'}));
+            loaded++;
+          }
+        } catch (error) { errors.push(file.name + ': ' + error.message); }
+      }
+      const total = motions.filter(item => item.url).length;
+      status.textContent = `${total} / 12종 준비됨 · 이번에 ${loaded}종 가져옴` + (errors.length ? ' · 오류: ' + errors.join(' / ') : '');
+      select(motions[selected].url ? selected : Math.max(0,motions.findIndex(item => item.url)));
+    }
+    document.querySelectorAll('input[type=file]').forEach(input => input.onchange = () => importFiles(input.files));
+    document.querySelector('#replay').onclick = () => { frame.src = motions[selected].url; };
+    document.querySelector('#open').onclick = () => window.open(motions[selected].url, '_blank', 'noopener');
+    document.querySelector('#full').onclick = () => screen.requestFullscreen().catch(() => {});
+    document.addEventListener('dragover', event => { event.preventDefault(); document.body.classList.add('dragging'); });
+    document.addEventListener('dragleave', event => { if (!event.relatedTarget) document.body.classList.remove('dragging'); });
+    document.addEventListener('drop', event => { event.preventDefault(); document.body.classList.remove('dragging'); importFiles(event.dataTransfer.files); });
+    new ResizeObserver(resize).observe(screen);
+    select(0);
+  </script>
+</body>
+</html>

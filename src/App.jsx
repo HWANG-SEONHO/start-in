@@ -1,8 +1,8 @@
 // 이 파일은 "주소표"입니다.
 // 브라우저 주소가 /jobs인지 /login인지 보고 어떤 React 페이지를 보여줄지 정합니다.
 
-import { useEffect } from 'react';
-import { Link, Route, Routes, useLocation, useSearchParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, Route, Routes, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import Header from './components/Header';
 import SearchPage from './pages/SearchPage';
 import JobDetailPage from './pages/JobDetailPage';
@@ -15,7 +15,29 @@ import './styles/service.css';
 export default function App() {
   // pathname은 현재 주소의 길 부분입니다. 예: /jobs/123 → /jobs/123
   const { pathname, search } = useLocation();
+  const navigate = useNavigate();
+  const [transition, setTransition] = useState('');
   const showCover = pathname === '/intro' || (pathname === '/' && !search && sessionStorage.getItem('startin-cover-seen') !== '1');
+
+  function enterMain() {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      sessionStorage.setItem('startin-cover-seen', '1');
+      navigate('/main', { replace: true });
+    } else setTransition('closing');
+  }
+
+  // 화면을 완전히 덮은 뒤 주소를 바꾸고, 같은 레이어로 메인을 드러냅니다.
+  useEffect(() => {
+    if (!transition) return;
+    const timer = setTimeout(() => {
+      if (transition === 'closing') {
+        sessionStorage.setItem('startin-cover-seen', '1');
+        navigate('/main', { replace: true });
+        setTransition('opening');
+      } else setTransition('');
+    }, transition === 'closing' ? 650 : 1350);
+    return () => clearTimeout(timer);
+  }, [transition, navigate]);
 
   // 완전히 다른 페이지로 이동했을 때만 맨 위에서 시작합니다.
   // 검색 조건/정렬처럼 같은 페이지 안에서 query string만 바뀔 때는 스크롤을 건드리지 않습니다.
@@ -23,10 +45,9 @@ export default function App() {
     window.scrollTo(0, 0);
   }, [pathname]);
 
-  if (showCover) return <CoverPage />;
-
   return (
-    <div className="site-shell">
+    <>
+    {showCover ? <CoverPage onEnter={enterMain} /> : <div className={`site-shell${transition === 'opening' ? 'intro-main-reveal' : ''}`}>
       {/* 메인(/)에는 자체 상단 구성이 있어서 공통 Header를 숨깁니다. */}
       {pathname !== '/' && pathname !== '/main' && <Header />}
 
@@ -54,7 +75,9 @@ export default function App() {
           )}
         />
       </Routes>
-    </div>
+    </div>}
+    {transition && <div className={`intro-route-transition ${transition}`} aria-hidden="true"><b>START<span>IN.</span></b><small>YOUR NEXT STARTS HERE</small></div>}
+    </>
   );
 }
 

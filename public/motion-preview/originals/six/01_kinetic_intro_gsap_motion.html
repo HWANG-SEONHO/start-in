@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>START IN — 01 Kinetic Intro GSAP Motion</title>
+<style>
+:root{
+  --bg:#090b0e;
+  --fg:#f4f0e8;
+  --paper:#f2eee5;
+  --ink:#0c0e10;
+  --green:#3ecf8e;
+  --blue:#86b4ff;
+  --amber:#ffb15e;
+  --muted:rgba(244,240,232,.58);
+  --hair:rgba(244,240,232,.16);
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--fg);font-family:Inter,"Helvetica Neue",Arial,sans-serif}
+body{user-select:none}
+.stage{
+  position:fixed;inset:0;overflow:hidden;
+  background:
+    radial-gradient(circle at 18% 14%,rgba(62,207,142,.055),transparent 22%),
+    radial-gradient(circle at 82% 18%,rgba(134,180,255,.045),transparent 22%),
+    var(--bg);
+}
+.scene{position:absolute;inset:0;visibility:hidden;opacity:0;overflow:hidden}
+.scene.is-active{visibility:visible}
+.grid{position:absolute;inset:0;opacity:.16;pointer-events:none;background:
+  linear-gradient(90deg,transparent 24.9%,rgba(255,255,255,.16) 25%,transparent 25.1%,transparent 49.9%,rgba(255,255,255,.16) 50%,transparent 50.1%,transparent 74.9%,rgba(255,255,255,.16) 75%,transparent 75.1%),
+  linear-gradient(transparent 24.9%,rgba(255,255,255,.16) 25%,transparent 25.1%,transparent 49.9%,rgba(255,255,255,.16) 50%,transparent 50.1%,transparent 74.9%,rgba(255,255,255,.16) 75%,transparent 75.1%)}
+.big{
+  font-size:clamp(78px,13vw,220px);
+  line-height:.82;
+  font-weight:900;
+  letter-spacing:-.078em;
+  text-transform:uppercase;
+}
+.mid{
+  font-size:clamp(44px,7.2vw,116px);
+  line-height:.9;
+  font-weight:900;
+  letter-spacing:-.058em;
+  text-transform:uppercase;
+}
+.micro{
+  font-size:11px;
+  line-height:1.4;
+  letter-spacing:.19em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+.accent{color:var(--green)}
+.paper{background:var(--paper);color:var(--ink)}
+.center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.rule{position:absolute;background:var(--hair)}
+.rule.v{top:0;bottom:0;width:1px}
+.rule.h{left:0;right:0;height:1px}
+.top-meta{
+  position:absolute;z-index:200;top:20px;left:26px;right:26px;
+  display:flex;justify-content:space-between;align-items:center;
+  pointer-events:none;
+}
+.runtime-badge{
+  position:absolute;z-index:220;left:26px;bottom:24px;
+  padding:7px 10px;border:1px solid rgba(255,255,255,.14);
+  border-radius:999px;background:rgba(7,9,11,.45);backdrop-filter:blur(12px);
+  font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.66)
+}
+.controls{
+  position:absolute;z-index:240;right:24px;bottom:20px;display:flex;gap:8px
+}
+.ctrl{
+  appearance:none;border:1px solid rgba(255,255,255,.16);
+  background:rgba(8,10,12,.56);color:var(--fg);
+  border-radius:999px;padding:9px 13px;
+  font-size:11px;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;cursor:pointer;backdrop-filter:blur(12px)
+}
+.progress{
+  position:absolute;z-index:230;left:24px;right:24px;bottom:12px;height:2px;
+  overflow:hidden;background:rgba(255,255,255,.10)
+}
+.progress > i{display:block;width:0;height:100%;background:linear-gradient(90deg,var(--green),var(--blue))}
+.motion-orb{
+  position:absolute;z-index:2;left:50%;top:50%;
+  width:260px;height:260px;border-radius:50%;
+  transform:translate(-50%,-50%);
+  background:radial-gradient(circle,rgba(62,207,142,.10),rgba(62,207,142,.02) 55%,transparent 70%);
+  filter:blur(2px);pointer-events:none
+}
+.maskbox{overflow:hidden}
+.maskbox > *{will-change:transform}
+@media(max-width:900px){
+  .big{font-size:clamp(62px,16vw,150px)}
+  .mid{font-size:clamp(34px,10vw,90px)}
+}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="motion-orb"></div>
+  <div class="top-meta">
+    <div class="micro">START IN / PORTFOLIO MOTION</div>
+    <div class="micro">23 SEC / REPLAYABLE</div>
+  </div>
+  
+<section class="scene is-active" id="s0"><div class="center"><div class="big" id="where">WHERE</div></div></section>
+<section class="scene" id="s1"><div class="center"><div><div class="big" id="doYou">DO YOU</div><div class="big accent" id="startQ">START?</div></div></div></section>
+<section class="scene" id="s2"><div class="grid"></div>
+  <div style="position:absolute;left:7%;top:22%"><div class="micro">01 / LOCATION</div><div class="mid datum" style="margin-top:12px">BUSAN</div></div>
+  <div style="position:absolute;right:8%;top:27%;text-align:right"><div class="micro">02 / DIRECTION</div><div class="mid datum" style="margin-top:12px">CAREER</div></div>
+  <div style="position:absolute;left:18%;bottom:17%"><div class="micro">03 / RESULT</div><div class="mid datum accent" style="margin-top:12px">1,248 JOBS</div></div>
+</section>
+<section class="scene" id="s3"><div class="center"><div class="big" id="seqWord">SEARCH</div></div></section>
+<section class="scene paper" id="s4"><div class="center"><div style="width:82%">
+  <div class="mid" id="less" style="color:#111">LESS SEARCHING.</div>
+  <div class="mid" id="more" style="color:#0d9466;text-align:right">MORE FINDING.</div>
+</div></div></section>
+<section class="scene" id="s5"><div class="grid"></div><div class="center"><div class="big" id="finish">START <span class="accent">IN</span></div></div>
+  <div class="micro" style="position:absolute;left:50%;bottom:18%;transform:translateX(-50%)">ENTER YOUR NEXT MOVE</div>
+</section>
+
+  <div class="runtime-badge" id="runtimeBadge">loading runtime…</div>
+  <div class="controls"><button class="ctrl" id="replay">Replay</button></div>
+  <div class="progress"><i id="progressBar"></i></div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/motion@13.4.0/dist/motion.js"></script>
+<script>
+const TOTAL = 23000;
+let master = null;
+let fallbackTimers = [];
+let fallbackAnimations = [];
+
+const $ = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => [...r.querySelectorAll(s)];
+
+function clearFallback() {
+  fallbackTimers.forEach(clearTimeout);
+  fallbackTimers = [];
+  fallbackAnimations.forEach(a => { try { a.cancel(); } catch(e) {} });
+  fallbackAnimations = [];
+}
+
+function showScene(id) {
+  $$('.scene').forEach(s => {
+    s.classList.remove('is-active');
+    s.style.visibility = 'hidden';
+    s.style.opacity = '0';
+  });
+  const el = document.getElementById(id);
+  if(el) {
+    el.classList.add('is-active');
+    el.style.visibility = 'visible';
+    el.style.opacity = '1';
+  }
+}
+
+function later(ms, fn) {
+  const id = setTimeout(fn, ms);
+  fallbackTimers.push(id);
+  return id;
+}
+
+function wa(el, frames, options={}) {
+  if(!el) return;
+  const a = el.animate(frames, {
+    duration: options.duration || 800,
+    delay: options.delay || 0,
+    easing: options.easing || 'cubic-bezier(.2,.8,.2,1)',
+    fill: 'forwards'
+  });
+  fallbackAnimations.push(a);
+  return a;
+}
+
+function setRuntimeLabel(mode) {
+  $('#runtimeBadge').textContent = mode;
+}
+
+function startProgress() {
+  const bar = $('#progressBar');
+  bar.style.transition = 'none';
+  bar.style.width = '0%';
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    bar.style.transition = `width ${TOTAL}ms linear`;
+    bar.style.width = '100%';
+  }));
+}
+
+function setupMotionInteractions() {
+  if(!window.Motion) return;
+  const { animate } = Motion;
+  const replay = $('#replay');
+  const orb = $('.motion-orb');
+  replay.addEventListener('pointerenter', () => animate(replay, { scale: 1.08 }, { type:'spring', stiffness:420, damping:24 }));
+  replay.addEventListener('pointerleave', () => animate(replay, { scale: 1 }, { type:'spring', stiffness:420, damping:24 }));
+  replay.addEventListener('pointerdown', () => animate(replay, { scale: .94 }, { duration:.12 }));
+  replay.addEventListener('pointerup', () => animate(replay, { scale: 1.06 }, { type:'spring', stiffness:500, damping:25 }));
+
+  let lastX = innerWidth/2, lastY = innerHeight/2;
+  addEventListener('pointermove', (e) => {
+    lastX = e.clientX; lastY = e.clientY;
+    animate(orb, {
+      x: (lastX-innerWidth/2)*.10,
+      y: (lastY-innerHeight/2)*.10,
+      scale: 1 + Math.min(0.08, Math.abs(lastX-innerWidth/2)/innerWidth*.05)
+    }, { type:'spring', stiffness:70, damping:18, mass:.5 });
+  });
+}
+
+function restart() {
+  location.reload();
+}
+$('#replay').addEventListener('click', restart);
+
+window.addEventListener('load', () => {
+  startProgress();
+  const gsapOK = !!window.gsap;
+  const motionOK = !!window.Motion;
+  if(gsapOK) {
+    setRuntimeLabel(`GSAP 3.13 + Motion 13.4 ${motionOK ? '· ACTIVE' : '· GSAP ACTIVE'}`);
+    setupMotionInteractions();
+    runGSAP();
+  } else {
+    setRuntimeLabel('OFFLINE FALLBACK · WEB ANIMATIONS');
+    runFallback();
+  }
+});
+</script>
+
+<script>
+function runGSAP() {
+
+gsap.set('.scene',{autoAlpha:0});
+gsap.set('#s0',{autoAlpha:1});
+master = gsap.timeline({defaults:{ease:'power3.out'}});
+master.from('#where',{y:120,opacity:0,scale:.92,letterSpacing:'-.13em',duration:1.15})
+      .to('#where',{y:-90,opacity:0,scale:1.13,duration:.75},'+=1.8')
+      .set('#s0',{autoAlpha:0}).set('#s1',{autoAlpha:1})
+      .from('#doYou',{x:-180,opacity:0,duration:.9})
+      .from('#startQ',{x:190,opacity:0,duration:1},'<.12')
+      .to('#s1',{autoAlpha:0,duration:.45},'+=1.7')
+      .set('#s2',{autoAlpha:1})
+      .from('#s2 .datum',{y:80,opacity:0,stagger:.28,duration:.9})
+      .to('#s2',{autoAlpha:0,duration:.45},'+=1.8')
+      .set('#s3',{autoAlpha:1});
+['SEARCH','MATCH','MOVE'].forEach((w,i)=>{
+  master.call(()=>{ document.querySelector('#seqWord').textContent=w; })
+        .fromTo('#seqWord',{opacity:0,filter:'blur(16px)',scale:1.22},{opacity:1,filter:'blur(0px)',scale:1,duration:.82})
+        .to('#seqWord',{opacity:0,filter:'blur(10px)',scale:.9,duration:.48},'+=.45');
+});
+master.set('#s3',{autoAlpha:0}).set('#s4',{autoAlpha:1})
+      .from('#less',{x:-150,opacity:0,duration:.9})
+      .from('#more',{x:150,opacity:0,duration:1},'<.25')
+      .to('#s4',{autoAlpha:0,duration:.45},'+=1.55')
+      .set('#s5',{autoAlpha:1})
+      .from('#finish',{scale:.74,opacity:0,letterSpacing:'.13em',duration:1.25,ease:'expo.out'});
+
+}
+function runFallback() {
+
+wa($('#where'),[{opacity:0,transform:'translateY(120px) scale(.92)'},{opacity:1,transform:'none'}],{duration:1150});
+later(3000,()=>{showScene('s1');wa($('#doYou'),[{opacity:0,transform:'translateX(-180px)'},{opacity:1,transform:'none'}],{duration:900});wa($('#startQ'),[{opacity:0,transform:'translateX(190px)'},{opacity:1,transform:'none'}],{duration:1000,delay:120})});
+later(6200,()=>{showScene('s2');$$('#s2 .datum').forEach((e,i)=>wa(e,[{opacity:0,transform:'translateY(80px)'},{opacity:1,transform:'none'}],{duration:900,delay:i*280}))});
+later(10000,()=>{showScene('s3');['SEARCH','MATCH','MOVE'].forEach((w,i)=>later(i*1500,()=>{$('#seqWord').textContent=w;wa($('#seqWord'),[{opacity:0,filter:'blur(16px)',transform:'scale(1.22)'},{opacity:1,filter:'blur(0)',transform:'scale(1)'}],{duration:820})}))});
+later(14800,()=>{showScene('s4');wa($('#less'),[{opacity:0,transform:'translateX(-150px)'},{opacity:1,transform:'none'}],{duration:900});wa($('#more'),[{opacity:0,transform:'translateX(150px)'},{opacity:1,transform:'none'}],{duration:1000,delay:250})});
+later(19000,()=>{showScene('s5');wa($('#finish'),[{opacity:0,transform:'scale(.74)',letterSpacing:'.13em'},{opacity:1,transform:'scale(1)',letterSpacing:'-.078em'}],{duration:1250})});
+
+}
+</script>
+</body>
+</html>

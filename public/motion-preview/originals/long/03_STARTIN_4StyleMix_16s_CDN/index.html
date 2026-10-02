@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+
+<html class="cdn-mode" lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>START IN Motion Mix Study — Brand Palette</title>
+<!-- Color-only revision: aligned to START IN main palette (#f5f8f6 / #141c32 / #008e6b). Motion/layout unchanged. -->
+<style>
+:root{
+  --paper:#f5f8f6;
+  --ink:#141c32;
+  --green:#008e6b;
+  --lime:#e0f6ef;
+  --muted:#7b8bac;
+  --dark:#081421;
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--paper);font-family:Arial,"Malgun Gothic","Apple SD Gothic Neo","Noto Sans KR",sans-serif;color:var(--ink)}
+button{font:inherit}
+#app{position:relative;width:100vw;height:100vh;overflow:hidden;background:var(--paper)}
+.scene{position:absolute;inset:0;opacity:0;visibility:hidden;overflow:hidden;pointer-events:none}
+.scene.active{visibility:visible}
+.chrome{position:absolute;inset:0;z-index:60;pointer-events:none;color:var(--ink)}
+.meta{position:absolute;top:28px;left:32px;font:700 10px/1.2 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.22em;text-transform:uppercase}
+.styleTag{position:absolute;top:28px;right:34px;font:700 10px/1.2 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.18em;text-transform:uppercase;color:var(--green)}
+.clock{position:absolute;bottom:28px;left:32px;font:700 10px/1.2 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.14em;color:#77889f}
+.progress{position:absolute;left:32px;right:32px;bottom:18px;height:1px;background:rgba(20,28,50,.14)}
+.progress>i{display:block;height:100%;width:0;background:var(--green)}
+.skip{position:absolute;right:32px;bottom:30px;pointer-events:auto;border:0;background:none;color:var(--ink);font:700 10px/1 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.16em;cursor:pointer}
+.corner{position:absolute;width:22px;height:22px;opacity:.35}
+.corner:before,.corner:after{content:"";position:absolute;background:var(--ink)}
+.corner:before{width:22px;height:1px}.corner:after{width:1px;height:22px}
+.c1{left:22px;top:22px}.c2{right:22px;top:22px;transform:rotate(90deg)}.c3{right:22px;bottom:22px;transform:rotate(180deg)}.c4{left:22px;bottom:22px;transform:rotate(270deg)}
+
+/* editorial */
+#editorial{background:var(--paper)}
+.ed-kicker{position:absolute;left:8vw;top:18vh;font:700 11px/1 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.24em;color:var(--green)}
+.ed-a,.ed-b,.ed-c{position:absolute;margin:0;font-weight:900;line-height:1.02;letter-spacing:-.075em;white-space:nowrap}
+.ed-a{left:7vw;top:24vh;font-size:clamp(84px,12vw,220px)}
+.ed-b{left:7vw;top:45vh;font-size:clamp(84px,12vw,220px);color:var(--green)}
+.ed-c{right:7vw;bottom:12vh;font-size:clamp(40px,6.4vw,120px);font-weight:800;text-align:right}
+.ed-note{position:absolute;right:7.4vw;top:25vh;width:260px;font-size:13px;line-height:1.65;color:#6d7e95}
+.ed-rule{position:absolute;right:7vw;top:42vh;width:18vw;height:4px;background:var(--lime)}
+.mask{overflow:hidden;padding:.10em .04em .14em .04em;margin:-.10em -.04em -.14em -.04em}
+.mask>span{display:block;will-change:transform,opacity}
+
+/* swiss */
+#swiss{background:#edf7f2}
+.sw-wrap{position:absolute;inset:9vh 5vw 8vh;display:grid;grid-template-columns:1.1fr 1fr .9fr;grid-template-rows:auto 1fr auto;column-gap:4vw}
+.sw-head{grid-column:1/4;display:grid;grid-template-columns:1.1fr 1fr .9fr;border-bottom:1px solid rgba(20,28,50,.25);padding-bottom:12px;font:700 11px/1 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.18em}
+.sw-list{grid-column:1/2;align-self:center}
+.sw-row{display:grid;grid-template-columns:52px 1fr;border-top:1px solid rgba(20,28,50,.18);padding:13px 0;font-weight:800;font-size:clamp(24px,3vw,56px);letter-spacing:-.05em}
+.sw-row span:first-child{font:700 11px/1 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.12em;color:var(--green);padding-top:8px}
+.sw-stats{grid-column:2/4;align-self:center;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.stat{border-left:1px solid rgba(20,28,50,.25);padding-left:18px}
+.stat strong{display:block;font-size:clamp(54px,7vw,130px);line-height:.9;letter-spacing:-.07em}
+.stat small{display:block;margin-top:18px;font:700 10px/1.3 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.14em;color:#77889f}
+.sw-foot{grid-column:1/4;border-top:1px solid rgba(20,28,50,.25);padding-top:12px;display:flex;justify-content:space-between;font:700 10px/1 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.14em}
+
+/* minimal */
+#minimal{background:#f5f8f6}
+.min-line{position:absolute;left:50%;top:50%;transform:translate(-50%,-55%);text-align:center;white-space:nowrap}
+.min-line h2{margin:0;font-size:clamp(54px,7.6vw,140px);line-height:1.08;letter-spacing:-.065em;font-weight:800}
+.min-line p{margin:24px 0 0;font-size:14px;color:#6d7e95;letter-spacing:.02em}
+.min-dot{width:7px;height:7px;border-radius:50%;background:var(--green);margin:0 auto 30px}
+
+/* cinematic */
+#cinematic{background:var(--dark);color:#f5f8f6}
+.cin-word{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:clamp(90px,15vw,290px);font-weight:900;line-height:1;letter-spacing:-.08em;white-space:nowrap;opacity:0}
+.cin-word.green{color:#7ecfb8}
+.cin-wipe{position:absolute;inset:0;background:var(--lime);transform:translateX(-102%);z-index:5}
+.cin-index{position:absolute;left:7vw;bottom:9vh;font:700 10px/1 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.18em;color:#82908d}
+
+/* finale */
+#finale{background:var(--paper)}
+.fi-label{position:absolute;left:7vw;top:12vh;font:700 10px/1 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.22em;color:var(--green)}
+.fi-a,.fi-b{position:absolute;margin:0;font-weight:900;line-height:1.02;letter-spacing:-.075em;white-space:nowrap}
+.fi-a{left:6vw;top:25vh;font-size:clamp(82px,11.5vw,215px)}
+.fi-b{right:6vw;top:48vh;font-size:clamp(82px,11.5vw,215px);color:var(--green)}
+.fi-detail{position:absolute;left:7vw;bottom:12vh;display:flex;gap:36px;align-items:flex-end}
+.fi-detail p{margin:0;width:260px;color:#6d7e95;font-size:13px;line-height:1.6}
+.enter{pointer-events:auto;border:1px solid var(--ink);background:var(--ink);color:#ffffff;padding:17px 22px;font:800 11px/1 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.15em;cursor:pointer;transition:transform .2s ease,background .2s ease,color .2s ease}
+.enter:hover{transform:translateY(-3px);background:var(--lime);color:var(--ink)}
+.replay{pointer-events:auto;border:0;background:none;color:#7b8bac;font:700 10px/1 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.12em;cursor:pointer;padding:10px}
+.fi-counter{position:absolute;right:7vw;bottom:12vh;text-align:right;font:700 10px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.13em;color:#77889f}
+
+@media(max-width:900px){
+ .ed-note,.ed-rule{display:none}.ed-c{right:auto;left:7vw;bottom:18vh;text-align:left}.sw-wrap{grid-template-columns:1fr;grid-template-rows:auto auto 1fr auto}.sw-head{grid-column:1}.sw-head span:nth-child(n+2){display:none}.sw-list{grid-column:1}.sw-stats{grid-column:1;grid-template-columns:repeat(3,1fr)}.sw-foot{grid-column:1}.stat strong{font-size:clamp(42px,11vw,76px)}.fi-b{left:6vw;right:auto;top:46vh}.fi-detail{bottom:10vh;gap:10px}.fi-detail p{display:none}.fi-counter{display:none}
+}
+</style>
+
+<style id="cdn-motion-runtime">
+html.cdn-mode *,html.cdn-mode *::before,html.cdn-mode *::after{animation:none!important}
+.cdn-error{position:fixed;z-index:999999;left:50%;top:18px;transform:translateX(-50%);padding:10px 14px;border:1px solid rgba(255,255,255,.22);background:#101826;color:#fff;font:600 12px/1.3 Arial,sans-serif;letter-spacing:.04em;border-radius:999px;box-shadow:0 12px 40px rgba(0,0,0,.25)}
+</style>
+</head>
+<body>
+<div id="app">
+<div class="chrome">
+<div class="meta">MOTION STUDY / 04 STYLES</div>
+<div class="styleTag" id="styleTag">EDITORIAL</div>
+<div class="clock" id="clock">00:00 / 00:16</div>
+<div class="progress"><i id="bar"></i></div>
+<button class="skip" id="skip">SKIP →</button>
+<i class="corner c1"></i><i class="corner c2"></i><i class="corner c3"></i><i class="corner c4"></i>
+</div>
+<section class="scene" id="editorial">
+<div class="ed-kicker">01 / EDITORIAL MOTION</div>
+<h1 class="ed-a mask"><span>좋은</span></h1>
+<h1 class="ed-b mask"><span>시작은</span></h1>
+<div class="ed-note">화면을 멈춰도 한 장의 포스터처럼 보이도록 크기와 위치 자체를 디자인합니다.</div>
+<div class="ed-rule"></div>
+<h2 class="ed-c mask"><span>빠른 판단에서.</span></h2>
+</section>
+<section class="scene" id="swiss">
+<div class="sw-wrap">
+<div class="sw-head"><span>02 / SWISS SYSTEM</span><span>FILTER / CAREER DATA</span><span>2026 / BUSAN</span></div>
+<div class="sw-list">
+<div class="sw-row"><span>01</span><b>지역</b></div>
+<div class="sw-row"><span>02</span><b>직무</b></div>
+<div class="sw-row"><span>03</span><b>경력</b></div>
+<div class="sw-row"><span>04</span><b>연봉</b></div>
+</div>
+<div class="sw-stats">
+<div class="stat"><strong>12,600</strong><small>AVAILABLE<br/>POSTINGS</small></div>
+<div class="stat"><strong>320</strong><small>FILTERED<br/>RESULTS</small></div>
+<div class="stat"><strong>48</strong><small>HIGH MATCH<br/>RESULTS</small></div>
+</div>
+<div class="sw-foot"><span>GRID / ALIGNMENT / ORDER</span><span>02 — 04</span></div>
+</div>
+</section>
+<section class="scene" id="minimal">
+<div class="min-line">
+<div class="min-dot"></div>
+<h2>필요한 것만.</h2>
+<p>Less motion. Better timing.</p>
+</div>
+</section>
+<section class="scene" id="cinematic">
+<div class="cin-wipe" id="cinWipe"></div>
+<div class="cin-word" id="word1">찾고</div>
+<div class="cin-word green" id="word2">비교하고</div>
+<div class="cin-word" id="word3">선택한다</div>
+<div class="cin-index">04 / CINEMATIC SEQUENCE — TIME BECOMES THE LAYOUT</div>
+</section>
+<section class="scene" id="finale">
+<div class="fi-label">COMBINED / EDITORIAL × SWISS × MINIMAL × CINEMATIC</div>
+<h1 class="fi-a mask"><span>좋은 시작은</span></h1>
+<h1 class="fi-b mask"><span>빠른 판단에서.</span></h1>
+<div class="fi-detail">
+<button class="enter" id="enter">ENTER →</button>
+<button class="replay" id="replay">REPLAY 16s</button>
+<p>편집 레이아웃을 그리드로 정리하고, 장면은 영화처럼 연결하되, 움직임은 필요한 만큼만 남겼습니다.</p>
+</div>
+<div class="fi-counter">EDITORIAL / LAYOUT<br/>SWISS / ORDER<br/>MINIMAL / RESTRAINT<br/>CINEMATIC / TIME</div>
+</section>
+</div>
+
+<div style="position:fixed;right:18px;top:18px;z-index:99;font:700 10px/1.2 ui-monospace,Consolas,monospace;letter-spacing:.08em;opacity:.42;pointer-events:none">STANDALONE HTML / 16s</div><script onerror="document.body.insertAdjacentHTML('beforeend','&lt;div class=cdn-error&gt;GSAP CDN 로드 실패 · 인터넷 연결을 확인하세요&lt;/div&gt;')" src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script><script>
+function mmss(v){const s=Math.max(0,Math.floor(v));return `00:${String(s).padStart(2,'0')}`}
+function wireClock(tl, clock, duration){
+  tl.eventCallback('onUpdate',()=>{if(clock) clock.textContent=mmss(Math.min(duration,tl.time()))});
+}
+function scene(tl, sel, at, stay){
+  tl.set(sel,{autoAlpha:1,pointerEvents:'auto'},at);
+  tl.to(sel,{autoAlpha:0,duration:.28,ease:'power2.inOut',pointerEvents:'none'},at+stay-.28);
+}
+function resetScenes(selectors){selectors.forEach(s=>gsap.set(s,{autoAlpha:0,pointerEvents:'none'}));}
+
+const D=16, scenes=['#editorial','#swiss','#minimal','#cinematic','#finale']; const clock=document.querySelector('#clock'), progress=document.querySelector('.progress > i')||document.querySelector('.progress'); let tl;
+function tag(s){const e=document.querySelector('#styleTag'); if(e)e.textContent=s}
+function build(){
+ if(tl)tl.kill();gsap.killTweensOf('*'); resetScenes(scenes);
+ gsap.set('#editorial .mask span,#finale .mask span',{yPercent:125}); gsap.set('#editorial .ed-note',{x:40,opacity:0}); gsap.set('#editorial .ed-rule',{scaleX:0,transformOrigin:'0 50%'});
+ gsap.set('#swiss .sw-head > *,#swiss .sw-row,#swiss .stat,#swiss .sw-foot',{y:20,opacity:0});
+ gsap.set('#minimal .min-dot',{scale:0}); gsap.set('#minimal h2,#minimal p',{y:16,opacity:0});
+ gsap.set('#cinematic .cin-word',{opacity:0,scale:.78,filter:'blur(12px)'}); gsap.set('#cinWipe',{xPercent:-110});
+ gsap.set('#finale .fi-label,#finale .fi-detail,#finale .fi-counter',{y:18,opacity:0});
+ tl=gsap.timeline({defaults:{ease:'power4.out'}});
+ tl.set('#editorial',{autoAlpha:1,pointerEvents:'auto'},0).call(()=>tag('EDITORIAL'),[],0).to('#editorial .ed-a span',{yPercent:0,duration:.76},.10).to('#editorial .ed-b span',{yPercent:0,duration:.76},.26).to('#editorial .ed-c span',{yPercent:0,duration:.80},.46).to('#editorial .ed-note',{x:0,opacity:1,duration:.62},.72).to('#editorial .ed-rule',{scaleX:1,duration:.62},.90).to('#editorial',{autoAlpha:0,duration:.28},3.05);
+ tl.set('#swiss',{autoAlpha:1,pointerEvents:'auto'},3.18).call(()=>tag('SWISS'),[],3.18).to('#swiss .sw-head > *',{y:0,opacity:1,duration:.42,stagger:.08},3.30).to('#swiss .sw-row',{y:0,opacity:1,duration:.46,stagger:.09},3.65).to('#swiss .stat',{y:0,opacity:1,duration:.50,stagger:.11},4.10).to('#swiss .sw-foot',{y:0,opacity:1,duration:.44},4.58).to('#swiss .sw-wrap',{x:8,duration:.85,ease:'sine.inOut'},5.15).to('#swiss',{autoAlpha:0,duration:.28},6.30);
+ tl.set('#minimal',{autoAlpha:1,pointerEvents:'auto'},6.42).call(()=>tag('MINIMAL'),[],6.42).to('#minimal .min-dot',{scale:1,duration:.55,ease:'back.out(1.7)'},6.55).to('#minimal h2',{y:0,opacity:1,duration:.72},6.72).to('#minimal p',{y:0,opacity:1,duration:.58},7.05).to('#minimal .min-line',{scale:1.025,duration:.55,ease:'sine.inOut'},7.90).to('#minimal',{autoAlpha:0,duration:.35},8.78);
+ tl.set('#cinematic',{autoAlpha:1,pointerEvents:'auto'},8.92).call(()=>tag('CINEMATIC'),[],8.92).to('#cinWipe',{xPercent:110,duration:.70,ease:'power4.inOut'},9.00).to('#word1',{opacity:1,scale:1,filter:'blur(0px)',duration:.58},9.20).to('#word1',{opacity:0,scale:1.17,filter:'blur(10px)',duration:.35},10.03).to('#word2',{opacity:1,scale:1,filter:'blur(0px)',duration:.58},10.18).to('#word2',{opacity:0,scale:1.17,filter:'blur(10px)',duration:.35},11.00).to('#word3',{opacity:1,scale:1,filter:'blur(0px)',duration:.58},11.15).to('#cinematic',{autoAlpha:0,duration:.32},12.26);
+ tl.set('#finale',{autoAlpha:1,pointerEvents:'auto'},12.40).call(()=>tag('COMBINED'),[],12.40).to('#finale .fi-a span',{yPercent:0,duration:.75},12.52).to('#finale .fi-b span',{yPercent:0,duration:.75},12.66).to('#finale .fi-label',{y:0,opacity:1,duration:.48},13.02).to('#finale .fi-detail',{y:0,opacity:1,duration:.52},13.24).to('#finale .fi-counter',{y:0,opacity:1,duration:.52},13.43);
+ tl.eventCallback('onUpdate',()=>{if(clock)clock.textContent=`${mmss(Math.min(D,tl.time()))} / 00:16`}); return tl;
+}
+function replay(){build().play(0)} document.querySelector('#replay').onclick=replay; document.querySelector('#enter').onclick=replay; document.querySelector('#skip').onclick=()=>{build().pause(D);tl.progress(1);tag('COMBINED');gsap.set('#finale',{autoAlpha:1,pointerEvents:'auto'});gsap.set('#finale .mask span',{yPercent:0});gsap.set('#finale .fi-label,#finale .fi-detail,#finale .fi-counter',{y:0,opacity:1});if(clock)clock.textContent='00:16 / 00:16'}; build();
+</script><script type="module">
+import { animate, press } from "https://cdn.jsdelivr.net/npm/motion@13.5.0/+esm";
+window.__MOTION_CDN_READY__ = true;
+const buttons = document.querySelectorAll('button');
+buttons.forEach((button) => {
+  button.addEventListener('pointerenter', () => animate(button, { scale: 1.025, y: -2 }, { type: 'spring', stiffness: 420, damping: 28 }));
+  button.addEventListener('pointerleave', () => animate(button, { scale: 1, y: 0 }, { type: 'spring', stiffness: 420, damping: 30 }));
+});
+press('button', (element) => {
+  animate(element, { scale: 0.97 }, { type: 'spring', stiffness: 520, damping: 32 });
+  return () => animate(element, { scale: 1 }, { type: 'spring', stiffness: 520, damping: 30 });
+});
+</script></body>
+</html>

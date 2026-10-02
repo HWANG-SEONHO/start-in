@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>START IN — Editorial Kinetic Cover v5</title>
+<style>
+  :root{
+    --paper:#f3f1e9;
+    --ink:#111312;
+    --muted:#777a74;
+    --green:#12b76a;
+    --green-dark:#0b7e4a;
+    --line:rgba(17,19,18,.18);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--paper);color:var(--ink)}
+  body{font-family:Arial,Helvetica,sans-serif}
+  button{font:inherit}
+  .stage{position:relative;width:100vw;height:100vh;overflow:hidden;background:var(--paper)}
+  .grain{position:absolute;inset:0;pointer-events:none;opacity:.1;background-image:radial-gradient(rgba(17,19,18,.16) .45px, transparent .45px);background-size:4px 4px;mix-blend-mode:multiply}
+  .grid{position:absolute;inset:0;pointer-events:none}
+  .grid i{position:absolute;background:var(--line);display:block;opacity:0}
+  .grid .v1{left:7.5%;top:0;width:1px;height:100%}.grid .v2{left:50%;top:0;width:1px;height:100%}.grid .v3{right:7.5%;top:0;width:1px;height:100%}
+  .grid .h1{left:0;top:9%;width:100%;height:1px}.grid .h2{left:0;bottom:9%;width:100%;height:1px}
+  .scene{position:absolute;inset:0;visibility:hidden;opacity:0}
+  .scene.is-live{visibility:visible}
+  .kicker{font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+  .micro{font-size:10px;line-height:1.45;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+  .serif{font-family:Georgia,'Times New Roman',serif}
+  .mask{overflow:hidden}
+  .mask > *{will-change:transform,opacity,clip-path}
+  .letter{display:inline-block;will-change:transform,opacity}
+  .green{color:var(--green)}
+  .rule{height:1px;background:var(--ink);transform-origin:left center}
+
+  /* SCENE 1 */
+  #s1 .meta-a{position:absolute;left:7.5%;top:5.2%}
+  #s1 .meta-b{position:absolute;right:7.5%;top:5.2%;text-align:right}
+  #s1 .word-start{position:absolute;left:6.6%;top:13.5%;font-size:clamp(92px,15vw,270px);font-weight:900;letter-spacing:-.075em;line-height:.8;white-space:nowrap}
+  #s1 .word-in{position:absolute;right:7.2%;bottom:12%;font-size:clamp(92px,15vw,260px);font-weight:900;letter-spacing:-.08em;line-height:.75;white-space:nowrap;color:var(--green)}
+  #s1 .s1-note{position:absolute;left:7.6%;bottom:12.5%;width:260px}
+  #s1 .s1-rule{position:absolute;left:7.6%;bottom:18.5%;width:260px}
+  #s1 .index{position:absolute;right:7.5%;top:49%;font-size:12px;letter-spacing:.18em;color:var(--muted);writing-mode:vertical-rl}
+
+  /* SCENE 2 */
+  #s2 .left-label{position:absolute;left:7.5%;top:12%}
+  #s2 .big-in{position:absolute;right:6.5%;top:10%;font-size:clamp(180px,31vw,560px);font-weight:900;letter-spacing:-.11em;line-height:.78;color:var(--green);white-space:nowrap}
+  #s2 .stack{position:absolute;left:7.4%;bottom:13%;width:40vw;max-width:620px}
+  #s2 .stack .line{font-size:clamp(34px,5.4vw,88px);font-weight:800;letter-spacing:-.04em;line-height:.9;overflow:hidden}
+  #s2 .stack .line.alt{font-family:Georgia,'Times New Roman',serif;font-weight:400;font-style:italic;letter-spacing:-.055em}
+  #s2 .caption{position:absolute;right:8%;bottom:10.5%;width:220px;text-align:right}
+  #s2 .green-band{position:absolute;left:0;top:48.2%;width:42%;height:10px;background:var(--green)}
+
+  /* SCENE 3 */
+  #s3 .poster{position:absolute;left:7.5%;top:10%;right:7.5%;bottom:10%;display:grid;grid-template-columns:1.05fr .95fr;gap:4vw}
+  #s3 .poster-left{position:relative;border-top:1px solid var(--ink);border-bottom:1px solid var(--ink)}
+  #s3 .poster-right{position:relative;border-left:1px solid var(--line)}
+  #s3 .vertical{position:absolute;left:-4px;top:16%;font-size:clamp(54px,8vw,138px);font-weight:900;letter-spacing:-.075em;line-height:.82}
+  #s3 .vertical span{display:block;overflow:hidden}
+  #s3 .vsub{position:absolute;left:0;bottom:4%;width:58%;}
+  #s3 .quote{position:absolute;right:0;top:4%;width:40%;font:400 clamp(20px,2.5vw,44px)/1.02 Georgia,'Times New Roman',serif;text-align:right}
+  #s3 .giant-start{position:absolute;left:8%;top:7%;font-size:clamp(74px,12vw,208px);font-weight:900;letter-spacing:-.085em;line-height:.78;white-space:nowrap}
+  #s3 .giant-in{position:absolute;left:8%;top:44%;font:400 italic clamp(88px,15vw,260px)/.8 Georgia,'Times New Roman',serif;color:var(--green)}
+  #s3 .small-grid{position:absolute;left:8%;right:5%;bottom:4%;display:grid;grid-template-columns:repeat(3,1fr);gap:16px;border-top:1px solid var(--line);padding-top:12px}
+  #s3 .small-grid div{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+
+  /* SCENE 4 */
+  #s4 .final-wrap{position:absolute;left:7.5%;right:7.5%;top:50%;transform:translateY(-50%);display:grid;grid-template-columns:1fr auto;align-items:end;gap:36px}
+  #s4 .final-word{font-size:clamp(82px,14vw,248px);font-weight:900;letter-spacing:-.08em;line-height:.75;white-space:nowrap}
+  #s4 .final-word .in{color:var(--green)}
+  #s4 .final-meta{width:230px;padding-bottom:10px}
+  #s4 .final-rule{position:absolute;left:7.5%;right:7.5%;top:61.5%;height:1px;background:var(--ink)}
+  #s4 .final-sub{position:absolute;left:7.5%;top:65.5%;font:400 italic clamp(18px,2.1vw,34px)/1 Georgia,'Times New Roman',serif}
+  #s4 .enter{position:absolute;right:7.5%;bottom:8.7%;border:1px solid var(--ink);background:transparent;color:var(--ink);padding:12px 18px;letter-spacing:.18em;font-size:10px;text-transform:uppercase;cursor:pointer;border-radius:999px}
+  #s4 .dot{position:absolute;right:23.8%;bottom:9.9%;width:9px;height:9px;border-radius:50%;background:var(--green)}
+
+  .progress{position:absolute;left:7.5%;right:7.5%;bottom:3.2%;height:1px;background:rgba(17,19,18,.12);z-index:20}
+  .progress b{display:block;width:0;height:100%;background:var(--green)}
+  .replay{position:absolute;right:2.4%;top:50%;transform:translateY(-50%);z-index:30;border:0;background:transparent;color:var(--muted);font-size:10px;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;writing-mode:vertical-rl}
+  .replay:hover{color:var(--ink)}
+  .noscript{display:none;position:absolute;inset:0;place-items:center;background:var(--paper);z-index:100;font-size:14px}
+  @media (max-width:800px){
+    #s3 .poster{grid-template-columns:1fr}.poster-right{display:none}.final-wrap{grid-template-columns:1fr!important}.final-meta{display:none}.word-start{font-size:24vw!important}.word-in{font-size:24vw!important}
+  }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div class="grain"></div>
+  <div class="grid" aria-hidden="true"><i class="v1"></i><i class="v2"></i><i class="v3"></i><i class="h1"></i><i class="h2"></i></div>
+
+  <section class="scene" id="s1">
+    <div class="kicker meta-a">START IN / COVER STUDY 01</div>
+    <div class="kicker meta-b">BUSAN · CAREER DISCOVERY</div>
+    <div class="mask word-start" aria-label="START">
+      <span class="letter">S</span><span class="letter">T</span><span class="letter">A</span><span class="letter">R</span><span class="letter">T</span>
+    </div>
+    <div class="mask word-in" aria-label="IN"><span class="letter">I</span><span class="letter">N</span></div>
+    <div class="rule s1-rule"></div>
+    <div class="micro s1-note">Find the direction first.<br>Then find the job.</div>
+    <div class="index">01 — KINETIC / EDITORIAL</div>
+  </section>
+
+  <section class="scene" id="s2">
+    <div class="kicker left-label">02 / RECOMPOSE</div>
+    <div class="mask big-in"><span class="letter">I</span><span class="letter">N</span></div>
+    <div class="green-band"></div>
+    <div class="stack">
+      <div class="line"><span>GOOD CAREER</span></div>
+      <div class="line alt"><span>starts with</span></div>
+      <div class="line"><span>GOOD DIRECTION.</span></div>
+    </div>
+    <div class="micro caption">Information is reduced.<br>Direction becomes visible.</div>
+  </section>
+
+  <section class="scene" id="s3">
+    <div class="poster">
+      <div class="poster-left">
+        <div class="vertical"><span><b>START</b></span><span><b>WITH</b></span><span><b class="green">DIRECTION.</b></span></div>
+        <div class="micro vsub">Editorial layout / kinetic type / sequential cut</div>
+        <div class="quote">“Before the job,<br>find the direction.”</div>
+      </div>
+      <div class="poster-right">
+        <div class="giant-start">START</div>
+        <div class="giant-in">IN</div>
+        <div class="small-grid"><div>Region<br>Busan</div><div>Mode<br>Explore</div><div>Signal<br>Live</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="scene" id="s4">
+    <div class="final-wrap">
+      <div class="final-word"><span>START</span> <span class="in">IN</span></div>
+      <div class="micro final-meta">A quieter way to see<br>where your career can begin.</div>
+    </div>
+    <div class="final-rule"></div>
+    <div class="final-sub">좋은 커리어는, 좋은 방향에서 시작됩니다.</div>
+    <span class="dot"></span>
+    <button class="enter" type="button">Explore jobs ↗</button>
+  </section>
+
+  <div class="progress"><b></b></div>
+  <button class="replay" type="button">Replay</button>
+  <div class="noscript" id="loadFail">Animation library could not load.</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/motion@13.4.0/dist/motion.js"></script>
+<script>
+(function(){
+  const fail = document.getElementById('loadFail');
+  if (!window.gsap) { fail.style.display='grid'; return; }
+
+  const { gsap } = window;
+  const scenes = ['#s1','#s2','#s3','#s4'];
+  gsap.set(scenes,{autoAlpha:0});
+  gsap.set('.grid i',{opacity:0});
+  gsap.set('.progress b',{width:'0%'});
+
+  function showScene(sel){
+    document.querySelector(sel).classList.add('is-live');
+  }
+  function hideScene(sel){
+    document.querySelector(sel).classList.remove('is-live');
+  }
+
+  // Main choreography = GSAP Timeline. No scaleX/scaleY/letter stretching.
+  const tl = gsap.timeline({
+    repeat:-1,
+    repeatDelay:.65,
+    defaults:{ease:'power3.out'},
+    onUpdate(){ gsap.set('.progress b',{width:(tl.progress()*100).toFixed(2)+'%'}); }
+  });
+
+  // Scene 1 — oversized split + mask reveal
+  tl.call(()=>showScene('#s1'))
+    .set('#s1',{autoAlpha:1})
+    .from('#s1 .meta-a, #s1 .meta-b',{y:-18,opacity:0,duration:.55,stagger:.08})
+    .from('#s1 .word-start .letter',{y:190,opacity:0,duration:.9,stagger:.075,ease:'expo.out'},'<.08')
+    .from('#s1 .word-in .letter',{y:-160,opacity:0,duration:.75,stagger:.11,ease:'expo.out'},'<.22')
+    .from('#s1 .s1-rule',{clipPath:'inset(0 100% 0 0)',duration:.6},'<.18')
+    .from('#s1 .s1-note',{y:18,opacity:0,duration:.55},'<.05')
+    .to('.grid i',{opacity:.5,duration:.35,stagger:.03},'<')
+    .to('#s1 .word-start .letter',{y:(i)=>[-18,8,-10,14,-5][i],duration:.65,stagger:.045,ease:'power2.inOut'},'+=.45')
+    .to('#s1 .word-in .letter',{x:(i)=>i===0?-24:18,duration:.55,stagger:.08,ease:'power2.inOut'},'<')
+    .to('#s1',{autoAlpha:0,duration:.34,ease:'power1.in'})
+    .call(()=>hideScene('#s1'));
+
+  // Scene 2 — editorial recomposition. Different visual grammar, same type system.
+  tl.call(()=>showScene('#s2'))
+    .set('#s2',{autoAlpha:1})
+    .from('#s2 .green-band',{clipPath:'inset(0 100% 0 0)',duration:.5,ease:'power4.out'})
+    .from('#s2 .big-in .letter',{y:(i)=>i===0?-220:220,opacity:0,duration:.8,stagger:.08,ease:'expo.out'},'<.05')
+    .from('#s2 .stack .line span',{y:96,opacity:0,duration:.64,stagger:.11,ease:'power4.out'},'<.16')
+    .from('#s2 .left-label, #s2 .caption',{opacity:0,y:14,duration:.45,stagger:.12},'<.22')
+    .to('#s2 .big-in .letter',{x:(i)=>i===0?-34:28,y:(i)=>i===0?18:-14,duration:.72,stagger:.05,ease:'power2.inOut'},'+=.45')
+    .to('#s2 .green-band',{x:'58vw',duration:.72,ease:'power3.inOut'},'<')
+    .to('#s2 .stack',{x:38,duration:.72,ease:'power3.inOut'},'<')
+    .to('#s2',{autoAlpha:0,duration:.34,ease:'power1.in'})
+    .call(()=>hideScene('#s2'));
+
+  // Scene 3 — motion-poster cut: vertical build vs serif identity.
+  tl.call(()=>showScene('#s3'))
+    .set('#s3',{autoAlpha:1})
+    .from('#s3 .poster-left',{clipPath:'inset(0 0 100% 0)',duration:.62,ease:'power4.out'})
+    .from('#s3 .vertical span b',{y:105,opacity:0,duration:.58,stagger:.1,ease:'expo.out'},'<.08')
+    .from('#s3 .quote',{x:55,opacity:0,duration:.55},'<.18')
+    .from('#s3 .poster-right',{x:90,opacity:0,duration:.64},'<.08')
+    .from('#s3 .giant-start',{y:-64,opacity:0,duration:.58},'<.05')
+    .from('#s3 .giant-in',{y:82,opacity:0,duration:.65,ease:'power4.out'},'<.08')
+    .from('#s3 .small-grid > div',{y:18,opacity:0,duration:.4,stagger:.08},'<.18')
+    .to('#s3 .quote',{x:-26,duration:.7,ease:'power2.inOut'},'+=.5')
+    .to('#s3 .giant-start',{x:32,duration:.7,ease:'power2.inOut'},'<')
+    .to('#s3 .giant-in',{x:-28,duration:.7,ease:'power2.inOut'},'<')
+    .to('#s3',{autoAlpha:0,duration:.34,ease:'power1.in'})
+    .call(()=>hideScene('#s3'));
+
+  // Scene 4 — clean brand lockup after the busier sequence.
+  tl.call(()=>showScene('#s4'))
+    .set('#s4',{autoAlpha:1})
+    .from('#s4 .final-word',{clipPath:'inset(0 0 100% 0)',y:54,duration:.82,ease:'expo.out'})
+    .from('#s4 .final-rule',{clipPath:'inset(0 100% 0 0)',duration:.65},'<.16')
+    .from('#s4 .final-sub',{y:22,opacity:0,duration:.55},'<.12')
+    .from('#s4 .final-meta',{y:18,opacity:0,duration:.45},'<.04')
+    .from('#s4 .enter, #s4 .dot',{y:16,opacity:0,duration:.42,stagger:.08},'<.08')
+    .to('#s4 .final-word',{x:-18,duration:.55,ease:'power2.inOut'},'+=.7')
+    .to('#s4 .final-sub',{x:22,duration:.55,ease:'power2.inOut'},'<')
+    .to('#s4',{autoAlpha:0,duration:.38,ease:'power1.in'},'+=1.0')
+    .call(()=>hideScene('#s4'));
+
+  document.querySelector('.replay').addEventListener('click',()=>tl.restart());
+
+  // Motion = small UI / microinteraction only, per START IN rule.
+  if (window.Motion) {
+    const { animate } = window.Motion;
+    const dot = document.querySelector('#s4 .dot');
+    const enter = document.querySelector('#s4 .enter');
+    const replay = document.querySelector('.replay');
+
+    // No scale here either: gentle position/opacity spring only.
+    animate(dot,{ y:[0,-7,0], opacity:[.55,1,.55] },{ duration:1.8, repeat:Infinity, ease:'easeInOut' });
+
+    function springTo(el, x, y){
+      animate(el,{ x, y },{ type:'spring', stiffness:360, damping:26, mass:.55 });
+    }
+    enter.addEventListener('pointermove',(e)=>{
+      const r=enter.getBoundingClientRect();
+      springTo(enter,(e.clientX-(r.left+r.width/2))*.16,(e.clientY-(r.top+r.height/2))*.22);
+    });
+    enter.addEventListener('pointerleave',()=>springTo(enter,0,0));
+    replay.addEventListener('pointerenter',()=>animate(replay,{ y:-7 },{ type:'spring',stiffness:320,damping:24 }));
+    replay.addEventListener('pointerleave',()=>animate(replay,{ y:0 },{ type:'spring',stiffness:320,damping:24 }));
+  }
+})();
+</script>
+</body>
+</html>

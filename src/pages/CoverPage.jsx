@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import '../styles/cover.css';
 import { api } from '../services/api';
 
@@ -29,16 +28,20 @@ function ServiceWindow() {
   </div>;
 }
 
-export default function CoverPage() {
+export default function CoverPage({ onEnter }) {
   const root = useRef(null);
   const timeline = useRef(null);
   const leaving = useRef(false);
+  const review = useRef(false);
+  const speed = useRef(1);
   const [run, setRun] = useState(0);
   const [chapter, setChapter] = useState(0);
   const [remaining, setRemaining] = useState(LENGTH);
   const [paused, setPaused] = useState(false);
+  const [reviewing, setReviewing] = useState(false);
+  const [playbackRate, setPlaybackRate] = useState(1);
+  const [position, setPosition] = useState(0);
   const [backendReady, setBackendReady] = useState(false);
-  const navigate = useNavigate();
 
   // 커버를 보는 동안 서버도 깨어나도록 상태 확인 요청을 미리 보냅니다.
   useEffect(() => {
@@ -53,16 +56,12 @@ export default function CoverPage() {
     if (leaving.current) return;
     leaving.current = true;
     timeline.current?.pause();
-    const finish = () => {
-      sessionStorage.setItem('startin-cover-seen', '1');
-      navigate('/main', { replace: true });
-    };
-    if (!window.gsap || window.matchMedia('(prefers-reduced-motion: reduce)').matches) finish();
-    else window.gsap.to(root.current, { autoAlpha: 0, scale: 1.04, duration: .45, ease: 'power3.in', onComplete: finish });
+    onEnter();
   }
 
   function replay() {
     setPaused(false);
+    setPosition(0);
     setRemaining(LENGTH);
     setRun(value => value + 1);
   }
@@ -72,6 +71,30 @@ export default function CoverPage() {
     const next = !timeline.current.paused();
     timeline.current.paused(next);
     setPaused(next);
+  }
+
+  function changeSpeed(event) {
+    const value = Number(event.target.value);
+    speed.current = value;
+    setPlaybackRate(value);
+    timeline.current?.timeScale(value);
+  }
+
+  function seek(event) {
+    const value = Number(event.target.value);
+    // 검수 중에는 자동 이동 없이 원하는 순간을 멈춰 확인합니다.
+    review.current = true;
+    setReviewing(true);
+    timeline.current?.pause().seek(value, true);
+    setPaused(true);
+    setPosition(value);
+    setRemaining(Math.ceil(LENGTH - value));
+    setChapter(value >= 10.5 ? 3 : value >= 7.1 ? 2 : value >= 3.6 ? 1 : 0);
+  }
+
+  function finishPlayback() {
+    if (!review.current) enter();
+    else setPaused(true);
   }
 
   useEffect(() => {
@@ -87,7 +110,7 @@ export default function CoverPage() {
     if (!gsap || reduced) {
       root.current.dataset.static = 'true';
       setChapter(3);
-      fallback = setTimeout(enter, LENGTH * 1000);
+      fallback = setTimeout(finishPlayback, LENGTH * 1000);
       const started = performance.now();
       countdown = setInterval(() => setRemaining(Math.max(0, LENGTH - Math.floor((performance.now() - started) / 1000))), 1000);
     } else {
@@ -96,8 +119,12 @@ export default function CoverPage() {
         const scenes = gsap.utils.toArray('.cover-scene');
         gsap.set(scenes, { autoAlpha: 0 });
         gsap.set('.cover-transition', { scaleX: 0 });
-        const tl = gsap.timeline({ onComplete: enter, onUpdate: () => setRemaining(Math.max(0, Math.ceil(LENGTH - tl.time()))) });
+        const tl = gsap.timeline({ onComplete: finishPlayback, onUpdate: () => {
+          setPosition(tl.time());
+          setRemaining(Math.max(0, Math.ceil(LENGTH - tl.time())));
+        } });
         timeline.current = tl;
+        tl.timeScale(speed.current);
         // 전환이 화면을 덮는 순간 장면을 교체합니다.
         [0, 3.6, 7.1, 10.5].forEach((at, index) => {
           tl.call(() => setChapter(index), [], at);
@@ -120,10 +147,12 @@ export default function CoverPage() {
         tl.to('.cover-opening .cover-letters > span', { yPercent: -140, rotation: -9, duration: .3, stagger: .01, ease: 'power4.in' }, 3.18);
 
         tl.from('.cover-define .cover-letters > span', { x: 180, rotationY: 85, opacity: 0, duration: .65, stagger: .026, ease: 'expo.out' }, 3.62);
-        tl.from('.cover-command', { y: 300, rotationX: 65, rotationZ: -12, scale: .55, duration: .85, ease: 'expo.out' }, 3.8);
+        tl.fromTo('.cover-command',
+          { y: 130, rotationX: 12, rotationY: -24, rotationZ: 0, scale: .9, opacity: 0 },
+          { y: 0, rotationX: 6, rotationY: -12, rotationZ: 0, scale: 1, opacity: 1, duration: .85, ease: 'power3.out' }, 3.8);
         tl.from('.cover-command-row', { x: 100, opacity: 0, duration: .32, stagger: .1, ease: 'power3.out' }, 4.35);
         tl.from('.cover-command-line', { scaleX: 0, transformOrigin: 'left', duration: .7, ease: 'expo.inOut' }, 4.9);
-        tl.to('.cover-command', { rotationY: -8, rotationZ: 5, y: -15, duration: 1.1, ease: 'power2.inOut' }, 5.4);
+        tl.to('.cover-command', { rotationX: 0, rotationY: 0, rotationZ: 0, y: 0, duration: 1.1, ease: 'power2.inOut' }, 5.1);
         tl.to('.cover-define .cover-letters', { xPercent: -130, skewX: 12, duration: .35, stagger: .04, ease: 'power4.in' }, 6.65);
 
         tl.from('.cover-action-word', { yPercent: 120, rotationX: -80, duration: .5, stagger: .16, ease: 'expo.out' }, 7.15);
@@ -133,11 +162,14 @@ export default function CoverPage() {
         tl.to('.cover-mega-arrow', { rotation: 45, scale: 10, duration: .55, ease: 'expo.in' }, 9.9);
 
         tl.from('.cover-finale .cover-letters > span', { yPercent: 140, rotationX: -75, duration: .65, stagger: .045, ease: 'expo.out' }, 10.6);
-        tl.from('.cover-browser', { y: 220, z: -1000, rotationX: 45, rotationY: -30, rotationZ: 12, scale: .65, opacity: 0, duration: 1, ease: 'expo.out' }, 10.8);
+        // 창 전체를 한 평면으로 회전하고 정면으로 돌려 메인 진입을 준비합니다.
+        tl.fromTo('.cover-browser',
+          { y: 130, rotationX: 12, rotationY: -24, rotationZ: 0, scale: .9, opacity: 0 },
+          { y: 0, rotationX: 6, rotationY: -12, rotationZ: 0, scale: 1, opacity: 1, duration: 1, ease: 'power3.out' }, 10.8);
         tl.from('.cover-product-search', { scaleX: 0, transformOrigin: 'left', duration: .55, ease: 'expo.out' }, 11.5);
         tl.from('.cover-product-jobs > div', { x: 50, opacity: 0, duration: .4, stagger: .08 }, 11.7);
         tl.from('.cover-final-copy', { y: 20, opacity: 0, duration: .5, stagger: .12 }, 11.65);
-        tl.to('.cover-browser', { rotationY: -4, rotationZ: -2, duration: 2, ease: 'power2.out' }, 12);
+        tl.to('.cover-browser', { rotationX: 0, rotationY: 0, rotationZ: 0, duration: 2.6, ease: 'power2.inOut' }, 12);
         tl.to('.cover-progress > span', { scaleX: 1, duration: LENGTH, ease: 'none' }, 0);
       }, root);
     }
@@ -161,7 +193,7 @@ export default function CoverPage() {
       <div className="cover-type-flash" aria-hidden="true">YOUR NEXT.</div>
     </div>
     <div className="cover-scene cover-define">
-      <div className="cover-editorial"><p className="cover-eyebrow">02 — MAKE IT YOURS</p><h2><Letters>내 조건이</Letters><Letters className="cover-yellow">방향이 된다.</Letters></h2><p className="cover-note">지역, 직무, 경력.<br />찾고 싶은 기회를 더 선명하게.</p></div>
+      <div className="cover-editorial"><p className="cover-eyebrow">02 — MAKE IT YOURS</p><h2><Letters>내 조건이</Letters><Letters>방향이 된다.</Letters></h2><p className="cover-note">지역, 직무, 경력.<br />찾고 싶은 기회를 더 선명하게.</p></div>
       <div className="cover-command"><div className="cover-command-top">YOUR NEXT / SEARCH SYSTEM <b>↗</b></div>{[['LOCATION','부산 · 서울'],['CAREER','신입 · 경력'],['INTEREST','IT · 개발']].map(([label,value]) => <div className="cover-command-row" key={label}><small>{label}</small><strong>{value}</strong><span>✓</span></div>)}<div className="cover-command-bottom">DEFINE YOUR DIRECTION<span>→</span><i className="cover-command-line" /></div></div>
     </div>
     <div className="cover-scene cover-connect">
@@ -174,7 +206,7 @@ export default function CoverPage() {
       <ServiceWindow />
     </div>
     <div className="cover-transition" aria-hidden="true" />
-    <footer className="cover-footer"><div className="cover-chapters">{titles.map((title,index) => <span className={chapter === index ? 'current' : ''} key={title}><small>0{index+1}</small>{title}</span>)}</div><div className="cover-controls"><button onClick={togglePause} disabled={!window.gsap} aria-label={paused ? '모션 재생' : '모션 일시정지'}>{paused ? '▶' : 'Ⅱ'}</button><button onClick={replay}>다시보기 ↻</button><span>{remaining}초 후 서비스로 이동</span></div></footer>
+    <footer className="cover-footer"><div className="cover-chapters">{titles.map((title,index) => <span className={chapter === index ? 'current' : ''} key={title}><small>0{index+1}</small>{title}</span>)}</div><div className="cover-controls"><button onClick={togglePause} disabled={!window.gsap} aria-label={paused ? '모션 재생' : '모션 일시정지'}>{paused ? '▶' : 'Ⅱ'}</button><button onClick={replay}>다시보기 ↻</button><select aria-label="모션 배속" value={playbackRate} onChange={changeSpeed}><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="1">1×</option></select><input aria-label="모션 재생 위치" type="range" min="0" max={LENGTH} step="0.05" value={position} onChange={seek} /><label><input type="checkbox" checked={reviewing} onChange={event => { review.current = event.target.checked; setReviewing(event.target.checked); }} /> 검수</label><span>{reviewing ? `${position.toFixed(1)} / ${LENGTH}초 · 자동 이동 꺼짐` : `${Math.ceil(remaining / playbackRate)}초 후 서비스로 이동`}</span></div></footer>
     <div className="cover-progress"><span /></div>
   </section>;
 }

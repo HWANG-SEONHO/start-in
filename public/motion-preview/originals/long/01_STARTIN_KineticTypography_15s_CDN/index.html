@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html class="cdn-mode" lang="ko"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>START IN — Kinetic Typography 15s</title><style>
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#f5f8f6}
+*{box-sizing:border-box}
+button{font:inherit}
+.standalone-note{position:fixed;right:18px;top:18px;z-index:99999;font:700 10px/1.2 ui-monospace,Consolas,monospace;letter-spacing:.08em;opacity:.42;pointer-events:none}
+
+:root {
+  --tc-bg: #f3f1e9;
+  --tc-ink: #10231c;
+  --tc-muted: #79847f;
+  --tc-line: rgba(16,35,28,.16);
+  --tc-green: #0e6b4a;
+  --tc-accent: #d6f34a;
+}
+
+.typo-cover {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  overflow: hidden;
+  background: var(--tc-bg);
+  color: var(--tc-ink);
+  font-family: "Malgun Gothic", "Apple SD Gothic Neo", "Noto Sans KR", "Noto Sans CJK KR", system-ui, sans-serif;
+  font-synthesis: weight;
+  text-rendering: geometricPrecision;
+  cursor: default;
+  isolation: isolate;
+}
+
+.typo-cover::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background:
+    radial-gradient(circle at 75% 18%, rgba(214,243,74,.20), transparent 26%),
+    radial-gradient(circle at 14% 82%, rgba(15,107,74,.08), transparent 30%),
+    linear-gradient(180deg, rgba(255,255,255,.44), rgba(255,255,255,0));
+}
+
+.typo-cover::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+  opacity: .20;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.86' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.12'/%3E%3C/svg%3E");
+}
+
+.typo-ghost-grid {
+  position: absolute;
+  inset: -2%;
+  z-index: -1;
+  opacity: .32;
+  background-image:
+    linear-gradient(to right, rgba(16,35,28,.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(16,35,28,.07) 1px, transparent 1px);
+  background-size: 8vw 8vw;
+  will-change: transform;
+}
+
+.typo-ghost-word {
+  position: absolute;
+  right: -2vw;
+  bottom: -11vh;
+  z-index: -1;
+  color: rgba(16,35,28,.027);
+  font-size: min(34vw, 590px);
+  font-weight: 900;
+  line-height: .72;
+  letter-spacing: -.10em;
+  user-select: none;
+  will-change: transform;
+}
+
+.cover-meta {
+  position: absolute;
+  top: 28px;
+  left: 34px;
+  right: 34px;
+  z-index: 10;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 24px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .14em;
+  color: #5c6964;
+}
+.cover-meta .meta-live { color: var(--tc-green); }
+.cover-meta button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--tc-ink);
+  font: inherit;
+  cursor: pointer;
+}
+
+.typo-stage {
+  position: absolute;
+  inset: 74px 34px 70px;
+}
+
+.typo-scene {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.typo-split { display: inline-flex; }
+.typo-char-mask { display: inline-block; overflow: hidden; padding: .055em .006em .08em; }
+.typo-char { display: inline-block; will-change: transform; }
+.outline {
+  color: var(--tc-green) !important;
+  -webkit-text-stroke: 0 transparent;
+  text-stroke: 0 transparent;
+}
+.accent { color: var(--tc-green) !important; }
+
+/* SCENE 01 */
+.scene-one {
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  gap: 0;
+}
+.scene-one-row {
+  width: 100%;
+  font-size: clamp(94px, 12.5vw, 238px);
+  font-weight: 900;
+  line-height: .72;
+  letter-spacing: -.055em;
+  white-space: nowrap;
+}
+.scene-one .line-a { text-align: left; padding-left: 2vw; }
+.scene-one .line-b { text-align: right; padding-right: 4vw; }
+.scene-one .line-b .outline { color: var(--tc-green) !important; }
+
+/* SCENE 02 */
+.scene-two {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 0 7vw;
+  background: var(--tc-ink);
+  color: var(--tc-bg);
+}
+.scene-two .slash {
+  position: absolute;
+  left: 6.1vw;
+  top: 16%;
+  bottom: 16%;
+  width: 4px;
+  background: var(--tc-accent);
+}
+.scene-two .statement {
+  margin: 0;
+  font-size: clamp(62px, 8.2vw, 156px);
+  font-weight: 900;
+  line-height: .86;
+  letter-spacing: -.045em;
+}
+.scene-two .statement.is-2 { margin-left: 16vw; color: #a9b7b1; }
+.scene-two .statement.is-3 { margin-left: 5vw; }
+.scene-two .statement em { color: var(--tc-accent); font-style: normal; }
+
+/* SCENE 03 */
+.scene-three {
+  flex-direction: column;
+  gap: 1.2vh;
+  overflow: hidden;
+}
+.filter-row {
+  display: flex;
+  align-items: center;
+  gap: 4vw;
+  width: max-content;
+  font-size: clamp(82px, 10.4vw, 198px);
+  font-weight: 900;
+  line-height: .78;
+  letter-spacing: -.050em;
+  white-space: nowrap;
+}
+.filter-row.is-top { transform: translateX(7%); }
+.filter-row.is-bottom { transform: translateX(-8%); }
+.filter-word { display: inline-block; }
+.filter-word.outline { color: var(--tc-green) !important; }
+.filter-word.accent {
+  padding: .04em .14em .08em;
+  background: var(--tc-accent);
+  color: var(--tc-ink) !important;
+}
+
+/* SCENE NUMBERS */
+.scene-numbers {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto 1fr;
+  align-content: center;
+  gap: 2.2vw;
+  padding: 0 5vw;
+}
+.number-column { text-align: center; color: var(--tc-ink); }
+.number-column span {
+  display: block;
+  font-size: clamp(96px, 11vw, 212px);
+  font-weight: 900;
+  line-height: .78;
+  letter-spacing: -.050em;
+}
+.number-column small {
+  display: block;
+  margin-top: 20px;
+  color: #6f7c77;
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: .04em;
+}
+.number-arrow {
+  align-self: center;
+  color: #93a09b;
+  font-size: clamp(34px, 3vw, 58px);
+  font-weight: 300;
+}
+.number-caption {
+  grid-column: 1 / -1;
+  margin: 5vh 0 0;
+  text-align: center;
+  color: #5b6863;
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: -.01em;
+}
+
+/* SCENE 04 */
+.scene-four {
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  gap: 1.2vh;
+  padding: 0 6vw;
+}
+.step-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 54px 1fr;
+  align-items: center;
+  min-height: 20vh;
+  overflow: hidden;
+}
+.step-index {
+  align-self: start;
+  margin-top: 2.2vh;
+  color: #87938e;
+  font: 800 9px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: .14em;
+}
+.step-word {
+  display: block;
+  font-size: clamp(76px, 9.5vw, 182px);
+  font-weight: 900;
+  line-height: .76;
+  letter-spacing: -.050em;
+}
+.step-line {
+  position: absolute;
+  left: 54px;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--tc-line);
+}
+
+/* FINAL */
+.scene-final {
+  align-items: flex-start;
+  justify-content: center;
+  flex-direction: column;
+  padding: 0 7vw;
+}
+.final-headline {
+  margin: 0;
+  font-size: clamp(82px, 10.2vw, 194px);
+  font-weight: 900;
+  line-height: .77;
+  letter-spacing: -.050em;
+}
+.final-line { display: block; overflow: hidden; }
+.final-headline .outline { color: var(--tc-green) !important; }
+.final-rule { width: min(620px, 52vw); height: 2px; margin-top: 38px; background: var(--tc-green); }
+.final-sub { margin: 18px 0 0; color: #66736e; font-size: 14px; font-weight: 650; letter-spacing: -.015em; }
+.final-enter-wrap { display: flex; align-items: center; gap: 18px; margin-top: 34px; }
+.final-enter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 238px;
+  height: 62px;
+  padding: 0 12px 0 21px;
+  border: 1px solid var(--tc-ink);
+  background: var(--tc-ink);
+  color: #f9fbf3;
+  cursor: pointer;
+  font: 850 11px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: .08em;
+}
+.final-enter b {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--tc-accent);
+  color: var(--tc-ink);
+  font-size: 17px;
+}
+.replay-button {
+  border: 0;
+  background: transparent;
+  color: #697671;
+  cursor: pointer;
+  font: 800 9px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: .10em;
+}
+
+.cover-timebar {
+  position: absolute;
+  left: 34px;
+  right: 34px;
+  bottom: 27px;
+  z-index: 10;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 14px;
+  color: #7a8782;
+  font: 800 8px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: .12em;
+}
+.timebar-track { height: 1px; background: rgba(16,35,28,.15); overflow: hidden; }
+.timebar-track i { display: block; width: 100%; height: 100%; transform: scaleX(0); transform-origin: left center; background: var(--tc-green); will-change: transform; }
+
+.cover-exit-panel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  height: 50.1%;
+  background: var(--tc-ink);
+  transform: scaleY(0);
+  pointer-events: none;
+}
+.cover-exit-panel.is-top { top: 0; transform-origin: top center; }
+.cover-exit-panel.is-bottom { bottom: 0; transform-origin: bottom center; }
+
+@media (max-width: 920px) {
+  .cover-meta, .cover-timebar { left: 18px; right: 18px; }
+  .typo-stage { inset: 68px 18px 64px; }
+  .scene-one-row { font-size: clamp(74px, 16vw, 145px); }
+  .scene-two { padding: 0 5vw 0 8vw; }
+  .scene-two .statement { font-size: clamp(50px, 11vw, 100px); }
+  .filter-row { font-size: clamp(62px, 13vw, 118px); }
+  .scene-numbers { grid-template-columns: 1fr auto 1fr auto 1fr; padding: 0 2vw; gap: 1.5vw; }
+  .number-column span { font-size: clamp(62px, 12vw, 116px); }
+  .step-word { font-size: clamp(62px, 13vw, 118px); }
+  .final-headline { font-size: clamp(66px, 13.5vw, 124px); }
+}
+
+@media (max-width: 600px) {
+  .cover-meta { grid-template-columns: 1fr auto; }
+  .cover-meta > span:first-child { display: none; }
+  .scene-one-row { font-size: clamp(60px, 20vw, 104px); }
+  .scene-two .statement { font-size: clamp(45px, 14vw, 82px); }
+  .filter-row { font-size: clamp(54px, 17vw, 96px); gap: 6vw; }
+  .scene-numbers { grid-template-columns: 1fr; gap: 2.1vh; }
+  .number-arrow { display: none; }
+  .number-column span { font-size: clamp(72px, 21vw, 118px); }
+  .number-column small { margin-top: 8px; }
+  .number-caption { margin-top: 1vh; font-size: 11px; }
+  .step-item { grid-template-columns: 36px 1fr; min-height: 19vh; }
+  .step-line { left: 36px; }
+  .step-word { font-size: clamp(57px, 17vw, 96px); }
+  .scene-final { padding: 0 4vw; }
+  .final-headline { font-size: clamp(57px, 17vw, 96px); }
+  .final-rule { width: 80vw; }
+  .final-enter-wrap { flex-direction: column; align-items: flex-start; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .typo-ghost-grid, .typo-ghost-word { transform: none !important; }
+}
+
+
+.typo-cover{--run:15s}
+.typo-scene{opacity:0;visibility:hidden}
+.cover-meta{opacity:0;animation:metaIn .5s .05s both}
+.scene-one{animation:s1 2.85s 0s both}
+.scene-one .line-a{animation:lineA 2.65s .12s both}
+.scene-one .line-b{animation:lineB 2.65s .20s both}
+.scene-one .typo-char{animation:charUp .64s .18s cubic-bezier(.16,1,.3,1) both}
+.scene-one .typo-char-mask:nth-child(2n) .typo-char{animation-delay:.23s}
+.scene-two{animation:s2 2.9s 2.72s both}
+.scene-two .slash{animation:slash .55s 2.76s both}
+.scene-two .statement{opacity:0;transform:translateY(60px);animation:statementIn .52s 2.82s cubic-bezier(.16,1,.3,1) forwards}
+.scene-two .statement.is-2{animation-delay:2.94s}.scene-two .statement.is-3{animation-delay:3.06s}
+.scene-three{animation:s3 2.5s 5.38s both}
+.scene-three .filter-word{opacity:0;transform:translateY(120%) rotate(2deg);animation:filterIn .58s 5.48s cubic-bezier(.25,1.4,.35,1) forwards}
+.scene-three .filter-word:nth-child(2){animation-delay:5.58s}.scene-three .filter-word:nth-child(3){animation-delay:5.68s}
+.scene-three .is-bottom .filter-word:nth-child(1){animation-delay:5.78s}.scene-three .is-bottom .filter-word:nth-child(2){animation-delay:5.88s}.scene-three .is-bottom .filter-word:nth-child(3){animation-delay:5.98s}
+.scene-three .filter-row.is-top{animation:rowTop 1.05s 6.54s ease-in-out forwards}.scene-three .filter-row.is-bottom{animation:rowBot 1.05s 6.54s ease-in-out forwards}
+.scene-numbers{animation:s4 2.7s 7.82s both}
+.number-column{opacity:0;filter:blur(10px);transform:scale(1.25);animation:numIn .72s 7.92s cubic-bezier(.16,1,.3,1) forwards}.number-column.is-b{animation-delay:8.03s}.number-column.is-c{animation-delay:8.14s}
+.number-caption{opacity:0;transform:translateY(20px);animation:capIn .55s 8.28s forwards}
+.scene-four{animation:s5 2.2s 10.38s both}
+.step-word{opacity:0;transform:translateY(70px);animation:stepIn .54s 10.48s cubic-bezier(.16,1,.3,1) forwards}.step-item:nth-child(2) .step-word{animation-delay:10.64s}.step-item:nth-child(3) .step-word{animation-delay:10.80s}
+.step-line{transform:scaleX(0);transform-origin:left center;animation:grow .82s 10.64s forwards}.step-item:nth-child(2) .step-line{animation-delay:10.77s}.step-item:nth-child(3) .step-line{animation-delay:10.90s}
+.scene-final{animation:sFinal 2.4s 12.68s both}
+.scene-final .typo-char{transform:translateY(118%);animation:charUp .70s 12.78s cubic-bezier(.16,1,.3,1) forwards}.scene-final .final-line:nth-child(2) .typo-char{animation-delay:12.90s}
+.final-rule{transform:scaleX(0);transform-origin:left center;animation:grow .78s 13.18s forwards}.final-sub,.final-enter-wrap{opacity:0;transform:translateY(18px);animation:capIn .52s 13.36s forwards}.final-enter-wrap{animation-delay:13.62s}
+#progress1{transform-origin:left center;animation:progress 15s linear forwards}
+.typo-ghost-word{transition:transform .16s ease-out}.typo-ghost-grid{transition:transform .16s ease-out}
+.final-enter{transition:transform .22s ease}.final-enter:hover{transform:translateX(8px) scale(1.015)}
+@keyframes metaIn{to{opacity:1}}
+@keyframes s1{0%,99%{opacity:1;visibility:visible}100%{opacity:0;visibility:hidden}}
+@keyframes lineA{0%{transform:translateX(-105%)}72%{transform:translateX(0)}100%{transform:translateX(18%)}}
+@keyframes lineB{0%{transform:translateX(105%)}72%{transform:translateX(0)}100%{transform:translateX(-18%)}}
+@keyframes charUp{to{transform:translateY(0)}}
+@keyframes s2{0%{opacity:0;visibility:visible;clip-path:inset(0 0 0 0)}5%,76%{opacity:1}100%{opacity:0;visibility:hidden;clip-path:inset(0 0 100% 0)}}
+@keyframes slash{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes statementIn{to{opacity:1;transform:translateY(0)}}
+@keyframes s3{0%{opacity:0;visibility:visible}5%,82%{opacity:1}100%{opacity:0;visibility:hidden}}
+@keyframes filterIn{to{opacity:1;transform:translateY(0) rotate(0)}}
+@keyframes rowTop{to{transform:translateX(-18%)}}@keyframes rowBot{to{transform:translateX(16%)}}
+@keyframes s4{0%{opacity:0;visibility:visible;transform:scale(1)}5%,84%{opacity:1}100%{opacity:0;visibility:hidden;transform:scale(.94)}}
+@keyframes numIn{to{opacity:1;filter:blur(0);transform:scale(1)}}@keyframes capIn{to{opacity:1;transform:translateY(0)}}
+@keyframes s5{0%{opacity:0;visibility:visible}5%,84%{opacity:1}100%{opacity:0;visibility:hidden}}
+@keyframes stepIn{to{opacity:1;transform:translateY(0)}}@keyframes grow{to{transform:scaleX(1)}}
+@keyframes sFinal{0%{opacity:0;visibility:visible}5%,100%{opacity:1;visibility:visible}}
+@keyframes progress{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+</style>
+<style id="cdn-motion-runtime">
+html.cdn-mode *,html.cdn-mode *::before,html.cdn-mode *::after{animation:none!important}
+.cdn-error{position:fixed;z-index:999999;left:50%;top:18px;transform:translateX(-50%);padding:10px 14px;border:1px solid rgba(255,255,255,.22);background:#101826;color:#fff;font:600 12px/1.3 Arial,sans-serif;letter-spacing:.04em;border-radius:999px;box-shadow:0 12px 40px rgba(0,0,0,.25)}
+</style>
+</head><body><section aria-label="START IN kinetic typography cover" class="typo-cover" id="cover">
+<div aria-hidden="true" class="typo-ghost-grid"></div>
+<div aria-hidden="true" class="typo-ghost-word">NEXT</div>
+<header class="cover-meta"><span>JOB SEARCH / KINETIC INTRO</span><span class="meta-live">15 SEC</span><button id="skip1">SKIP</button></header>
+<main class="typo-stage">
+<section class="typo-scene scene-one"><div class="scene-one-row line-a"><span class="typo-split"><span class="typo-char-mask"><span class="typo-char">어</span></span><span class="typo-char-mask"><span class="typo-char">디</span></span><span class="typo-char-mask"><span class="typo-char">서</span></span></span></div><div class="scene-one-row line-b"><span class="typo-split outline"><span class="typo-char-mask"><span class="typo-char">시</span></span><span class="typo-char-mask"><span class="typo-char">작</span></span><span class="typo-char-mask"><span class="typo-char">할</span></span><span class="typo-char-mask"><span class="typo-char">지</span></span></span></div></section>
+<section class="typo-scene scene-two"><div class="slash"></div><p class="statement is-1">조건은 많고</p><p class="statement is-2">시간은 짧다</p><p class="statement is-3"><em>답은 빨라야 한다.</em></p></section>
+<section class="typo-scene scene-three"><div class="filter-row is-top"><span class="filter-word">지역</span><span class="filter-word">직무</span><span class="filter-word">경력</span></div><div class="filter-row is-bottom"><span class="filter-word outline">연봉</span><span class="filter-word outline">근무형태</span><span class="filter-word accent">지금</span></div></section>
+<section class="typo-scene scene-numbers"><div class="number-column is-a"><span>12,600</span><small>전체</small></div><div class="number-arrow">→</div><div class="number-column is-b"><span>320</span><small>조건</small></div><div class="number-arrow">→</div><div class="number-column is-c"><span>48</span><small>지금 볼 공고</small></div><p class="number-caption">조건이 선명해질수록, 다음 선택은 가까워진다.</p></section>
+<section class="typo-scene scene-four"><div class="step-item"><span class="step-index">01</span><strong class="step-word">찾고</strong><i class="step-line"></i></div><div class="step-item"><span class="step-index">02</span><strong class="step-word outline">비교하고</strong><i class="step-line"></i></div><div class="step-item"><span class="step-index">03</span><strong class="step-word accent">시작한다</strong><i class="step-line"></i></div></section>
+<section class="typo-scene scene-final"><h1 class="final-headline"><span class="final-line"><span class="typo-split"><span class="typo-char-mask"><span class="typo-char">좋</span></span><span class="typo-char-mask"><span class="typo-char">은</span></span><span class="typo-char-mask"><span class="typo-char"> </span></span><span class="typo-char-mask"><span class="typo-char">시</span></span><span class="typo-char-mask"><span class="typo-char">작</span></span><span class="typo-char-mask"><span class="typo-char">은</span></span></span></span><span class="final-line"><span class="typo-split outline"><span class="typo-char-mask"><span class="typo-char">빠</span></span><span class="typo-char-mask"><span class="typo-char">른</span></span><span class="typo-char-mask"><span class="typo-char"> </span></span><span class="typo-char-mask"><span class="typo-char">판</span></span><span class="typo-char-mask"><span class="typo-char">단</span></span><span class="typo-char-mask"><span class="typo-char">에</span></span><span class="typo-char-mask"><span class="typo-char">서</span></span><span class="typo-char-mask"><span class="typo-char">.</span></span></span></span></h1><div class="final-rule"></div><p class="final-sub">내 조건에서 지금 볼 수 있는 공고부터.</p><div class="final-enter-wrap"><button class="final-enter" id="enter1"><span>ENTER START IN</span><b>↗</b></button><button class="replay-button" id="replay1">REPLAY 15s</button></div></section>
+</main>
+<footer class="cover-timebar"><span id="clock1">00:00</span><div class="timebar-track"><i id="progress1"></i></div><span>00:15</span></footer>
+<div class="cover-exit-panel is-top"></div><div class="cover-exit-panel is-bottom"></div>
+</section><div class="standalone-note">GSAP + MOTION CDN / 15s</div><script onerror="document.body.insertAdjacentHTML('beforeend','&lt;div class=cdn-error&gt;GSAP CDN 로드 실패 · 인터넷 연결을 확인하세요&lt;/div&gt;')" src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script><script>
+function mmss(v){const s=Math.max(0,Math.floor(v));return `00:${String(s).padStart(2,'0')}`}
+function wireClock(tl, clock, duration){
+  tl.eventCallback('onUpdate',()=>{if(clock) clock.textContent=mmss(Math.min(duration,tl.time()))});
+}
+function scene(tl, sel, at, stay){
+  tl.set(sel,{autoAlpha:1,pointerEvents:'auto'},at);
+  tl.to(sel,{autoAlpha:0,duration:.28,ease:'power2.inOut',pointerEvents:'none'},at+stay-.28);
+}
+function resetScenes(selectors){selectors.forEach(s=>gsap.set(s,{autoAlpha:0,pointerEvents:'none'}));}
+
+const D=15, root=document.querySelector('#cover'), clock=document.querySelector('#clock1'), progress=document.querySelector('#progress1');
+const scenes=['.scene-one','.scene-two','.scene-three','.scene-numbers','.scene-four','.scene-final'];
+let tl;
+function build(){
+  if(tl) tl.kill();
+  gsap.killTweensOf('*');
+  resetScenes(scenes); gsap.set(progress,{scaleX:0,transformOrigin:'0 50%'});
+  gsap.set('.scene-one .typo-char,.scene-final .typo-char',{yPercent:125});
+  gsap.set('.scene-two .statement',{y:42,opacity:0}); gsap.set('.scene-two .slash',{scaleY:0,transformOrigin:'50% 100%'});
+  gsap.set('.scene-three .filter-word',{y:42,opacity:0,scale:.92});
+  gsap.set('.scene-numbers .number-column,.scene-numbers .number-arrow',{y:46,opacity:0}); gsap.set('.number-caption',{y:15,opacity:0});
+  gsap.set('.scene-four .step-word',{y:34,opacity:0}); gsap.set('.scene-four .step-line',{scaleX:0,transformOrigin:'0 50%'});
+  gsap.set('.final-rule',{scaleX:0,transformOrigin:'0 50%'}); gsap.set('.final-sub,.final-enter-wrap',{y:16,opacity:0});
+  tl=gsap.timeline({defaults:{ease:'power4.out'}});
+  tl.to(progress,{scaleX:1,duration:D,ease:'none'},0);
+  scene(tl,'.scene-one',0,2.8); tl.to('.scene-one .line-a .typo-char',{yPercent:0,duration:.72,stagger:.055},.10).to('.scene-one .line-b .typo-char',{yPercent:0,duration:.72,stagger:.045},.22).to('.scene-one .line-a',{xPercent:3,duration:.8,ease:'sine.inOut'},1.35).to('.scene-one .line-b',{xPercent:-3,duration:.8,ease:'sine.inOut'},1.35);
+  scene(tl,'.scene-two',2.72,2.75); tl.to('.scene-two .slash',{scaleY:1,duration:.58},2.80).to('.scene-two .statement',{y:0,opacity:1,duration:.58,stagger:.13},2.88).to('.scene-two .statement.is-3',{x:18,duration:.72,ease:'power2.inOut'},4.05);
+  scene(tl,'.scene-three',5.35,2.35); tl.to('.scene-three .filter-word',{y:0,opacity:1,scale:1,duration:.58,stagger:.085,ease:'back.out(1.45)'},5.45).to('.scene-three .is-top',{xPercent:-3,duration:1.0,ease:'sine.inOut'},6.15).to('.scene-three .is-bottom',{xPercent:3,duration:1.0,ease:'sine.inOut'},6.15);
+  scene(tl,'.scene-numbers',7.58,2.70); tl.to('.scene-numbers .number-column,.scene-numbers .number-arrow',{y:0,opacity:1,duration:.66,stagger:.10},7.70).to('.number-caption',{y:0,opacity:1,duration:.48},8.15).to('.scene-numbers .is-c',{scale:1.055,duration:.48,ease:'back.out(1.8)'},8.55);
+  scene(tl,'.scene-four',10.15,2.25); tl.to('.scene-four .step-word',{y:0,opacity:1,duration:.55,stagger:.14},10.28).to('.scene-four .step-line',{scaleX:1,duration:.65,stagger:.10},10.42);
+  tl.set('.scene-final',{autoAlpha:1,pointerEvents:'auto'},12.34).to('.scene-final .final-line:first-child .typo-char',{yPercent:0,duration:.72,stagger:.035},12.43).to('.scene-final .final-line:nth-child(2) .typo-char',{yPercent:0,duration:.72,stagger:.032},12.54).to('.final-rule',{scaleX:1,duration:.70},13.05).to('.final-sub',{y:0,opacity:1,duration:.50},13.22).to('.final-enter-wrap',{y:0,opacity:1,duration:.50},13.42);
+  wireClock(tl,clock,D); return tl;
+}
+function replay(){build().play(0)}
+document.querySelector('#replay1').onclick=replay;
+document.querySelector('#skip1').onclick=()=>{build().pause(D);tl.progress(1);gsap.set('.scene-final',{autoAlpha:1,pointerEvents:'auto'});gsap.set('.scene-final .typo-char',{yPercent:0});gsap.set('.final-rule',{scaleX:1});gsap.set('.final-sub,.final-enter-wrap',{opacity:1,y:0});if(clock)clock.textContent='00:15'};
+document.querySelector('#enter1').onclick=()=>{const p=gsap.timeline({onComplete:()=>replay()});p.to('.cover-exit-panel.is-top',{scaleY:1,transformOrigin:'50% 0%',duration:.48,ease:'power4.inOut'},0).to('.cover-exit-panel.is-bottom',{scaleY:1,transformOrigin:'50% 100%',duration:.48,ease:'power4.inOut'},0).to(root,{opacity:0,duration:.25},.42)};
+build();
+</script><script type="module">
+import { animate, press } from "https://cdn.jsdelivr.net/npm/motion@13.5.0/+esm";
+window.__MOTION_CDN_READY__ = true;
+const buttons = document.querySelectorAll('button');
+buttons.forEach((button) => {
+  button.addEventListener('pointerenter', () => animate(button, { scale: 1.025, y: -2 }, { type: 'spring', stiffness: 420, damping: 28 }));
+  button.addEventListener('pointerleave', () => animate(button, { scale: 1, y: 0 }, { type: 'spring', stiffness: 420, damping: 30 }));
+});
+press('button', (element) => {
+  animate(element, { scale: 0.97 }, { type: 'spring', stiffness: 520, damping: 32 });
+  return () => animate(element, { scale: 1 }, { type: 'spring', stiffness: 520, damping: 30 });
+});
+</script></body></html>
