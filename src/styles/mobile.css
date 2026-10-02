@@ -1,0 +1,823 @@
+/* START IN mobile web
+   This file is imported last and only changes layouts at mobile widths.
+   Desktop rules remain the source of truth on the main branch. */
+
+@media (max-width: 767px) {
+  :root {
+    background: #f4f7f5;
+  }
+
+  html {
+    overflow-y: auto;
+    scrollbar-gutter: auto;
+  }
+
+  body {
+    min-width: 320px;
+    overflow-x: hidden;
+    background: #f4f7f5;
+  }
+
+  .site-shell {
+    width: 100%;
+    max-width: none;
+  }
+
+  /* Header: compact top row + horizontally scrollable product navigation. */
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    min-height: 0;
+    height: auto;
+    border-bottom: 1px solid #e3ece7;
+    background: rgba(255, 255, 255, .96);
+    box-shadow: 0 8px 24px rgba(21, 55, 45, .06);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+
+  .header-inner {
+    width: 100%;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: 54px 42px;
+    gap: 0;
+    padding: 0;
+  }
+
+  .brand {
+    grid-column: 1;
+    grid-row: 1;
+    margin: 0;
+    padding-left: 18px;
+  }
+
+  .brand-logo {
+    width: 124px;
+    max-width: 124px;
+  }
+
+  .header-actions {
+    grid-column: 2;
+    grid-row: 1;
+    gap: 6px;
+    padding-right: 14px;
+  }
+
+  .notification-button {
+    display: none;
+  }
+
+  .header-actions button {
+    height: 34px;
+    border-radius: 10px;
+    font-size: 12px;
+  }
+
+  .header-actions .login-button {
+    width: 54px;
+  }
+
+  .header-actions .join-button {
+    width: 66px;
+  }
+
+  .header-nav {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    width: 100%;
+    min-width: 0;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    gap: 22px;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    padding: 0 18px 8px;
+    transform: none;
+    scrollbar-width: none;
+  }
+
+  .header-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .header-nav button {
+    flex: 0 0 auto;
+    padding: 7px 0 6px;
+    font-size: 12.5px;
+    font-weight: 700;
+    letter-spacing: -.35px;
+  }
+
+  /* Home hero: mobile-first content order, with search as the primary action. */
+  .hero-background {
+    height: auto;
+    min-height: 0;
+    background:
+      linear-gradient(180deg, rgba(247, 251, 249, .88) 0%, rgba(247, 251, 249, .98) 63%, #f4f7f5 100%),
+      url('/images/hero-main.png') 68% top / cover no-repeat;
+  }
+
+  .hero-section {
+    height: auto;
+    padding: 22px 16px 16px;
+  }
+
+  .hero-introduction {
+    position: relative;
+    top: auto;
+    left: auto;
+    padding: 2px 2px 0;
+  }
+
+  .hero-eyebrow {
+    font-size: 13px;
+    line-height: 20px;
+    letter-spacing: -.35px;
+  }
+
+  .hero-introduction h1 {
+    margin-top: 4px;
+    max-width: 330px;
+    font-size: clamp(31px, 9vw, 40px);
+    line-height: 1.03;
+    letter-spacing: -2.2px;
+    transform: none;
+  }
+
+  .hero-description {
+    max-width: 310px;
+    margin-top: 10px;
+    color: #617365;
+    font-size: 13px;
+    line-height: 1.55;
+    letter-spacing: -.35px;
+    word-break: keep-all;
+  }
+
+  .hero-statistics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 7px;
+    margin: 16px 0 0;
+  }
+
+  .hero-stat {
+    min-width: 0;
+    gap: 5px;
+    padding: 10px 8px;
+    border: 1px solid rgba(210, 230, 221, .9);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, .82);
+  }
+
+  .hero-stat svg,
+  .hero-stat:last-child svg {
+    width: 20px;
+    height: 23px;
+  }
+
+  .hero-stat strong {
+    overflow: hidden;
+    font-size: 15px;
+    line-height: 18px;
+    text-overflow: ellipsis;
+  }
+
+  .hero-stat span {
+    font-size: 9px;
+    line-height: 12px;
+  }
+
+  .ai-search-panel {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: 100%;
+    height: auto;
+    margin-top: 14px;
+    padding: 15px;
+    border-color: #dcebe4;
+    border-radius: 18px;
+    box-shadow: 0 16px 36px rgba(25, 84, 64, .08);
+  }
+
+  .search-panel-heading {
+    height: auto;
+    min-height: 36px;
+    margin-bottom: 11px;
+  }
+
+  .sparkle-icon {
+    width: 25px;
+    height: 29px;
+  }
+
+  .search-panel-title h2 {
+    font-size: 19px;
+    letter-spacing: -.8px;
+  }
+
+  .search-panel-heading > p {
+    display: none;
+  }
+
+  .search-help {
+    margin-left: auto;
+    padding: 6px 8px;
+    font-size: 10px;
+  }
+
+  .ai-search-field {
+    display: grid;
+    grid-template-columns: 24px minmax(0, 1fr);
+    gap: 8px 7px;
+    height: auto;
+    padding: 10px;
+    border-radius: 13px;
+  }
+
+  .search-icon {
+    width: 21px;
+    height: 21px;
+    align-self: center;
+  }
+
+  .search-placeholder {
+    min-height: 34px;
+    font-size: 14px;
+    white-space: normal;
+  }
+
+  .ask-ai-button {
+    grid-column: 1 / -1;
+    width: 100%;
+    height: 42px;
+    margin: 2px 0 0;
+    border-radius: 10px;
+    font-size: 14px;
+  }
+
+  .search-guidance {
+    margin: 9px 0 6px;
+    font-size: 10.5px;
+    line-height: 1.45;
+  }
+
+  .search-suggestions {
+    overflow: hidden;
+    padding-right: 0;
+  }
+
+  .suggestion-row {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 6px;
+    margin-top: 6px;
+    padding-bottom: 3px;
+    scrollbar-width: none;
+  }
+
+  .suggestion-row::-webkit-scrollbar {
+    display: none;
+  }
+
+  .suggestion-row button {
+    flex: 0 0 auto;
+    height: 31px;
+    padding: 0 10px;
+    font-size: 10.5px;
+  }
+
+  .more-suggestions {
+    display: none;
+  }
+
+  /* Page container */
+  .search-page-main,
+  .search-page-main-home {
+    width: 100%;
+    margin: 0;
+    padding: 0 12px 22px;
+  }
+
+  /* Filters: keep every function, but convert rows into touch-friendly strips. */
+  .filter-panel {
+    height: auto;
+    margin-top: 10px;
+    padding: 12px 12px 7px;
+    border: 1px solid #dfeae5;
+    border-radius: 16px;
+    box-shadow: 0 10px 28px rgba(24, 70, 55, .04);
+  }
+
+  .filter-heading {
+    display: grid;
+    grid-template-columns: 25px minmax(0, 1fr) auto;
+    gap: 6px 8px;
+    min-height: 0;
+    padding: 0 0 10px;
+  }
+
+  .filter-location-icon {
+    grid-column: 1;
+    width: 21px;
+    height: 25px;
+    margin: 1px 0 0;
+  }
+
+  .filter-heading h2 {
+    grid-column: 2;
+    align-self: center;
+    font-size: 17px;
+    letter-spacing: -.75px;
+  }
+
+  .filter-heading p {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    max-width: none;
+    padding: 0;
+    overflow: hidden;
+    color: #7d8d84;
+    font-size: 11px;
+    line-height: 16px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .filter-reset {
+    grid-column: 3;
+    grid-row: 1;
+    position: static;
+    align-self: center;
+    height: 29px;
+    padding: 0 9px;
+    gap: 5px;
+    border-radius: 9px;
+    font-size: 11px;
+  }
+
+  .filter-reset svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  .filter-row {
+    display: block;
+    height: auto;
+    min-height: 0;
+    padding: 8px 0 9px;
+    border-top: 1px solid #edf2ef;
+  }
+
+  .filter-row-label {
+    width: auto;
+    padding: 0 0 6px;
+    gap: 6px;
+    font-size: 12px;
+  }
+
+  .filter-row-label svg {
+    width: 16px;
+    height: 17px;
+  }
+
+  .filter-options {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    flex-wrap: nowrap;
+    gap: 6px;
+    overflow-x: auto;
+    padding: 0 1px 3px;
+    scrollbar-width: none;
+  }
+
+  .filter-options::-webkit-scrollbar {
+    display: none;
+  }
+
+  .filter-option {
+    flex: 0 0 auto;
+    height: 31px;
+    padding: 0 9px;
+    border-radius: 999px;
+    font-size: 11px;
+    letter-spacing: -.35px;
+  }
+
+  .filter-option::before {
+    width: 14px;
+    height: 14px;
+    flex-basis: 14px;
+  }
+
+  .filter-group-label {
+    flex: 0 0 auto;
+    height: 31px;
+    margin-left: 5px;
+    padding: 0 5px 0 10px;
+    font-size: 11px;
+  }
+
+  /* Results: map first, then jobs. */
+  .results-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding-top: 12px;
+  }
+
+  .results-layout > section {
+    min-height: 0;
+  }
+
+  .map-section {
+    min-height: 360px;
+    padding: 11px;
+    border-radius: 16px;
+  }
+
+  .map-heading {
+    display: grid;
+    grid-template-columns: 22px minmax(0, 1fr) auto;
+    grid-template-rows: auto auto;
+    gap: 4px 7px;
+    height: auto;
+    min-height: 54px;
+    margin-bottom: 7px;
+    padding: 0 1px;
+  }
+
+  .map-chart-icon {
+    grid-column: 1;
+    grid-row: 1;
+    width: 18px;
+    height: 21px;
+    margin-top: 2px;
+  }
+
+  .map-heading h2 {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: center;
+    overflow: hidden;
+    font-size: 16px;
+    letter-spacing: -.65px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .map-heading p {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    margin: 0;
+    overflow: hidden;
+    font-size: 10px;
+    line-height: 14px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .map-view-options {
+    grid-column: 3;
+    grid-row: 1;
+    width: 112px;
+    height: 29px;
+  }
+
+  .map-view-options button {
+    font-size: 11px;
+  }
+
+  .map-image-frame {
+    height: 292px;
+    border-radius: 12px;
+  }
+
+  .district-marker {
+    max-width: 92px;
+    min-height: 28px;
+    padding: 4px 6px;
+    font-size: 9px;
+  }
+
+  .map-heat-legend {
+    left: 8px;
+    right: 8px;
+    bottom: 7px;
+    gap: 4px 7px;
+    padding: 6px 8px;
+    font-size: 8px;
+  }
+
+  .map-controls {
+    top: 8px;
+    right: 8px;
+  }
+
+  /* Jobs: cards become readable vertical summaries instead of compressed desktop rows. */
+  .job-list-section {
+    min-height: 0;
+    padding: 13px 12px 11px;
+    border-radius: 16px;
+  }
+
+  .job-list-heading {
+    min-height: 66px;
+    height: auto;
+    gap: 8px;
+    padding-bottom: 8px;
+  }
+
+  .job-heading-icon {
+    width: 19px;
+    height: 23px;
+    flex-basis: 19px;
+    margin-top: 3px;
+  }
+
+  .job-list-title-group h2 {
+    font-size: 16px;
+    line-height: 22px;
+    white-space: normal;
+  }
+
+  .job-list-title-group h2 strong {
+    font-size: 19px;
+  }
+
+  .job-list-title-group > p {
+    margin-top: 3px;
+    font-size: 10px;
+    line-height: 14px;
+  }
+
+  .recommendation-help {
+    display: none;
+  }
+
+  .job-sort-options {
+    display: flex;
+    width: 100%;
+    height: auto;
+    gap: 6px;
+    margin: 2px 0 7px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .job-sort-options::-webkit-scrollbar {
+    display: none;
+  }
+
+  .job-sort-option {
+    flex: 0 0 auto;
+    min-width: 76px;
+    height: 31px;
+    padding: 0 10px;
+    border-radius: 999px;
+    font-size: 10px;
+    letter-spacing: -.25px;
+  }
+
+  .job-card {
+    grid-template-columns: minmax(0, 1fr) 28px;
+    grid-template-rows: auto auto auto;
+    gap: 5px 8px;
+    min-height: 112px;
+    height: auto;
+    padding: 12px 2px;
+  }
+
+  .company-logo {
+    display: none;
+    transform: none;
+  }
+
+  .job-company-name {
+    display: block;
+    grid-column: 1;
+    grid-row: 1;
+    margin: 0;
+    color: #66786f;
+    font-size: 11px;
+    line-height: 15px;
+  }
+
+  .job-description {
+    grid-column: 1;
+    grid-row: 2;
+    padding: 0;
+  }
+
+  .job-description h3 {
+    margin-bottom: 6px;
+    font-size: 14px;
+    line-height: 20px;
+    white-space: normal;
+  }
+
+  .job-tags {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 4px;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+  }
+
+  .job-tags::-webkit-scrollbar {
+    display: none;
+  }
+
+  .job-tags > span {
+    flex: 0 0 auto;
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-size: 9.5px;
+    line-height: 16px;
+  }
+
+  .job-compensation {
+    grid-column: 1;
+    grid-row: 3;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin: 0;
+    padding: 0;
+    text-align: left;
+  }
+
+  .job-compensation p,
+  .job-compensation > span {
+    margin: 0;
+    font-size: 10.5px;
+    line-height: 15px;
+  }
+
+  .job-bookmark {
+    grid-column: 2;
+    grid-row: 1 / 4;
+    align-self: center;
+    justify-self: end;
+    width: 22px;
+    height: 22px;
+  }
+
+  .more-jobs {
+    height: 38px;
+    margin-top: 8px;
+    border-radius: 10px;
+    font-size: 12px;
+  }
+
+  /* Search/result pages outside home. */
+  .page-search-heading {
+    display: block;
+    margin-top: 12px;
+    padding: 16px;
+    border-radius: 15px;
+  }
+
+  .page-search-heading h1 {
+    font-size: 22px;
+  }
+
+  .page-search-heading form {
+    width: 100%;
+    margin-top: 11px;
+  }
+
+  .full-job-list {
+    margin: 12px 0;
+  }
+
+  .all-filtered-jobs {
+    right: 12px;
+    bottom: 12px;
+    gap: 2px;
+    padding: 9px 12px;
+    border-radius: 14px;
+    box-shadow: 0 8px 28px rgba(17, 61, 48, .18);
+  }
+
+  .all-filtered-jobs span {
+    display: none;
+  }
+
+  .all-filtered-jobs strong {
+    font-size: 11px;
+  }
+
+  .all-filtered-jobs small {
+    font-size: 10px;
+  }
+
+  /* Service/detail pages */
+  .service-page {
+    width: auto;
+    margin: 12px;
+    padding: 18px 15px;
+    border-radius: 16px;
+  }
+
+  .job-facts,
+  .company-directory {
+    grid-template-columns: 1fr;
+  }
+
+  .action-row,
+  .my-tabs {
+    overflow-x: auto;
+  }
+
+  .application-item {
+    grid-template-columns: 32px minmax(0, 1fr);
+    gap: 10px;
+    padding: 14px;
+  }
+
+  .logout-dialog {
+    width: calc(100vw - 28px);
+    border-radius: 18px;
+  }
+
+  .logout-dialog-content {
+    padding: 24px 18px 18px;
+  }
+
+  /* Intro keeps the same content but removes desktop-only inspection chrome on phones. */
+  .cover-header {
+    padding-inline: 16px;
+  }
+
+  .cover-header small {
+    display: none;
+  }
+
+  .cover-header button {
+    font-size: 11px;
+  }
+
+  .cover-footer {
+    padding-inline: 14px;
+  }
+
+  .cover-chapters {
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .cover-chapters::-webkit-scrollbar {
+    display: none;
+  }
+
+  .cover-chapters span {
+    flex: 0 0 auto;
+    font-size: 9px;
+  }
+
+  .cover-controls {
+    display: none;
+  }
+
+  .cover-side-label,
+  .cover-signal {
+    display: none;
+  }
+
+  .cover-browser {
+    max-width: calc(100vw - 34px);
+  }
+
+  .cover-product-filters {
+    overflow-x: auto;
+  }
+}
+
+@media (max-width: 380px) {
+  .header-actions .join-button {
+    display: none;
+  }
+
+  .hero-section {
+    padding-inline: 12px;
+  }
+
+  .search-page-main,
+  .search-page-main-home {
+    padding-inline: 9px;
+  }
+
+  .hero-statistics {
+    gap: 5px;
+  }
+
+  .hero-stat {
+    padding-inline: 5px;
+  }
+}
