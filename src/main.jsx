@@ -7,6 +7,7 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import { AccountProvider } from './services/AccountContext';
 import './styles/main.css';
+import './styles/mobile.css';
 
 // index.html 안의 <div id="root">를 React가 사용할 자리로 바꿉니다.
 const rootElement = document.getElementById('root');
