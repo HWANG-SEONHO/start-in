@@ -4,6 +4,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { rememberHomeSearch } from '../services/homeSearch';
 import { defaultFilters, filterGroups } from '../data/filters';
 import { api, getJobs } from '../services/api';
 
@@ -113,6 +114,10 @@ function readAiConditions(params) {
 export function useJobSearch({ home = false } = {}) {
   // useSearchParams는 현재 URL의 ?뒤 값을 React에서 읽고 바꾸게 해줍니다.
   const [params, setParams] = useSearchParams();
+  const homeSearch = params.toString();
+  useEffect(() => {
+    if (home) rememberHomeSearch(homeSearch ? `?${homeSearch}` : '');
+  }, [home, homeSearch]);
 
   // ---- 1. 현재 URL → 화면이 사용할 검색 상태로 바꾸기 ----
   const filters = readFilters(params);

@@ -1,13 +1,16 @@
 // 학습용 설명: 로고, 메뉴, 로그인/로그아웃 버튼이 있는 상단바입니다.
 // 큰 흐름: 메뉴 클릭 → navigate()로 주소 변경, 로그아웃 클릭 → 확인 dialog → API 로그아웃.
 
-import { useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useId, useRef, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { homeSearchUrl } from '../services/homeSearch';
 import { useAccount } from '../services/AccountContext';
 import '../styles/header.css';
 
 export default function Header() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const logoInkId = useId().replace(/:/g, '');
   const { user, logout } = useAccount();
 
   // dialog DOM과 "로그아웃 요청이 이미 진행 중인지"를 ref로 기억합니다.
@@ -49,14 +52,19 @@ export default function Header() {
     <>
       <header className="site-header">
         <div className="header-inner">
-          {/* 브랜드 영역을 누르면 항상 메인으로 돌아갑니다. */}
+          {/* 홈에서는 조건을 유지하고, 다른 페이지에서는 마지막 홈 검색으로 돌아갑니다. */}
           <button
             type="button"
             className="brand"
             aria-label="STARTIN 홈"
-            onClick={() => navigate('/')}
+            onClick={() => {
+              if (location.pathname !== '/main') navigate(homeSearchUrl());
+            }}
           >
-            <img className="brand-logo" src="/images/startin-logo-horizontal.png" alt="스타트인 START IN" />
+            <svg className="brand-logo" viewBox="0 0 789 210" role="img" aria-label="스타트인 START IN">
+              <defs><filter id={logoInkId} x="-2%" y="-5%" width="104%" height="110%" colorInterpolationFilters="sRGB"><feMorphology operator="dilate" radius="1.8" /></filter></defs>
+              <image href="/images/startin-logo-horizontal.png" width="789" height="210" filter={`url(#${logoInkId})`} />
+            </svg>
           </button>
 
           {/* 준비중 기능은 /coming-soon으로 보내고 feature 이름을 query string으로 전달합니다. */}
