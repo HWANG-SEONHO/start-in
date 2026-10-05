@@ -1,0 +1,36 @@
+import {chromium} from '@playwright/test';
+const browser=await chromium.launch({channel:'msedge',headless:true});
+const results=[];
+for(const viewport of [{width:1280,height:720},{width:390,height:844}]) {
+ const page=await browser.newPage({viewport});
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto('http://127.0.0.1:5173/intro');
+ await page.locator('.intro-entry').waitFor({timeout:60000});
+ await page.getByRole('button',{name:'서비스 바로가기',exact:true}).click();
+ const closing=await page.locator('.intro-route-transition.closing').evaluate(el=>({duration:el.getAnimations()[0].effect.getTiming().duration,easing:getComputedStyle(el).animationTimingFunction,text:el.textContent}));
+ await page.waitForURL('**/main');
+ const opening=await page.locator('.intro-route-transition.opening').evaluate(el=>{
+  const animation=el.getAnimations()[0];animation.pause();
+  const samples=[0,324,675,1350].map(time=>{animation.currentTime=time;return {time,y:new DOMMatrix(getComputedStyle(el).transform).m42}});
+  return {duration:animation.effect.getTiming().duration,easing:getComputedStyle(el).animationTimingFunction,samples};
+ });
+ if(closing.duration!==650||opening.duration!==1350)throw Error('Transition duration changed');
+ if(opening.easing!=='cubic-bezier(0.76, 0, 0.24, 1)')throw Error('Opening curve mismatch');
+ if(Math.abs(opening.samples[0].y)>.1||Math.abs(opening.samples[1].y)>.1||Math.abs(opening.samples.at(-1).y+viewport.height)>.1)throw Error('Opening direction/hold mismatch');
+ await page.waitForFunction(()=>!document.querySelector('.intro-route-transition'));
+ if(!page.url().startsWith('http://127.0.0.1:5173/main'))throw Error('External navigation');
+ await page.locator('.brand-wordmark').waitFor();
+ if(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth))throw Error('Horizontal overflow');
+ if(errors.length)throw Error(errors.join('\n'));
+ await page.screenshot({path:`E:/Project/.cache/brand-options/main-connected-${viewport.width}.png`});
+ results.push({viewport,closing,opening,localMain:true,errors});await page.close();
+}
+const reduced=await browser.newPage({reducedMotion:'reduce'});
+await reduced.goto('http://127.0.0.1:5173/intro');
+await reduced.locator('.intro-entry').waitFor({timeout:60000});
+await reduced.getByRole('button',{name:'서비스 바로가기',exact:true}).click();
+await reduced.waitForURL('**/main');
+if(await reduced.locator('.intro-route-transition').count())throw Error('Reduced-motion curtain remained');
+const direct=await browser.newPage();await direct.goto('http://127.0.0.1:5173/main');
+if(await direct.locator('.intro-route-transition').count())throw Error('Direct-main curtain unexpectedly appeared');
+console.log(JSON.stringify({results,reducedMotion:true,directMain:true},null,2));await browser.close();

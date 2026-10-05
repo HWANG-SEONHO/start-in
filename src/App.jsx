@@ -14,19 +14,20 @@ import './styles/service.css';
 
 export default function App() {
   // pathname은 현재 주소의 길 부분입니다. 예: /jobs/123 → /jobs/123
-  const { pathname, search } = useLocation();
+  const { pathname } = useLocation();
   const navigate = useNavigate();
   const [transition, setTransition] = useState('');
-  const showCover = pathname === '/intro' || (pathname === '/' && !search && sessionStorage.getItem('startin-cover-seen') !== '1');
+  const showCover = pathname === '/intro' || pathname === '/';
 
   function enterMain() {
+    if (transition) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       sessionStorage.setItem('startin-cover-seen', '1');
       navigate('/main', { replace: true });
     } else setTransition('closing');
   }
 
-  // 화면을 완전히 덮은 뒤 주소를 바꾸고, 같은 레이어로 메인을 드러냅니다.
+  // 흰 커튼이 덮인 상태에서 메인을 준비하고, 같은 커튼을 위로 걷는다.
   useEffect(() => {
     if (!transition) return;
     const timer = setTimeout(() => {
@@ -76,7 +77,7 @@ export default function App() {
         />
       </Routes>
     </div>}
-    {transition && <div className={`intro-route-transition ${transition}`} aria-hidden="true"><b>START<span>IN.</span></b><small>YOUR NEXT STARTS HERE</small></div>}
+    {transition && <div className={`intro-route-transition ${transition}`} aria-hidden="true"><b>나의 기회로<svg className="intro-transition-arrow" viewBox="0 0 32 32" fill="none"><path d="M16 27V5M7 14l9-9 9 9" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg></b><small>YOUR NEXT STARTS HERE</small></div>}
     </>
   );
 }
