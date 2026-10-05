@@ -18,7 +18,8 @@ export function aiTypographyState(t){
   notesX:arrive(t,1.08,1.36,-640,0,700,10,24)};
 }
 export function createAiTypography(canvas){
- const W=640,H=640,cache=new Map(),layer=document.createElement('canvas'),sum=document.createElement('canvas');
+ // Extra space to the right preserves full lines after left alignment.
+ const W=768,H=640,cache=new Map(),layer=document.createElement('canvas'),sum=document.createElement('canvas');
  let density=2,lastWidth=0,lastHeight=0;
  const family=getComputedStyle(canvas).fontFamily;
  function resize(){const bounds=canvas.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2),w=Math.max(1,Math.round(bounds.width*d)),h=Math.max(1,Math.round(bounds.height*d));if(w===lastWidth&&h===lastHeight)return false;lastWidth=w;lastHeight=h;for(const el of [canvas,layer,sum]){el.width=w;el.height=h}density=Math.max(2,w/W*2);cache.clear();return true}
@@ -68,14 +69,15 @@ export function createAiTypography(canvas){
   if(t>=2.85){
    const shrink=1-clamp((t-5.2)/.35)**2;
    c.save();c.translate(centerX,264);c.scale(shrink,shrink);c.translate(-centerX,-264);
+   const servicesLeft=centerX-glyph('준비하고.',78,LIME).width/2;
    // LET / US / CREATE: two horizontal arrivals and one vertical arrival.
    for(let i=0;i<services.length;i++){
     const at=2.85+i*.4;if(t<at)continue;
-    const x=i<2?arrive(t,at,at+.3,1000,centerX,-650,9,22):centerX;
+    const x=i<2?arrive(t,at,at+.3,1000,servicesLeft,-650,9,22):servicesLeft;
     const y=i<2?100+i*116:arrive(t,at,at+.3,690,332,-650,9,22);
     c.save();c.translate(x,y);
-    centered(c,services[i][0],0,58,LIME);
-    centered(c,services[i][1],72,25,INK,500);
+    text(c,services[i][0],0,0,58,LIME);
+    text(c,services[i][1],0,72,25,INK,500);
     c.restore();
    }
    c.restore();
@@ -92,7 +94,8 @@ export function createAiTypography(canvas){
    c.scale(pose.scale,pose.scale);text(c,'찾고,',-first.width/2,-39,78);c.restore();}
   if(t>=.84){c.save();c.translate(centerX,pose.lower);centered(c,'준비하고.',0,78,LIME);c.restore();}
   if(t>=1.08){c.save();c.translate(centerX+pose.notesX,278);
-   for(let i=0;i<notes.length;i++)centered(c,notes[i],i*30,25,i===2?LIME:INK,i===2?700:500);
+   const notesLeft=-glyph('준비하고.',78,LIME).width/2;
+   for(let i=0;i<notes.length;i++)text(c,notes[i],notesLeft,i*30,25,i===2?LIME:INK,i===2?700:500);
    c.restore();}
   c.restore();
  }

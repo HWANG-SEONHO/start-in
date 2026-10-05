@@ -1,3 +1,4 @@
+import RequestError from '../components/RequestError';
 // 학습용 설명: 기업 목록과 기업별 공고를 보여주는 페이지입니다.
 // 큰 흐름: /companies면 기업 목록, /companies/:id면 기업 상세 + 그 기업 공고 목록.
 
@@ -21,10 +22,7 @@ export default function CompaniesPage() {
       {companies.loading ? (
         <p role="status">기업 정보를 불러오는 중입니다…</p>
       ) : companies.error ? (
-        <p role="alert">
-          {companies.error}
-          <button onClick={companies.retry}>다시 시도</button>
-        </p>
+        <RequestError message={companies.error} onRetry={companies.retry} />
       ) : id ? (
         // 기업 하나를 보는 주소라면 상세정보와 해당 기업 공고를 보여줍니다.
         <>
@@ -66,10 +64,7 @@ function CompanyJobs({ id }) {
       {jobs.loading ? (
         <p role="status">공고를 불러오는 중입니다…</p>
       ) : jobs.error ? (
-        <p role="alert">
-          {jobs.error}
-          <button onClick={jobs.retry}>다시 시도</button>
-        </p>
+        <RequestError message={jobs.error} onRetry={jobs.retry} />
       ) : (
         <>
           {jobs.data.items.map(job => <JobCard key={job.id} job={job} />)}

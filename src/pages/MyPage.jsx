@@ -1,3 +1,4 @@
+import RequestError from '../components/RequestError';
 // 학습용 설명: 저장공고, 지원현황, 이력서를 한곳에서 관리하는 MY 페이지입니다.
 // 큰 흐름: 로그인 확인 → tab 선택 → 저장공고/지원현황/이력서 중 하나 표시.
 
@@ -249,10 +250,7 @@ function AccountWorkspace() {
           {applications.loading ? (
             <p role="status">지원 기록을 불러오는 중입니다…</p>
           ) : applications.error ? (
-            <p role="alert">
-              {applications.error}
-              <button onClick={applications.retry}>다시 시도</button>
-            </p>
+            <RequestError message={applications.error} onRetry={applications.retry} />
           ) : (
             <>
               {applications.data.map((application, index) => (

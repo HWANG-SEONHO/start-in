@@ -1,3 +1,4 @@
+import RequestError from './RequestError';
 // 학습용 설명: PDF 이력서를 올리고, 내려받고, 바꾸고, 지우는 화면 부품입니다.
 // 큰 흐름: 서버의 현재 이력서 확인 → 파일 선택 → 업로드/교체/삭제 → 다시 조회.
 
@@ -92,10 +93,7 @@ export default function ResumePanel() {
       {resume.loading ? (
         <p role="status">이력서를 확인하는 중입니다…</p>
       ) : resume.error ? (
-        <p role="alert">
-          {resume.error}
-          <button onClick={resume.retry}>다시 시도</button>
-        </p>
+        <RequestError message={resume.error} onRetry={resume.retry} />
       ) : (
         <>
           {/* 이미 저장한 이력서가 있으면 파일정보와 다운로드/삭제 버튼을 보여줍니다. */}

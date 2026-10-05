@@ -5,6 +5,7 @@
 import { queueJobRequest } from './jobRequestQueue';
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL || '/api';
+const connectionErrorMessage = '서버에 연결할 수 없습니다. 잠시 후 다시 시도해 주세요.';
 
 // 이력서 PDF는 브라우저가 직접 내려받을 수 있도록 완성된 주소를 따로 내보냅니다.
 export const resumeDownloadUrl = `${baseUrl}/me/resume/file`;
@@ -44,7 +45,7 @@ export async function api(path, { method = 'GET', body, signal } = {}) {
   } catch (error) {
     // 사용자가 다른 검색을 시작해서 이전 요청을 취소한 경우는 정상 흐름이므로 그대로 전달합니다.
     if (error.name === 'AbortError') throw error;
-    throw new Error('서버에 연결할 수 없습니다. FastAPI 실행 상태를 확인한 후 다시 시도하세요.');
+    throw new Error(connectionErrorMessage);
   }
 
   // HTTP 200번대가 아니면 화면에서 처리할 수 있는 Error로 바꿉니다.
@@ -57,7 +58,9 @@ export async function api(path, { method = 'GET', body, signal } = {}) {
     // 서버가 보낸 설명의 모양이 다르므로 순서대로 확인합니다.
     // 문장이면 그대로 쓰고, 입력 오류 목록이면 안내 문구로 바꿔 읽기 쉽게 전달합니다.
     let message = '서버 요청에 실패했습니다. 다시 시도하세요.';
-    if (typeof detail === 'string') {
+    if (response.status >= 500) {
+      message = connectionErrorMessage;
+    } else if (typeof detail === 'string') {
       message = detail;
     } else if (Array.isArray(detail)) {
       message = path.startsWith('/auth/')

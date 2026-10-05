@@ -1,3 +1,4 @@
+import RequestError from '../components/RequestError';
 // 학습용 설명: 검색조건, 지도, 공고목록을 한 화면에 연결하는 검색 페이지입니다.
 // 큰 흐름: useJobSearch에서 상태/함수 받기 → Filter/Map/JobList에 나눠 전달 → 사용자 클릭이 다시 hook으로 돌아감.
 
@@ -153,10 +154,7 @@ export default function SearchPage({ home = false }) {
         {search.loading && !search.refreshingSort ? (
           <p className="request-status" role="status">공고를 불러오는 중입니다…</p>
         ) : search.error ? (
-          <div className="request-status" role="alert">
-            {search.error}
-            <button onClick={search.retry}>다시 시도</button>
-          </div>
+          <RequestError message={search.error} onRetry={search.retry} />
         ) : home ? (
           // 메인은 선택한 지역마다 "지도 + 공고 5개" 한 줄을 만듭니다.
           search.regions.map((region, index) => {

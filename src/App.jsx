@@ -11,6 +11,7 @@ import MyPage from './pages/MyPage';
 import CompaniesPage from './pages/CompaniesPage';
 import CoverPage from './pages/CoverPage';
 import './styles/service.css';
+import './styles/brand-theme.css';
 
 export default function App() {
   // pathname은 현재 주소의 길 부분입니다. 예: /jobs/123 → /jobs/123
@@ -48,7 +49,7 @@ export default function App() {
 
   return (
     <>
-    {showCover ? <CoverPage onEnter={enterMain} /> : <div className={`site-shell${transition === 'opening' ? 'intro-main-reveal' : ''}`}>
+    {showCover ? <CoverPage onEnter={enterMain} /> : <div className={`site-shell${transition === 'opening' ? ' intro-main-reveal' : ''}`}>
       {/* 메인(/)에는 자체 상단 구성이 있어서 공통 Header를 숨깁니다. */}
       {pathname !== '/' && pathname !== '/main' && <Header />}
 

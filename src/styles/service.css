@@ -11,6 +11,10 @@
 .service-page button:not(.job-bookmark), .request-status button, .page-search-heading button { border: 1px solid #c3ded3; border-radius: 7px; padding: 8px 15px; background: #eff9f5; }
 .service-page .primary-action { display: inline-block; background: #008e6b !important; color: white; border-radius: 8px; padding: 10px 20px; margin: 18px 0; border: 0; text-decoration: none; }
 .service-page [role='alert'] { color: #a22c38; margin: 12px 0; }
+.request-error, .service-page .request-error { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; padding: 20px 24px; margin: 12px 0; border: 1px solid #dcebe5; border-radius: 12px; background: white; color: #183c33; font-size: 14px; line-height: 1.6; }
+.request-error button, .service-page .request-error button { flex-shrink: 0; border: 1px solid #c3ded3; border-radius: 7px; padding: 8px 15px; background: #eff9f5; color: #183c33; font: inherit; cursor: pointer; }
+.request-error button:hover { background: #e0f2ea; }
+.request-error button:focus-visible { outline: 2px solid #008e6b; outline-offset: 3px; }
 .auth-page { max-width: 460px; }
 .auth-page form { margin: 20px 0; }
 .auth-page form .primary-action { width: 100%; }

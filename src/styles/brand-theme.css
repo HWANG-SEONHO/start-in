@@ -1,0 +1,80 @@
+/* Shared service palette: navy structure, green actions, violet AI accents. */
+:root {
+  --brand-navy: #182138;
+  --brand-violet: #5146c8;
+  --brand-violet-soft: #f2f0fc;
+  --brand-line: #dfe3ed;
+  --brand-copy: #5d6980;
+  background: #f5f6fa;
+}
+.site-shell { color: var(--brand-navy); }
+.site-shell .site-header { background: rgba(24,33,56,.96); border-bottom-color: rgba(255,255,255,.12); }
+.site-shell .brand-wordmark { color: #fff; }
+.site-shell .brand-wordmark > span { color: #69dcc0; }
+.site-shell .header-nav button { color: #e2e6f0; }
+.site-shell .header-nav button:hover { color: #fff; }
+.site-shell .header-nav .header-nav-highlight { color: #c4bcff; }
+.site-shell .notification-button, .site-shell .login-button { background: #fff; color: var(--brand-navy); border-color: #dfe3ed; }
+.site-shell .hero-introduction h1 { color: var(--brand-navy); }
+.site-shell .hero-description, .site-shell .hero-stat span { color: var(--brand-copy); }
+.site-shell .ai-search-panel { background: linear-gradient(135deg,#fff 65%,#f5f2ff); border: 1px solid #d9d5ed; box-shadow: 0 8px 28px rgba(24,33,56,.09); }
+.site-shell .search-panel-title h2 { color: var(--brand-navy); }
+.site-shell .sparkle-icon { color: var(--brand-violet); }
+.site-shell .search-panel-heading > p, .site-shell .search-guidance { color: var(--brand-copy); }
+.site-shell .search-help { background: var(--brand-violet-soft); border-color: #e0daf6; color: var(--brand-violet); }
+.site-shell .recommendation-help { background: #f0f2f8; border-color: var(--brand-line); color: var(--brand-copy); }
+.site-shell .search-help span { background: var(--brand-violet); }
+.site-shell .search-help-panel { border-color: #d9d2f0; box-shadow: 0 8px 24px #18213820; color: var(--brand-navy); }
+.site-shell .search-help-panel button { background: var(--brand-violet-soft); color: var(--brand-violet); }
+.site-shell .ai-search-field { border-color: #bcb5e2; background: #fff; }
+.site-shell .ai-search-field:focus-within { border-color: var(--brand-violet); box-shadow: 0 0 0 3px #5146c813; }
+.site-shell .search-icon { stroke: var(--brand-violet); }
+.site-shell .suggestion-row button { border-color: var(--brand-line); color: var(--brand-copy); }
+.site-shell .suggestion-row button:hover { background: var(--brand-violet-soft); border-color: #cfc7ef; color: var(--brand-violet); }
+.site-shell .suggestion-row .suggestion-highlight { color: #007b5d; background: #effaf6; }
+.site-shell .filter-panel, .site-shell .job-list-section, .site-shell .map-section { border-color: var(--brand-line); }
+.site-shell .filter-heading h2, .site-shell .map-heading h2, .site-shell .job-list-title-group h2, .site-shell .job-company-name { color: var(--brand-navy); }
+.site-shell .filter-location-icon, .site-shell .job-heading-icon, .site-shell .map-chart-icon { color: var(--brand-navy); }
+.site-shell .filter-heading p, .site-shell .map-heading p, .site-shell .job-list-title-group > p { color: var(--brand-copy); }
+.site-shell .job-sort-option.is-current { background: var(--brand-navy); color: #fff; border-color: var(--brand-navy); }
+.site-shell .map-view-options { background: #f0f2f8; border-color: var(--brand-line); }
+.site-shell .district-summary { background: #f4f5fa; }
+.site-shell .district-marker.is-active { background: var(--brand-navy); }
+.site-shell .service-page { border-color: var(--brand-line); border-top: 3px solid var(--brand-navy); box-shadow: 0 8px 28px #18213806; }
+.site-shell .service-page h1, .site-shell .service-page h2, .site-shell .job-facts dt { color: var(--brand-navy); }
+.site-shell .service-page input, .site-shell .service-page select, .site-shell .service-page textarea, .site-shell .resume-file-picker { border-color: #cbd2e0; color: var(--brand-navy); }
+.site-shell .service-page input:focus-visible, .site-shell .service-page select:focus-visible, .site-shell .service-page textarea:focus-visible { outline: 2px solid var(--brand-navy); outline-offset: 2px; }
+.site-shell .demo-notice { background: #f0f2f8; color: var(--brand-copy); }
+.site-shell .company-directory > a { border-color: var(--brand-line); color: var(--brand-navy); }
+.site-shell .company-directory > a:hover { border-color: #b7d8cc; background: #f6fbf8; }
+.site-shell .company-directory > a span { color: #007b5d; }
+.site-shell .company-directory p { color: var(--brand-copy); }
+.site-shell .my-tabs button { background: #f0f2f8; border-color: var(--brand-line); color: var(--brand-copy); }
+.site-shell .my-tabs button[aria-pressed='true'] { background: var(--brand-navy); border-color: var(--brand-navy); color: #fff; }
+.site-shell .application-item, .site-shell .job-facts { border-color: var(--brand-line); }
+.site-shell .application-number { color: var(--brand-navy); background: #eef1f7; }
+.site-shell .request-error { color: var(--brand-navy); border-color: var(--brand-line); }
+.site-shell .request-error button { color: var(--brand-navy); background: #f0f2f8; border-color: #d4dae6; }
+.site-shell .request-error button:hover { background: #e7ebf4; }
+.service-toast { background: #182138; box-shadow: 0 6px 20px #18213826; }
+.logout-dialog { color: #182138; border-color: #dfe3ed; }
+.logout-dialog::backdrop { background: rgba(24,33,56,.4); }
+.logout-dialog-icon { color: #008e6b; background: #edf7f2; }
+.logout-cancel { background: #f0f2f8; color: #5d6980; border-color: #dfe3ed; }
+
+/* A narrow top highlight gives filled actions a little depth. */
+.site-shell .ask-ai-button, .site-shell .join-button, .site-shell .service-page .primary-action {
+  background-image: linear-gradient(180deg,rgba(255,255,255,.13),rgba(255,255,255,0) 48%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.38),inset 0 -1px 0 rgba(0,0,0,.09),0 2px 5px rgba(24,33,56,.09);
+  transition: box-shadow .18s ease,filter .18s ease;
+}
+.site-shell .ask-ai-button { background-color: #008e6b; }
+.site-shell .join-button { background-color: #008e6b; }
+.site-shell .ask-ai-button:hover:not(:disabled), .site-shell .join-button:hover:not(:disabled), .site-shell .service-page .primary-action:hover:not(:disabled) {
+  filter: brightness(1.06);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.48),inset 0 -1px 0 rgba(0,0,0,.09),0 3px 8px rgba(24,33,56,.13);
+}
+.site-shell .ask-ai-button:active:not(:disabled), .site-shell .join-button:active:not(:disabled), .site-shell .service-page .primary-action:active:not(:disabled) { filter: brightness(.98); box-shadow: inset 0 1px 3px rgba(0,0,0,.13); }
+.site-shell .service-page .primary-action { background: linear-gradient(180deg,#12a17e,#008e6b 48%) !important; }
+.site-shell .login-button:hover, .site-shell .notification-button:hover, .site-shell .filter-reset:hover { background: #f0f2f8; box-shadow: inset 0 1px 0 #fff; }
+@media(prefers-reduced-motion:reduce){.site-shell .ask-ai-button,.site-shell .join-button,.site-shell .service-page .primary-action{transition:none}}

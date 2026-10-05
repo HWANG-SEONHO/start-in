@@ -1,3 +1,4 @@
+import RequestError from '../components/RequestError';
 // 학습용 설명: 공고 하나의 자세한 내용을 보여주는 페이지입니다.
 // 큰 흐름: URL의 :id 읽기 → GET /jobs/:id → 상세 표시 → 저장/지원현황 기능 연결.
 
@@ -73,9 +74,7 @@ export default function JobDetailPage() {
       {loading ? (
         <p role="status">공고를 불러오는 중입니다…</p>
       ) : error ? (
-        <div role="alert">
-          {error} <button onClick={retry}>다시 시도</button>
-        </div>
+        <RequestError message={error} onRetry={retry} />
       ) : (
         <>
           {job.is_demo && (

@@ -5,8 +5,8 @@
 .site-header { height: 58px; background: rgb(255 255 255 / 20%); border-bottom: 1px solid rgb(255 255 255 / 30%); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); }
 .header-inner { width: min(1792px, calc(100% - 128px)); height: 100%; margin: auto; display: grid; grid-template-columns: 28% 44% 28%; align-items: center; }
 .brand { display: flex; align-items: center; width: max-content; border: 0; padding: 0; background: transparent; text-align: left; }
-@font-face { font-family: 'StartIn Manrope'; src: url('/fonts/manrope-medium.ttf') format('truetype'); font-weight: 500; font-style: normal; font-display: swap; }
-.brand-wordmark { display: inline-flex; align-items: baseline; gap: 5px; color: #20372f; font-family: 'StartIn Manrope', sans-serif; font-size: 27px; font-weight: 500; line-height: 1; letter-spacing: -.8px; white-space: nowrap; }
+@font-face { font-family: 'StartIn Manrope'; src: url('/fonts/manrope-extrabold.ttf') format('truetype'); font-weight: 800; font-style: normal; font-display: swap; }
+.brand-wordmark { display: inline-flex; align-items: baseline; gap: 5px; color: #20372f; font-family: 'StartIn Manrope', sans-serif; font-size: 27px; font-weight: 800; line-height: 1; letter-spacing: -.8px; white-space: nowrap; }
 .brand-wordmark > span { color: #008e6b; letter-spacing: -.6px; }
 .header-nav { display: flex; justify-content: space-between; align-items: center; gap: 22px; white-space: nowrap; transform: translateY(-2px); }
 .header-nav button { position: relative; padding: 17px 0 16px; border: 0; background: none; color: #253937; font-size: 15px; font-weight: 650; line-height: 1; letter-spacing: -.25px; }
