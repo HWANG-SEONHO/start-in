@@ -3,7 +3,7 @@
 
 import { useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { homeSearchUrl } from '../services/homeSearch';
+import { homeSearchUrl, jobsSearchUrl } from '../services/homeSearch';
 import { useAccount } from '../services/AccountContext';
 import '../styles/header.css';
 
@@ -67,7 +67,10 @@ export default function Header() {
           <nav className="header-nav" aria-label="메인 메뉴">
             <button type="button" className="header-nav-highlight" onClick={() => navigate('/coming-soon?feature=AI 취업코치')}>AI 취업코치</button>
             <button type="button" className="header-nav-highlight" onClick={() => navigate('/coming-soon?feature=AI 매칭')}>AI 매칭</button>
-            <button type="button" onClick={() => navigate('/jobs')}>채용공고</button>
+            <button type="button" onClick={() => {
+              if (location.pathname === '/jobs') return;
+              navigate(jobsSearchUrl(location.pathname === '/main' ? location.search : undefined));
+            }}>채용공고</button>
             <button type="button" onClick={() => navigate('/companies')}>기업정보</button>
             <button type="button" onClick={() => navigate('/coming-soon?feature=현직자 인사이트')}>현직자 인사이트</button>
             <button type="button" onClick={() => navigate('/coming-soon?feature=합격 후기')}>합격 후기</button>

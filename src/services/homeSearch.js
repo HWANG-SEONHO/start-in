@@ -9,3 +9,17 @@ export function homeSearchUrl() {
   try { return `/main${sessionStorage.getItem(HOME_SEARCH_KEY) || ''}`; }
   catch { return '/main'; }
 }
+
+// 전체 공고로 이동할 때 검색조건은 이어가고 화면별 페이지 상태는 제외한다.
+export function jobsSearchUrl(search) {
+  if (search === undefined) {
+    try { search = sessionStorage.getItem(HOME_SEARCH_KEY) || ''; }
+    catch { search = ''; }
+  }
+  const params = new URLSearchParams(search);
+  const next = new URLSearchParams();
+  for (const key of ['filters', 'q', 'sort', 'districts', 'ai']) {
+    if (params.has(key)) next.set(key, params.get(key));
+  }
+  return `/jobs${next.size ? `?${next}` : ''}`;
+}
