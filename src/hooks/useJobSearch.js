@@ -7,7 +7,6 @@ import { useSearchParams } from 'react-router-dom';
 import { rememberHomeSearch } from '../services/homeSearch';
 import { defaultFilters, filterGroups, sortRegions } from '../data/filters';
 import { api, getJobs } from '../services/api';
-
 const VALID_SORTS = ['latest', 'salary', 'size'];
 
 // page=abc처럼 이상한 값이 와도 화면이 깨지지 않게 1페이지로 고칩니다.
@@ -19,26 +18,10 @@ function validPage(value) {
 // filters라는 URL 값을 안전하게 읽습니다.
 function readFilters(params) {
   try {
-    const parsed = params.has('filters')
-      ? JSON.parse(params.get('filters'))
-      : defaultFilters;
-
-    return Object.fromEntries(
-      Object.entries(parsed)
-        // 우리 사이트가 실제로 아는 필터만 남깁니다.
-        .filter(([key]) => key in filterGroups)
-        .map(([key, values]) => [
-          key,
-          key === 'region' && Array.isArray(values)
-            ? sortRegions(values)
-            : Array.isArray(values)
-            ? values.filter(value => (
-              filterGroups[key].options.includes(value)
-              && value !== filterGroups[key].neutral
-            ))
-            : [],
-        ]),
-    );
+    const parsed = params.has('filters') ? JSON.parse(params.get('filters')) : defaultFilters;
+    return Object.fromEntries(Object.entries(parsed)
+    // 우리 사이트가 실제로 아는 필터만 남깁니다.
+    .filter(([key]) => key in filterGroups).map(([key, values]) => [key, key === 'region' && Array.isArray(values) ? sortRegions(values) : Array.isArray(values) ? values.filter(value => filterGroups[key].options.includes(value) && value !== filterGroups[key].neutral) : []]));
   } catch {
     // URL의 JSON이 망가졌다면 기본 필터로 돌아갑니다.
     return defaultFilters;
@@ -50,25 +33,15 @@ function readDistricts(params) {
   try {
     const raw = JSON.parse(params.get('districts') || '{}');
     if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return {};
+    return Object.fromEntries(Object.entries(raw).filter(([region]) => filterGroups.region.options.includes(region)).map(([region, value]) => {
+      // 옛 주소의 구 이름 하나도 배열로 바꿔, 복수 선택과 같은 흐름으로 읽습니다.
+      let values = [];
+      if (Array.isArray(value)) values = value;else if (typeof value === 'string' && value) values = [value];
 
-    return Object.fromEntries(
-      Object.entries(raw)
-        .filter(([region]) => filterGroups.region.options.includes(region))
-        .map(([region, value]) => {
-          // 옛 주소의 구 이름 하나도 배열로 바꿔, 복수 선택과 같은 흐름으로 읽습니다.
-          let values = [];
-          if (Array.isArray(value)) values = value;
-          else if (typeof value === 'string' && value) values = [value];
-
-          // 중복을 없애고, 너무 긴 값이나 너무 많은 값은 잘라냅니다.
-          const safeValues = [...new Set(
-            values.filter(district => typeof district === 'string' && district.length <= 40),
-          )].slice(0, 30);
-
-          return [region, safeValues];
-        })
-        .filter(([, values]) => values.length),
-    );
+      // 중복을 없애고, 너무 긴 값이나 너무 많은 값은 잘라냅니다.
+      const safeValues = [...new Set(values.filter(district => typeof district === 'string' && district.length <= 40))].slice(0, 30);
+      return [region, safeValues];
+    }).filter(([, values]) => values.length));
   } catch {
     return {};
   }
@@ -78,11 +51,7 @@ function readDistricts(params) {
 function readRegionPages(params) {
   try {
     const parsed = JSON.parse(params.get('pages') || '{}');
-    return Object.fromEntries(
-      Object.entries(parsed)
-        .filter(([region]) => filterGroups.region.options.includes(region))
-        .map(([region, page]) => [region, validPage(page)]),
-    );
+    return Object.fromEntries(Object.entries(parsed).filter(([region]) => filterGroups.region.options.includes(region)).map(([region, page]) => [region, validPage(page)]));
   } catch {
     return {};
   }
@@ -92,13 +61,7 @@ function readRegionPages(params) {
 function readRegionSorts(params) {
   try {
     const parsed = JSON.parse(params.get('regionSorts') || '{}');
-    return Object.fromEntries(
-      Object.entries(parsed)
-        .filter(([region, value]) => (
-          filterGroups.region.options.includes(region)
-          && VALID_SORTS.includes(value)
-        )),
-    );
+    return Object.fromEntries(Object.entries(parsed).filter(([region, value]) => filterGroups.region.options.includes(region) && VALID_SORTS.includes(value)));
   } catch {
     return {};
   }
@@ -112,8 +75,9 @@ function readAiConditions(params) {
     return null;
   }
 }
-
-export function useJobSearch({ home = false } = {}) {
+export function useJobSearch({
+  home = false
+} = {}) {
   // useSearchParams는 현재 URL의 ?뒤 값을 React에서 읽고 바꾸게 해줍니다.
   const [params, setParams] = useSearchParams();
   const homeSearch = params.toString();
@@ -148,7 +112,7 @@ export function useJobSearch({ home = false } = {}) {
     results: [],
     error: '',
     key: '',
-    regions: [],
+    regions: []
   });
 
   // 아래 값 중 하나라도 바뀌면 "새 검색 요청"이라고 판단할 수 있는 열쇠입니다.
@@ -162,52 +126,57 @@ export function useJobSearch({ home = false } = {}) {
     page,
     home,
     revision,
-    ai,
+    ai
   });
 
   // ---- 3. 검색조건이 바뀔 때 FastAPI에서 공고 가져오기 ----
   useEffect(() => {
     const controller = new AbortController();
     const request = JSON.parse(requestKey);
-    const selectedRegions = request.filters.region?.length
-      ? request.filters.region
-      : filterGroups.region.options;
+    const selectedRegions = request.filters.region?.length ? request.filters.region : filterGroups.region.options;
 
     // 메인 화면은 서울/부산처럼 지역별 카드가 따로 있으므로 지역마다 요청을 하나씩 만듭니다.
     // /jobs 일반 화면은 전체 결과 하나만 요청합니다.
     // 빠르게 연속 선택하면 마지막 조건만 조회합니다. 체크 표시와 URL은 즉시 바뀝니다.
     const timer = setTimeout(() => {
-      const requests = request.home
-        ? selectedRegions.map(region => getJobs({
-            ...request,
-            sort: request.regionSorts[region] || request.sort,
-            filters: { ...request.filters, region: [region] },
-            districts: request.districts[region]
-              ? { [region]: request.districts[region] }
-              : {},
-            page: request.pages[region] || 1,
-            pageSize: 5,
-            signal: controller.signal,
-          }))
-        : [getJobs({ ...request, pageSize: 10, signal: controller.signal })];
-
-      Promise.all(requests)
-        .then(results => {
-          if (controller.signal.aborted) return;
-          setState({
-            results,
-            error: '',
-            key: requestKey,
-            regions: selectedRegions,
-          });
-        })
-        .catch(error => {
-          // 새 검색 때문에 취소된 요청은 오류로 표시하지 않습니다.
-          if (!controller.signal.aborted && error.name !== 'AbortError') {
-            setState({ results: [], error: error.message, key: requestKey, regions: [] });
-            controller.abort();
-          }
+      const requests = request.home ? selectedRegions.map(region => getJobs({
+        ...request,
+        sort: request.regionSorts[region] || request.sort,
+        filters: {
+          ...request.filters,
+          region: [region]
+        },
+        districts: request.districts[region] ? {
+          [region]: request.districts[region]
+        } : {},
+        page: request.pages[region] || 1,
+        pageSize: 5,
+        signal: controller.signal
+      })) : [getJobs({
+        ...request,
+        pageSize: 10,
+        signal: controller.signal
+      })];
+      Promise.all(requests).then(results => {
+        if (controller.signal.aborted) return;
+        setState({
+          results,
+          error: '',
+          key: requestKey,
+          regions: selectedRegions
         });
+      }).catch(error => {
+        // 새 검색 때문에 취소된 요청은 오류로 표시하지 않습니다.
+        if (!controller.signal.aborted && error.name !== 'AbortError') {
+          setState({
+            results: [],
+            error: error.message,
+            key: requestKey,
+            regions: []
+          });
+          controller.abort();
+        }
+      });
     }, 250);
 
     // 조건이 또 바뀌면 이전 요청을 취소해 오래된 결과가 늦게 덮어쓰지 못하게 합니다.
@@ -226,24 +195,23 @@ export function useJobSearch({ home = false } = {}) {
   }
 
   // 검색 상태를 URL에 저장하는 공통 함수입니다.
-  function updateSearchParams(
-    nextFilters,
-    nextQuery = query,
-    nextSort = sort,
-    nextAi = ai,
-    nextRegionSorts = regionSorts,
-  ) {
+  function updateSearchParams(nextFilters, nextQuery = query, nextSort = sort, nextAi = ai, nextRegionSorts = regionSorts) {
     cancelInterpretation();
-
     setParams({
       filters: JSON.stringify(nextFilters),
-      ...(nextQuery ? { q: nextQuery } : {}),
+      ...(nextQuery ? {
+        q: nextQuery
+      } : {}),
       sort: nextSort,
-      ...(Object.keys(nextRegionSorts).length
-        ? { regionSorts: JSON.stringify(nextRegionSorts) }
-        : {}),
-      ...(nextAi ? { ai: JSON.stringify(nextAi) } : {}),
-    }, { preventScrollReset: true });
+      ...(Object.keys(nextRegionSorts).length ? {
+        regionSorts: JSON.stringify(nextRegionSorts)
+      } : {}),
+      ...(nextAi ? {
+        ai: JSON.stringify(nextAi)
+      } : {})
+    }, {
+      preventScrollReset: true
+    });
   }
 
   // 자연어 검색문장을 FastAPI의 AI 해석 API로 보냅니다.
@@ -255,21 +223,20 @@ export function useJobSearch({ home = false } = {}) {
       updateSearchParams(filters, '', sort, null);
       return;
     }
-
     const controller = new AbortController();
     interpretationRequest.current = controller;
     setInterpreting(true);
-
     try {
       const result = await api('/search/interpret', {
         method: 'POST',
-        body: { query: text },
-        signal: controller.signal,
+        body: {
+          query: text
+        },
+        signal: controller.signal
       });
 
       // 이 요청 뒤에 더 최신 요청이 시작됐다면 오래된 답은 무시합니다.
       if (interpretationRequest.current !== controller) return;
-
       updateSearchParams(filters, text, sort, result.conditions);
       setAiMessage(result.message);
     } catch (error) {
@@ -289,90 +256,94 @@ export function useJobSearch({ home = false } = {}) {
     // 무관이면 모두 비우고, 이미 고른 값이면 빼고, 새 값이면 더합니다.
     // 이렇게 만든 목록을 URL에 저장하면 화면과 다음 검색이 같은 조건을 사용합니다.
     let nextValues;
-    if (value === filterGroups[field].neutral || (field === 'region' && value === '전체')) {
+    if (value === filterGroups[field].neutral || field === 'region' && value === '전체') {
       nextValues = [];
     } else if (currentValues.includes(value)) {
       nextValues = currentValues.filter(item => item !== value);
     } else {
       nextValues = [...currentValues, value];
     }
-
-    updateSearchParams({ ...filters, [field]: field === 'region' ? sortRegions(nextValues) : nextValues });
+    updateSearchParams({
+      ...filters,
+      [field]: field === 'region' ? sortRegions(nextValues) : nextValues
+    });
   }
 
   // 지도/목록에서 구·군을 선택합니다.
-  function selectDistrict(region, district, { multiple = false } = {}) {
+  function selectDistrict(region, district, {
+    multiple = false
+  } = {}) {
     cancelInterpretation();
-
     setParams(previous => {
       const nextParams = new URLSearchParams(previous);
       const nextDistricts = readDistricts(previous);
       const currentDistricts = nextDistricts[region] || [];
       let selectedDistricts;
-
       if (!district) {
         selectedDistricts = [];
       } else if (multiple) {
         // 목록 모드는 여러 구·군을 동시에 체크할 수 있습니다.
-        selectedDistricts = currentDistricts.includes(district)
-          ? currentDistricts.filter(item => item !== district)
-          : [...currentDistricts, district];
+        selectedDistricts = currentDistricts.includes(district) ? currentDistricts.filter(item => item !== district) : [...currentDistricts, district];
       } else {
         // 지도 마커는 같은 곳을 다시 누르면 선택 해제, 다른 곳을 누르면 하나만 선택합니다.
-        selectedDistricts = currentDistricts.length === 1 && currentDistricts[0] === district
-          ? []
-          : [district];
+        selectedDistricts = currentDistricts.length === 1 && currentDistricts[0] === district ? [] : [district];
       }
-
-      if (selectedDistricts.length) nextDistricts[region] = selectedDistricts;
-      else delete nextDistricts[region];
-
+      if (selectedDistricts.length) nextDistricts[region] = selectedDistricts;else delete nextDistricts[region];
       nextParams.set('districts', JSON.stringify(nextDistricts));
       // 조건이 달라졌으니 페이지는 다시 첫 페이지부터 봅니다.
       nextParams.delete('page');
       nextParams.delete('pages');
       return nextParams;
-    }, { preventScrollReset: true });
+    }, {
+      preventScrollReset: true
+    });
   }
 
   // 일반 목록 또는 특정 지역 카드의 페이지를 바꿉니다.
   function setPage(nextPage, region) {
     cancelInterpretation();
-
     setParams(previous => {
       const nextParams = new URLSearchParams(previous);
-
       if (region) {
         const currentPages = readRegionPages(previous);
-        nextParams.set('pages', JSON.stringify({ ...currentPages, [region]: nextPage }));
+        nextParams.set('pages', JSON.stringify({
+          ...currentPages,
+          [region]: nextPage
+        }));
       } else {
         nextParams.set('page', String(nextPage));
       }
-
       return nextParams;
-    }, { preventScrollReset: true });
+    }, {
+      preventScrollReset: true
+    });
   }
 
   // 정렬 방법을 바꿉니다.
   function setSort(nextSort, region) {
     if (!VALID_SORTS.includes(nextSort)) return;
     cancelInterpretation();
-
     setParams(previous => {
       const nextParams = new URLSearchParams(previous);
-
       if (home && region) {
         const currentRegionSorts = readRegionSorts(previous);
         const currentPages = readRegionPages(previous);
-        nextParams.set('regionSorts', JSON.stringify({ ...currentRegionSorts, [region]: nextSort }));
-        nextParams.set('pages', JSON.stringify({ ...currentPages, [region]: 1 }));
+        nextParams.set('regionSorts', JSON.stringify({
+          ...currentRegionSorts,
+          [region]: nextSort
+        }));
+        nextParams.set('pages', JSON.stringify({
+          ...currentPages,
+          [region]: 1
+        }));
       } else {
         nextParams.set('sort', nextSort);
         nextParams.delete('page');
       }
-
       return nextParams;
-    }, { preventScrollReset: true });
+    }, {
+      preventScrollReset: true
+    });
   }
 
   // ---- 4. 화면에 보여줄 최종 상태 만들기 ----
@@ -386,18 +357,7 @@ export function useJobSearch({ home = false } = {}) {
   const displayRegions = refreshingSort && state.regions.length ? state.regions : regions;
 
   // AI가 해석한 조건을 사용자가 읽을 수 있는 한 줄 설명으로 바꿉니다.
-  const aiDescription = ai && typeof ai === 'object'
-    ? [
-        ...(Array.isArray(ai.regions) ? sortRegions(ai.regions) : []),
-        ai.category,
-        ai.experience,
-        ai.work_mode,
-        ai.salary_min != null ? `연봉 ${ai.salary_min}만원 이상` : '',
-        ...(Array.isArray(ai.keywords) ? ai.keywords : []),
-      ]
-        .filter(value => typeof value === 'string' && value)
-        .join(' · ')
-    : '';
+  const aiDescription = ai && typeof ai === 'object' ? [...(Array.isArray(ai.regions) ? sortRegions(ai.regions) : []), ai.category, ai.experience, ai.work_mode, ai.salary_min != null ? `연봉 ${ai.salary_min}만원 이상` : '', ...(Array.isArray(ai.keywords) ? ai.keywords : [])].filter(value => typeof value === 'string' && value).join(' · ') : '';
 
   // 이 hook을 쓰는 SearchPage가 필요한 값과 함수만 한 묶음으로 돌려줍니다.
   return {
@@ -423,6 +383,6 @@ export function useJobSearch({ home = false } = {}) {
     reset: () => updateSearchParams(defaultFilters, '', 'latest', null, {}),
     search: text => updateSearchParams(filters, text, sort, null),
     setSort,
-    retry: () => setRevision(value => value + 1),
+    retry: () => setRevision(value => value + 1)
   };
 }

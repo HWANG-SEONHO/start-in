@@ -3,14 +3,13 @@
 
 import { useState } from 'react';
 import '../styles/hero.css';
-
 export default function Hero({
   query,
   onSearch,
   count,
   companyCount,
   searching = false,
-  guidance = '',
+  guidance = ''
 }) {
   // draft는 사용자가 현재 입력창에서 편집 중인 글자입니다.
   const [draft, setDraft] = useState(query);
@@ -27,9 +26,7 @@ export default function Hero({
     event.preventDefault();
     onSearch(draft.trim());
   }
-
-  return (
-    <section className="hero-section" aria-labelledby="hero-title">
+  return <section className="hero-section" aria-labelledby="hero-title">
       {/* 왼쪽: 서비스 설명과 현재 데이터 숫자 */}
       <div className="hero-introduction">
         <p className="hero-eyebrow">AI가 찾아주는 맞춤 채용 기회</p>
@@ -97,12 +94,7 @@ export default function Hero({
             당신에게 맞는 결과를 찾아드립니다.
           </p>
 
-          <button
-            type="button"
-            className="search-help"
-            onClick={() => setHelpOpen(value => !value)}
-            aria-expanded={helpOpen}
-          >
+          <button type="button" className="search-help" onClick={() => setHelpOpen(value => !value)} aria-expanded={helpOpen}>
             <span>?</span>
             어떤 걸 물어볼 수 있나요?
           </button>
@@ -114,14 +106,7 @@ export default function Hero({
             <path d="m19 19 8 8" />
           </svg>
 
-          <input
-            className="search-placeholder"
-            aria-label="공고 검색어"
-            placeholder="기업명, 직무, 기술 키워드로 검색"
-            maxLength={200}
-            value={draft}
-            onChange={event => setDraft(event.target.value)}
-          />
+          <input className="search-placeholder" aria-label="공고 검색어" placeholder="기업명, 직무, 기술 키워드로 검색" maxLength={200} value={draft} onChange={event => setDraft(event.target.value)} />
 
           <button type="submit" className="ask-ai-button" disabled={searching}>
             {searching ? '조건 해석 중…' : '공고 검색'} <span aria-hidden="true">⟶</span>
@@ -134,18 +119,14 @@ export default function Hero({
             <path d="m10 1 9 4v7c0 4-6 8-9 9-3-1-9-5-9-9V5z" fill="currentColor" />
             <path d="m5 10 3 3 6-6" fill="none" stroke="white" strokeWidth="2" />
           </svg>
-          {searching
-            ? '검색조건을 해석하고 있습니다…'
-            : guidance || '원하는 조건을 입력하세요. AI 연결이 없으면 키워드 검색으로 이어집니다.'}
+          {searching ? '검색조건을 해석하고 있습니다…' : guidance || '원하는 조건을 입력하세요. AI 연결이 없으면 키워드 검색으로 이어집니다.'}
         </p>
 
-        {helpOpen && (
-          <div className="search-help-panel" role="status">
+        {helpOpen && <div className="search-help-panel" role="status">
             추천검색어를 누르면 예시 문구만 입력됩니다. 검색을 누르면 AI 연결 시 입력 문구를 해석하고,
             직접 선택한 필터와 함께 적용합니다. 키가 없거나 실패하면 키워드 검색합니다. 후기 분석은 제공하지 않습니다.
             <button type="button" onClick={() => setHelpOpen(false)}>닫기</button>
-          </div>
-        )}
+          </div>}
 
         {/* 추천 문구는 검색 실행이 아니라 입력 예시입니다. */}
         <div className="search-suggestions">
@@ -163,16 +144,10 @@ export default function Hero({
             <button type="button" onClick={() => chooseSuggestion('야근 적은 회사')}>야근 적은 회사</button>
           </div>
 
-          <button
-            type="button"
-            className="more-suggestions"
-            onClick={() => setHelpOpen(value => !value)}
-            aria-label="추천 검색어 더 보기"
-          >
+          <button type="button" className="more-suggestions" onClick={() => setHelpOpen(value => !value)} aria-label="추천 검색어 더 보기">
             <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6" /></svg>
           </button>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 }

@@ -6,10 +6,7 @@ export function salaryLabel(job) {
   if (!job.salary_min) return '회사내규';
 
   // 시급/일급은 원, 연봉/월급은 이 프로젝트 데이터에서 만원 단위를 씁니다.
-  const unit = job.salary_type === '시급' || job.salary_type === '일급'
-    ? '원'
-    : '만원';
-
+  const unit = job.salary_type === '시급' || job.salary_type === '일급' ? '원' : '만원';
   return `${job.salary_type} ${job.salary_min.toLocaleString()} ~ ${job.salary_max.toLocaleString()}${unit}`;
 }
 
@@ -22,7 +19,6 @@ export function deadlineLabel(deadline) {
   const deadlineDate = new Date(`${deadline}T00:00:00`);
   const oneDayMs = 86_400_000;
   const remaining = Math.round((deadlineDate - today) / oneDayMs);
-
   if (remaining < 0) return '마감';
   if (remaining === 0) return '오늘 마감';
   return `D-${remaining}`;

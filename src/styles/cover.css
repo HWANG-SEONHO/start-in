@@ -442,3 +442,5 @@
 
 
 
+/* 실패 시 캔버스만 숨기고 대체 문구를 보여줍니다. */
+.is-motion-hidden { visibility: hidden; }

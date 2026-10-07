@@ -4,37 +4,29 @@
 import '../styles/filter.css';
 import { useState } from 'react';
 import { filterGroups } from '../data/filters';
-
-export default function FilterPanel({ filters, onToggle, onReset, summary }) {
+export default function FilterPanel({
+  filters,
+  onToggle,
+  onReset,
+  summary
+}) {
   // 모바일에서는 지역부터 보여주고, 나머지 조건은 사용자가 펼쳐서 고릅니다.
   const [expanded, setExpanded] = useState(false);
   // field 하나(예: region)의 모든 선택지를 버튼으로 바꿉니다.
   function renderOptions(field) {
-    const { options, neutral } = filterGroups[field];
-
+    const {
+      options,
+      neutral
+    } = filterGroups[field];
     return options.map(option => {
       // neutral은 "무관/전체"처럼 아무 제한도 걸지 않는 특별 선택지입니다.
-      const selected = option === neutral
-        ? !(filters[field]?.length)
-        : !!filters[field]?.includes(option);
-
-      return (
-        <button
-          key={option}
-          type="button"
-          className={`filter-option${selected ? ' is-selected' : ''}`}
-          aria-label={option}
-          aria-pressed={selected}
-          onClick={() => onToggle(field, option)}
-        >
+      const selected = option === neutral ? !filters[field]?.length : !!filters[field]?.includes(option);
+      return <button key={option} type="button" className={`filter-option${selected ? ' is-selected' : ''}`} aria-label={option} aria-pressed={selected} onClick={() => onToggle(field, option)}>
           {option}
-        </button>
-      );
+        </button>;
     });
   }
-
-  return (
-    <section className="filter-panel" aria-labelledby="filter-title">
+  return <section className="filter-panel" aria-labelledby="filter-title">
       {/* 필터 박스 제목, 현재 조건 요약, 초기화 버튼 */}
       <div className="filter-heading">
         <svg className="filter-location-icon" viewBox="0 0 24 30" aria-hidden="true">
@@ -44,10 +36,7 @@ export default function FilterPanel({ filters, onToggle, onReset, summary }) {
         </svg>
 
         <h2 id="filter-title">상세 조건으로 원하는 공고를 찾아보세요</h2>
-        <p
-          aria-live="polite"
-          title="같은 항목 안에서는 하나라도, 서로 다른 항목은 모두 일치하는 공고를 표시합니다."
-        >
+        <p aria-live="polite" title="같은 항목 안에서는 하나라도, 서로 다른 항목은 모두 일치하는 공고를 표시합니다.">
           {summary || '조건을 선택하면 결과가 실시간으로 업데이트됩니다.'}
         </p>
 
@@ -145,6 +134,5 @@ export default function FilterPanel({ filters, onToggle, onReset, summary }) {
       <button className="mobile-filter-toggle" type="button" aria-expanded={expanded} aria-controls="search-filter-rows" onClick={() => setExpanded(value => !value)}>
         {expanded ? '상세 조건 접기' : '직무·급여 등 상세 조건 펼치기'}
       </button>
-    </section>
-  );
+    </section>;
 }

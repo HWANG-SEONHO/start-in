@@ -1,20 +1,28 @@
+// 검색조건을 같은 브라우저 탭에 보관해 홈과 공고목록이 같은 조건을 사용하게 합니다.
 const HOME_SEARCH_KEY = 'startin-home-search';
 
 // 홈을 떠나도 같은 탭에서는 마지막 검색조건을 다시 사용할 수 있게 보관한다.
 export function rememberHomeSearch(search) {
-  try { sessionStorage.setItem(HOME_SEARCH_KEY, search); } catch { /* 저장이 차단돼도 현재 검색은 유지한다. */ }
+  try {
+    sessionStorage.setItem(HOME_SEARCH_KEY, search);
+  } catch {/* 저장이 차단돼도 현재 검색은 유지한다. */}
 }
-
 export function homeSearchUrl() {
-  try { return `/main${sessionStorage.getItem(HOME_SEARCH_KEY) || ''}`; }
-  catch { return '/main'; }
+  try {
+    return `/main${sessionStorage.getItem(HOME_SEARCH_KEY) || ''}`;
+  } catch {
+    return '/main';
+  }
 }
 
 // 전체 공고로 이동할 때 검색조건은 이어가고 화면별 페이지 상태는 제외한다.
 export function jobsSearchUrl(search) {
   if (search === undefined) {
-    try { search = sessionStorage.getItem(HOME_SEARCH_KEY) || ''; }
-    catch { search = ''; }
+    try {
+      search = sessionStorage.getItem(HOME_SEARCH_KEY) || '';
+    } catch {
+      search = '';
+    }
   }
   const params = new URLSearchParams(search);
   const next = new URLSearchParams();

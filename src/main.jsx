@@ -20,10 +20,8 @@ const root = createRoot(rootElement);
 
 // BrowserRouter: 주소(URL)에 따라 어떤 페이지를 보여줄지 도와줍니다.
 // AccountProvider: 로그인한 사용자 정보를 여러 화면에서 함께 쓰게 해줍니다.
-root.render(
-  <BrowserRouter basename={routerBase}>
+root.render(<BrowserRouter basename={routerBase}>
     <AccountProvider>
       <App />
     </AccountProvider>
-  </BrowserRouter>,
-);
+  </BrowserRouter>);

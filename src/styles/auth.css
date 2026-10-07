@@ -46,7 +46,7 @@ html:has(.auth-scene) { overflow-y: auto; }
 .auth-scene .auth-social-mark svg { width: 24px; height: 24px; stroke: none; }
 .auth-switch { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 16px; padding: 12px; border-radius: 9px; background: #f3f6f9; font-size: 12px; color: #6b7b91; }
 .auth-switch a { display: inline-flex; align-items: center; gap: 8px; min-height: 34px; color: #182138; border: 1px solid #bdc8d9; border-radius: 7px; padding: 0 12px; background: linear-gradient(180deg,#fff 0%,#f7f9fe 43%,#e8edf6 48%,#d4dce9 100%); box-shadow: inset 0 1px 0 #fff,inset 0 -1px 0 #b4c0d280,0 2px 3px #18213815; font-weight: 700; white-space: nowrap; }
-.auth-switch a:hover { color: #006b51; background: #edf8f3; text-decoration: none; }
+.auth-switch a:hover { text-decoration: none; }
 .auth-switch a > span { font-size: 19px; }
 /* 가입은 왼쪽에 폼과 장점, 오른쪽에 인물을 둡니다. */
 .auth-register::before { background: linear-gradient(90deg,#f8fbfa 0%,#f8fbfaf5 40%,#f8fbfaaa 60%,transparent 77%); }
@@ -75,3 +75,5 @@ html:has(.auth-scene) { overflow-y: auto; }
 @media(max-width:1000px) { .auth-register .auth-layout { grid-template-columns: minmax(0,1fr); max-width: 580px; } .auth-benefits { display: none; } }
 @media(max-width:850px) { .auth-scene { height: auto; min-height: calc(100dvh - var(--auth-header-height,58px)); } .auth-layout { width: min(580px,calc(100% - 32px)); height: auto; grid-template-columns: 1fr; gap: 20px; padding: 24px 0; } .auth-card { max-height: none; overflow: visible; padding: 24px; } .auth-introduction { max-width: none; } .auth-introduction h1 { margin: 8px 0; font-size: 30px; } .auth-introduction > p,.auth-intro-features { display: none; } .auth-scene::before { background: #f6faf4d9; } .auth-register .auth-layout { grid-template-rows: auto auto; gap: 18px; } .auth-register-heading { padding: 0; } .auth-register-heading h1 { font-size: 30px; } }
 @media(max-width:480px) { .auth-fields.is-two-columns { grid-template-columns: 1fr; } .auth-card { padding: 22px 18px; } .auth-socials.is-compact { grid-template-columns: 1fr; } .auth-socials.is-compact button { flex-wrap: nowrap; min-height: 44px; } .auth-socials.is-compact small { flex-basis: auto; } .auth-switch { font-size: 11px; padding: 8px; } }
+/* 사진을 흐리게 덮던 페이드만 제거합니다. 카드·버튼 스타일과는 별개입니다. */
+.auth-scene::before { display: none; }

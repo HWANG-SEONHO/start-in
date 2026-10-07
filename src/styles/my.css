@@ -1,0 +1,35 @@
+/* MY 화면만 정리합니다. 공통 메뉴의 기존 버튼 디자인은 그대로 사용합니다. */
+.site-shell .my-workspace { border-color: #dfe5ed; background: #fff; }
+.site-shell .my-workspace .my-tabs { gap: 6px; padding: 6px; border-radius: 12px; background: #f2f4f8; }
+.site-shell .my-workspace .my-tabs button {
+  flex: 1; min-height: 46px; padding: 10px 18px;
+  border: 1px solid transparent; border-radius: 8px;
+  background: transparent; color: #56647c; font-weight: 700;
+  box-shadow: none; text-shadow: none; transition: background .15s,color .15s;
+}
+.site-shell .my-workspace .my-tabs button:hover { background: #e4e9f1; color: #182138; }
+.site-shell .my-workspace .my-tabs button[aria-pressed='true'] { background: #182138; color: #fff; border-color: #182138; box-shadow: none; }
+.site-shell .my-workspace .my-tabs button[aria-pressed='true']:hover { background: #273650; color: #fff; }
+.site-shell .my-workspace button:where(:not(.job-bookmark,.my-tabs button)) {
+  min-height: 44px; padding: 10px 18px; border-radius: 8px;
+  background: #fff; color: #182138; border: 1px solid #cfd8e4;
+  font-weight: 700; box-shadow: none; text-shadow: none; filter: none;
+  transition: background .15s,border-color .15s;
+}
+.site-shell .my-workspace button:where(:not(.job-bookmark,.my-tabs button)):hover:not(:disabled) { background: #edf2f7; border-color: #aab8cb; filter: none; box-shadow: none; }
+.site-shell .my-workspace .action-row .action-save,
+.site-shell .my-workspace .primary-action { background: #00836a !important; color: #fff !important; border-color: #00836a !important; }
+.site-shell .my-workspace .action-row .action-save:hover:not(:disabled),
+.site-shell .my-workspace .primary-action:hover:not(:disabled) { background: #006e58 !important; border-color: #006e58 !important; }
+.site-shell .my-workspace .action-danger { background: #fff; color: #a43d4c; border-color: #e3c8ce; }
+.site-shell .my-workspace .action-danger:hover:not(:disabled) { background: #fff0f2; color: #8c2938; border-color: #cf9eaa; }
+.site-shell .my-workspace button:disabled { opacity: .55; cursor: not-allowed; }
+.site-shell .my-workspace button:focus-visible { outline: 2px solid #00836a; outline-offset: 3px; }
+.site-shell .my-workspace .resume-file-picker { padding: 14px; border-color: #d6dee8; background: #f8fafc; }
+.site-shell .my-workspace .resume-current { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; border-color: #d6dee8; }
+.site-shell .my-workspace .resume-current a { font-weight: 700; }
+.site-shell .my-workspace .delete-confirm { flex-wrap: wrap; }
+.site-shell .my-workspace .application-item { border-color: #dfe5ed; padding: 24px; }
+.site-shell .my-workspace .my-tabs button[aria-pressed='true']:hover:not(:disabled) { background: #273650; color: #fff; border-color: #182138; }
+@media(max-width:480px) { .site-shell .my-workspace .my-tabs button { padding: 10px 6px; font-size: 13px; } .site-shell .my-workspace .application-item { padding: 16px 12px; } }
+@media(prefers-reduced-motion:reduce) { .site-shell .my-workspace button { transition: none; } }

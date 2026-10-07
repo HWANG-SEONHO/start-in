@@ -1,7 +1,7 @@
+// 공고 요청 대기줄입니다. 동시에 2개까지만 보내고, 취소된 요청은 줄에서 뺍니다.
 const waiting = [];
 let active = 0;
 const MAX_ACTIVE = 2;
-
 function runNext() {
   while (active < MAX_ACTIVE && waiting.length) {
     const request = waiting.shift();
@@ -25,7 +25,12 @@ export function queueJobRequest(run, signal) {
       reject(new DOMException('검색 취소', 'AbortError'));
       return;
     }
-    const request = { run, signal, resolve, reject };
+    const request = {
+      run,
+      signal,
+      resolve,
+      reject
+    };
     request.cancel = () => {
       const index = waiting.indexOf(request);
       if (index !== -1) {
@@ -33,7 +38,9 @@ export function queueJobRequest(run, signal) {
         reject(new DOMException('검색 취소', 'AbortError'));
       }
     };
-    signal?.addEventListener('abort', request.cancel, { once: true });
+    signal?.addEventListener('abort', request.cancel, {
+      once: true
+    });
     waiting.push(request);
     runNext();
   });

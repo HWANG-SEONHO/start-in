@@ -49,3 +49,5 @@
 @keyframes robot-message-enter { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 @media (max-width: 700px) { .floating-robot { --robot-width: 110px; } .floating-robot-visual { height: 125px; } .floating-robot-toggle { width: 20px; } .floating-robot-list-link.is-collapsed, .floating-robot-bubble.is-collapsed { width: 22px; } .floating-robot-list-link > div, .floating-robot-bubble > div { width: calc(var(--panel-width) - 36px); } .floating-robot-visual .floating-robot-close { right: 8px; top: 13px; } }
 @media (prefers-reduced-motion: reduce) { .floating-robot-visual, .floating-robot-message { animation: none; } .floating-robot-list-link, .floating-robot-bubble, .floating-robot-chevron { transition: none; } }
+/* 공고 수를 읽는 동안 자리 폭은 유지해 말풍선이 튀지 않게 합니다. */
+.is-count-hidden { visibility: hidden; }

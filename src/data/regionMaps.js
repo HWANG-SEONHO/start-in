@@ -3,21 +3,21 @@
 
 // 사용자가 제공한 지역별 지도 원본입니다.
 export const regionMaps = {
-  "부산": "/images/busan-map-wide.png",
-  "서울": "/images/regions/seoul.png",
-  "경기": "/images/regions/gyeonggi.png",
-  "인천": "/images/regions/incheon.png",
-  "대구": "/images/regions/daegu.png",
-  "광주": "/images/regions/gwangju.png",
-  "대전": "/images/regions/daejeon.png",
-  "울산": "/images/regions/ulsan.png",
-  "세종": "/images/regions/sejong.png",
-  "강원": "/images/regions/gangwon.png",
-  "충북": "/images/regions/chungbuk.png",
-  "충남": "/images/regions/chungnam.png",
-  "전북": "/images/regions/jeonbuk.png",
-  "전남": "/images/regions/jeonnam.png",
-  "경북": "/images/regions/gyeongbuk.png",
-  "경남": "/images/regions/gyeongnam.png",
-  "제주": "/images/regions/jeju.png"
+  "부산": "/images/busan-map-wide.webp",
+  "서울": "/images/regions/seoul.webp",
+  "경기": "/images/regions/gyeonggi.webp",
+  "인천": "/images/regions/incheon.webp",
+  "대구": "/images/regions/daegu.webp",
+  "광주": "/images/regions/gwangju.webp",
+  "대전": "/images/regions/daejeon.webp",
+  "울산": "/images/regions/ulsan.webp",
+  "세종": "/images/regions/sejong.webp",
+  "강원": "/images/regions/gangwon.webp",
+  "충북": "/images/regions/chungbuk.webp",
+  "충남": "/images/regions/chungnam.webp",
+  "전북": "/images/regions/jeonbuk.webp",
+  "전남": "/images/regions/jeonnam.webp",
+  "경북": "/images/regions/gyeongbuk.webp",
+  "경남": "/images/regions/gyeongnam.webp",
+  "제주": "/images/regions/jeju.webp"
 };

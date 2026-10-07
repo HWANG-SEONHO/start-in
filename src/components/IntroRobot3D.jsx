@@ -1,24 +1,41 @@
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-
-export default function IntroRobot3D({ timeline, onReady, startAt = 0, endAt = 10.9, revealDuration = 0, showcase = false, scrollDriven = false }) {
+export default function IntroRobot3D({
+  timeline,
+  onReady,
+  startAt = 0,
+  endAt = 10.9,
+  revealDuration = 0,
+  showcase = false,
+  scrollDriven = false
+}) {
   const host = useRef(null);
-
   useEffect(() => {
     const element = host.current;
-    let renderer, frame, model, mixer, action, stopped = false, previousTime = -1;
+    let renderer,
+      frame,
+      model,
+      mixer,
+      action,
+      stopped = false,
+      previousTime = -1;
     const disposeModel = object => object.traverse(node => {
       if (!node.isMesh) return;
       node.geometry.dispose();
       const materials = Array.isArray(node.material) ? node.material : [node.material];
       materials.forEach(material => {
-        Object.values(material).forEach(value => { if (value?.isTexture) value.dispose(); });
+        Object.values(material).forEach(value => {
+          if (value?.isTexture) value.dispose();
+        });
         material.dispose();
       });
     });
     try {
-      renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+      renderer = new THREE.WebGLRenderer({
+        alpha: true,
+        antialias: true
+      });
     } catch {
       // 3D를 지원하지 않는 기기에서도 로봇 자리가 비지 않도록 이미지가 남는다.
       onReady?.();
@@ -40,12 +57,18 @@ export default function IntroRobot3D({ timeline, onReady, startAt = 0, endAt = 1
     const camera = new THREE.OrthographicCamera(-1, 1, .7, -.7, .01, 100);
     camera.position.set(2.5, 1.5, 4);
     camera.lookAt(0, .5, 0);
-    const whiteMask = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, depthWrite: false });
+    const whiteMask = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      depthWrite: false
+    });
     const resize = () => {
-      const width = element.clientWidth, height = element.clientHeight;
+      const width = element.clientWidth,
+        height = element.clientHeight;
       if (!width || !height) return;
       const halfWidth = .7 * width / height;
-      camera.left = -halfWidth; camera.right = halfWidth;
+      camera.left = -halfWidth;
+      camera.right = halfWidth;
       camera.updateProjectionMatrix();
       renderer.setSize(width, height, false);
       previousTime = -1;
@@ -53,14 +76,21 @@ export default function IntroRobot3D({ timeline, onReady, startAt = 0, endAt = 1
     const observer = new ResizeObserver(resize);
     observer.observe(element);
     resize();
-
     new GLTFLoader().load('/models/cute-home-robot.glb', gltf => {
-      if (stopped) { disposeModel(gltf.scene); return; }
+      if (stopped) {
+        disposeModel(gltf.scene);
+        return;
+      }
       model = gltf.scene;
       // 원본의 바닥은 빼고 로봇만 투명 배경 위에 놓는다.
       const floors = [];
-      model.traverse(node => { if (node.isMesh && /Suelo/i.test(node.name)) floors.push(node); });
-      floors.forEach(node => { node.removeFromParent(); disposeModel(node); });
+      model.traverse(node => {
+        if (node.isMesh && /Suelo/i.test(node.name)) floors.push(node);
+      });
+      floors.forEach(node => {
+        node.removeFromParent();
+        disposeModel(node);
+      });
       model.updateMatrixWorld(true);
       const bounds = new THREE.Box3().setFromObject(model);
       const center = bounds.getCenter(new THREE.Vector3());
@@ -88,23 +118,16 @@ export default function IntroRobot3D({ timeline, onReady, startAt = 0, endAt = 1
       renderer.render(scene, camera);
       onReady?.();
       previousTime = -1;
-    }, undefined, () => { element.dataset.ready = 'false'; onReady?.(); });
-
+    }, undefined, () => {
+      element.dataset.ready = 'false';
+      onReady?.();
+    });
     const smooth = (time, start, end) => {
       const value = THREE.MathUtils.clamp((time - start) / (end - start), 0, 1);
       return value * value * (3 - 2 * value);
     };
     // 빠른 방향 전환과 한 바퀴 회전을 순서대로 연결한다. 같은 시간에는 같은 자세가 나온다.
-    const performance = [
-      [0, -.6, 0, 0], [1.2, -.4, 0, 0],
-      [1.7, .4, -.16, -.1], [2.1, -.5, .18, .09], [2.5, .5, -.13, -.07],
-      [3.05, .4, -.18, -.08], [3.85, Math.PI * 2 + .4, .16, .13],
-      [4.2, Math.PI * 2 + .2, 0, 0], [4.65, Math.PI * 2 + .7, -.17, -.1],
-      [5.05, Math.PI * 2 - .4, .2, .12], [5.5, Math.PI * 2 + .3, -.08, 0],
-      [5.9, Math.PI * 2 - .3, -.16, .08], [6.45, Math.PI * 2 + .65, .15, -.1],
-      [6.95, Math.PI * 2 + .2, 0, 0], [7.6, Math.PI * 2 - .2, -.06, -.04],
-      [8.5, Math.PI * 2 + .15, 0, 0],
-    ];
+    const performance = [[0, -.6, 0, 0], [1.2, -.4, 0, 0], [1.7, .4, -.16, -.1], [2.1, -.5, .18, .09], [2.5, .5, -.13, -.07], [3.05, .4, -.18, -.08], [3.85, Math.PI * 2 + .4, .16, .13], [4.2, Math.PI * 2 + .2, 0, 0], [4.65, Math.PI * 2 + .7, -.17, -.1], [5.05, Math.PI * 2 - .4, .2, .12], [5.5, Math.PI * 2 + .3, -.08, 0], [5.9, Math.PI * 2 - .3, -.16, .08], [6.45, Math.PI * 2 + .65, .15, -.1], [6.95, Math.PI * 2 + .2, 0, 0], [7.6, Math.PI * 2 - .2, -.06, -.04], [8.5, Math.PI * 2 + .15, 0, 0]];
     const jump = (time, start, end, height) => {
       if (time <= start || time >= end) return 0;
       const progress = (time - start) / (end - start);
@@ -147,9 +170,7 @@ export default function IntroRobot3D({ timeline, onReady, startAt = 0, endAt = 1
         const yaw = spinning ? Math.PI * 2 * easedSpin : .7 * Math.sin(phase * Math.PI * 2 / 5);
         pivot.rotation.set(.025 * Math.sin(localTime * .4), .35 + yaw, .025 * Math.sin(localTime * .7));
         pivot.position.set(.02 * Math.sin(localTime * .4), 0, 0);
-      }
-      else if (showcase) perform(localTime * .8);
-      else {
+      } else if (showcase) perform(localTime * .8);else {
         pivot.rotation.set(0, -.65 * (1 - smooth(localTime, 3.1, 3.9)), 0);
         pivot.position.set(0, 0, 0);
       }
@@ -175,13 +196,15 @@ export default function IntroRobot3D({ timeline, onReady, startAt = 0, endAt = 1
       cancelAnimationFrame(frame);
       observer.disconnect();
       mixer?.stopAllAction();
-      if (model) { mixer?.uncacheRoot(model); disposeModel(model); }
+      if (model) {
+        mixer?.uncacheRoot(model);
+        disposeModel(model);
+      }
       whiteMask.dispose();
       renderer.dispose();
       renderer.forceContextLoss();
       renderer.domElement.remove();
     };
   }, [timeline, onReady, startAt, endAt, revealDuration, showcase, scrollDriven]);
-
   return <div className="intro-robot-stage" ref={host} aria-hidden="true"><img className="intro-robot-fallback" src="/images/cute-home-robot-cutout.png" alt="" /></div>;
 }
