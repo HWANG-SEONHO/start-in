@@ -1,0 +1,27 @@
+name: Compact Backup Artifact
+on:
+  push:
+    branches:
+      - backup-2026-10-07
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact snapshot
+        uses: actions/checkout@v4
+        with:
+          ref: db047fec5f1538767bb02af891e217f59cf27237
+      - name: Build compact backup
+        run: |
+          zip -r START-IN_compact_backup-2026-10-07.zip \
+            .env.example .gitignore README.md RENDER_COLD_START_FIX.md alembic.ini compose.yaml \
+            package.json package-lock.json playwright.config.js vite.config.js index.html \
+            src backend docs verification data \
+            assets/icons public/favicon.png public/favicon.svg public/fonts public/vendor \
+            -x "*/__pycache__/*" "*.pyc"
+      - name: Upload compact backup
+        uses: actions/upload-artifact@v4
+        with:
+          name: START-IN_compact_backup-2026-10-07
+          path: START-IN_compact_backup-2026-10-07.zip
+          retention-days: 30
