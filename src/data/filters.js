@@ -3,22 +3,23 @@
 
 export const filterGroups = {
   "region": {
+    // 수도권 우선으로, 인접 지역을 권역별로 묶어 표시합니다.
     "options": [
-      "부산",
       "서울",
       "경기",
       "인천",
-      "대구",
-      "광주",
-      "대전",
-      "울산",
-      "세종",
       "강원",
+      "대전",
+      "세종",
       "충북",
       "충남",
+      "광주",
       "전북",
       "전남",
+      "대구",
       "경북",
+      "부산",
+      "울산",
       "경남",
       "제주"
     ],
@@ -163,4 +164,9 @@ export const filterGroups = {
   }
 };
 
-export const defaultFilters = { region: ['부산'] };
+// 클릭 순서와 관계없이 지역 표시 순서를 동일하게 유지합니다.
+export function sortRegions(regions) {
+  return filterGroups.region.options.filter(region => regions.includes(region));
+}
+
+export const defaultFilters = { region: ['서울'] };

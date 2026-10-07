@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-export default function IntroRobot3D({ timeline, onReady, startAt = 0, endAt = 10.9, revealDuration = 0, showcase = false }) {
+export default function IntroRobot3D({ timeline, onReady, startAt = 0, endAt = 10.9, revealDuration = 0, showcase = false, scrollDriven = false }) {
   const host = useRef(null);
 
   useEffect(() => {
@@ -135,7 +135,20 @@ export default function IntroRobot3D({ timeline, onReady, startAt = 0, endAt = 1
       if (action) action.paused = false;
       const motionTime = Math.max(0, localTime - .4) * (showcase ? 1 : .7);
       mixer.setTime(motionTime);
-      if (showcase) perform(localTime * .8);
+      if (scrollDriven) {
+        // 느린 좌우 살피기 두 번 뒤 짧은 한 바퀴 회전을 반복합니다.
+        const elapsed = Math.max(0, (localTime - 1.2) / .16);
+        const lookDuration = 10;
+        const spinDuration = 1.4;
+        const phase = elapsed % (lookDuration + spinDuration);
+        const spinning = phase >= lookDuration;
+        const spinProgress = Math.min(1, Math.max(0, (phase - lookDuration) / spinDuration));
+        const easedSpin = spinProgress * spinProgress * (3 - 2 * spinProgress);
+        const yaw = spinning ? Math.PI * 2 * easedSpin : .7 * Math.sin(phase * Math.PI * 2 / 5);
+        pivot.rotation.set(.025 * Math.sin(localTime * .4), .35 + yaw, .025 * Math.sin(localTime * .7));
+        pivot.position.set(.02 * Math.sin(localTime * .4), 0, 0);
+      }
+      else if (showcase) perform(localTime * .8);
       else {
         pivot.rotation.set(0, -.65 * (1 - smooth(localTime, 3.1, 3.9)), 0);
         pivot.position.set(0, 0, 0);
@@ -168,7 +181,7 @@ export default function IntroRobot3D({ timeline, onReady, startAt = 0, endAt = 1
       renderer.forceContextLoss();
       renderer.domElement.remove();
     };
-  }, [timeline, onReady, startAt, endAt, revealDuration, showcase]);
+  }, [timeline, onReady, startAt, endAt, revealDuration, showcase, scrollDriven]);
 
   return <div className="intro-robot-stage" ref={host} aria-hidden="true"><img className="intro-robot-fallback" src="/images/cute-home-robot-cutout.png" alt="" /></div>;
 }

@@ -2,6 +2,7 @@
 // 큰 흐름: 로그인 확인 → 사용자/저장공고 기억 → 다른 화면이 useAccount()로 꺼내 씀.
 
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { api, setCsrfToken, setUnauthorizedHandler } from './api';
 
 // Context는 멀리 떨어진 component끼리 같은 값을 공유하는 React 기능입니다.
@@ -21,6 +22,9 @@ const AUTO_HIDE_NOTICES = [
 export function AccountProvider({ children }) {
   // user: 로그인한 회원 정보. null이면 로그인하지 않은 상태입니다.
   const [user, setUser] = useState(null);
+  const location = useLocation();
+  // 로그아웃을 시작한 화면에서만 메인으로 이동하고, 이후 MY 접근은 로그인을 요구합니다.
+  const [logoutLocationKey, setLogoutLocationKey] = useState(null);
   // ready: 처음 서버에 세션 확인을 끝냈는지 알려줍니다.
   const [ready, setReady] = useState(false);
   // savedJobs: 현재 사용자가 저장한 공고 목록입니다.
@@ -57,6 +61,7 @@ export function AccountProvider({ children }) {
     if (version !== sessionVersion.current) return;
 
     setUser(session.user);
+    if (session.user) setLogoutLocationKey(null);
     setSavedJobs(saved);
     setNotice('');
     setReady(true);
@@ -71,6 +76,7 @@ export function AccountProvider({ children }) {
     setUnauthorizedHandler(() => {
       sessionVersion.current += 1;
       setUser(null);
+      setLogoutLocationKey(null);
       setSavedJobs([]);
       setCsrfToken(null);
       setNotice('로그인이 만료되었습니다. 다시 로그인해 주세요.');
@@ -154,6 +160,7 @@ export function AccountProvider({ children }) {
 
     try {
       await api('/auth/logout', { method: 'POST' });
+      setLogoutLocationKey(location.key);
       await acceptSession({ user: null });
       return true;
     } catch (error) {
@@ -166,6 +173,7 @@ export function AccountProvider({ children }) {
     <AccountContext.Provider
       value={{
         user,
+        loggedOut: logoutLocationKey === location.key,
         ready,
         savedJobs,
         pendingIds,

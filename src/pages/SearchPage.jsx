@@ -8,7 +8,9 @@ import Hero from '../components/Hero';
 import FilterPanel from '../components/FilterPanel';
 import MapSection from '../components/MapSection';
 import JobList from '../components/JobList';
+import FloatingRobot from '../components/FloatingRobot';
 import { useJobSearch } from '../hooks/useJobSearch';
+import { filterGroups } from '../data/filters';
 
 export default function SearchPage({ home = false }) {
   // 검색에 필요한 대부분의 상태와 동작은 useJobSearch 한 곳에 모아 두었습니다.
@@ -16,8 +18,8 @@ export default function SearchPage({ home = false }) {
   const location = useLocation();
 
   // 지도에서 선택한 구·군을 "부산 해운대구" 같은 표시용 글자로 바꿉니다.
-  const selectedDistrictLabels = Object.entries(search.districts)
-    .flatMap(([region, names]) => names.map(name => `${region} ${name}`));
+  const selectedDistrictLabels = filterGroups.region.options
+    .flatMap(region => (search.districts[region] || []).map(name => `${region} ${name}`));
 
   // 지역 필터를 제외하고 사용자가 고른 세부조건 개수를 셉니다.
   const selectedFilterCount = Object.entries(search.filters)
@@ -188,13 +190,16 @@ export default function SearchPage({ home = false }) {
 
       {/* 메인 오른쪽의 떠있는 전체 공고 바로가기입니다. */}
       {home && (
+        <FloatingRobot>
         <Link className="all-filtered-jobs" to={listLink()}>
-          <span>선택 조건 전체</span>
-          <strong>공고 목록 보기 →</strong>
-          {!search.loading && !search.error && (
-            <small>{search.total.toLocaleString()}건</small>
-          )}
+          <strong className="floating-jobs-title">
+            <span>공고 목록 보기</span>
+            <small style={{ visibility: search.loading || search.error ? 'hidden' : 'visible' }} aria-hidden={search.loading || !!search.error}>{search.loading || search.error ? '0000건' : `${search.total.toLocaleString()}건`}</small>
+            <b aria-hidden="true">→</b>
+          </strong>
+          <span>선택한 조건의 공고를 모아봐요.</span>
         </Link>
+        </FloatingRobot>
       )}
     </>
   );

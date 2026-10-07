@@ -8,6 +8,10 @@ const LENGTH = 49;
 const BASE_STARTS = [0, 9.8, 17.6, 22.6, 27.1];
 const STARTS = [0, 9.8, 19, 29, 39];
 const CHAPTERS = ['INTRO', 'WHY', 'WHERE', 'FOR YOU', 'START'];
+// 배경·전환은 화면 전체를 쓰고, 내부 콘텐츠만 기준 비율로 축소합니다.
+function IntroScene({ className, children }) {
+  return <div className={`intro-scene ${className}`}><div className="intro-scene-content">{children}</div></div>;
+}
 // 짧은 이동 뒤 긴 감속을 잇는다. 구간 경계에서 위치뿐 아니라 속도도 공유한다.
 const MAP_CAMERA_PATH = [
   { t: 0, scale: 1.24, xPercent: 7, yPercent: 2, rotation: -2.4 },
@@ -182,6 +186,22 @@ export default function CoverPage({ onEnter }) {
   const [run, setRun] = useState(0), [chapter, setChapter] = useState(0), [position, setPosition] = useState(0);
   const [paused, setPaused] = useState(false), [reviewing, setReviewing] = useState(false), [playbackRate, setPlaybackRate] = useState(1);
   const [robotReady, setRobotReady] = useState(false), [introReady, setIntroReady] = useState(false), [showLoading, setShowLoading] = useState(true);
+  useEffect(() => {
+    const element = root.current;
+    // 데스크톱 장면은 1920×1080 비율로 함께 축소해 세로가 짧아져도 배치를 유지합니다.
+    const fitStage = () => {
+      const { width, height } = element.getBoundingClientRect();
+      element.style.setProperty('--intro-scale', Math.min(width / 1920, height / 1080));
+      const controls = element.querySelector('.intro-footer');
+      if (controls) element.style.setProperty('--intro-controls-height', `${controls.getBoundingClientRect().height}px`);
+    };
+    const observer = new ResizeObserver(fitStage);
+    observer.observe(element);
+    const controls = element.querySelector('.intro-footer');
+    if (controls) observer.observe(controls);
+    fitStage();
+    return () => observer.disconnect();
+  }, [introReady]);
   const markRobotReady = useCallback(() => setRobotReady(true), []);
   const revealIntro = useCallback(() => setIntroReady(true), []);
   const finishLoading = useCallback(() => setShowLoading(false), []);
@@ -219,18 +239,33 @@ export default function CoverPage({ onEnter }) {
     }
     delete root.current.dataset.static;
     context = gsap.context(() => {
+      const stage = root.current.querySelector('.intro-stage');
+      const canvas = stage.querySelector('.intro-scene-content');
+      // 내부 이동은 디자인 좌표, 화면 전체 전환은 실제 표시 좌표로 계산합니다.
+      const stageBox = () => stage.getBoundingClientRect();
+      const designBox = element => {
+        const bounds = canvas.getBoundingClientRect();
+        const scale = bounds.width / canvas.offsetWidth;
+        const rect = element.getBoundingClientRect();
+        return { left: (rect.left - bounds.left) / scale, top: (rect.top - bounds.top) / scale,
+          width: rect.width / scale, height: rect.height / scale };
+      };
+      const screenBox = element => {
+        const bounds = stageBox(), rect = element.getBoundingClientRect();
+        return { left: rect.left - bounds.left, top: rect.top - bounds.top, width: rect.width, height: rect.height };
+      };
       const scenes = gsap.utils.toArray('.intro-scene');
       gsap.set(scenes, { autoAlpha: 0 });
       gsap.set('.intro-dot', { opacity: 0 });
       gsap.set('.intro-job-word', { opacity: 0 });
-      gsap.set('.intro-ai-robot', { autoAlpha: 0, clipPath: 'inset(0% 0% 100% 0%)' });
+      gsap.set('.intro-ai-robot', { autoAlpha: 0, y: 14, clipPath: 'none' });
       gsap.set('.intro-why-words', { '--ring-progress': '0deg' });
       const whyRing = root.current.querySelector('.intro-why-ring:not(.intro-why-ring-ink)');
       const ringStroke = parseFloat(getComputedStyle(whyRing).borderTopWidth);
       gsap.set(whyRing, { autoAlpha: 0, scale: .015, borderWidth: ringStroke * 5 });
       gsap.set('.intro-why-ring-ink', { autoAlpha: 0 });
       gsap.set('.intro-why-note', { autoAlpha: 0, y: 30 });
-      gsap.set('.intro-map-image', { opacity: 0 });
+      gsap.set('.intro-map-image', { opacity: 1 });
       gsap.set('.intro-map-camera', { scale: MAP_CAMERA_PATH[0].scale, xPercent: MAP_CAMERA_PATH[0].xPercent, yPercent: MAP_CAMERA_PATH[0].yPercent, rotation: MAP_CAMERA_PATH[0].rotation, rotationX: 0, rotationY: 0, transformOrigin: '50% 50%' });
       let lastTick = -1;
       const tl = gsap.timeline({ onComplete: () => { if (review.current) setPaused(true); else enter(); }, onUpdate: () => {
@@ -245,44 +280,36 @@ export default function CoverPage({ onEnter }) {
           tl.set(scenes[index], { zIndex: index + 1 }, index === 1 ? 9 : at);
           // 내용은 자리를 지킨다. 화면 전체를 쏘듯 밀지 않고 짧은 겹침으로 연결한다.
           const incoming = scenes[index];
-          // 흰 지도 장면 자체가 오른쪽에서 왼쪽으로 커튼처럼 펼쳐진다.
-          if (index === 2) tl.fromTo(incoming, { clipPath: 'inset(0% 100% 0% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.15, ease: 'sine.inOut', immediateRender: false }, at);
+          if (index === 2) tl.fromTo(incoming, { autoAlpha: 0 }, { autoAlpha: 1, duration: .85, ease: 'sine.inOut', immediateRender: false }, at);
 
 
           if (index === 3) {
             // 제목의 마침표에서 새 장면이 자란다. 되감아도 같은 원 중심으로 돌아간다.
             const circleFromPeriod = radius => () => {
-              const dot = root.current.querySelector('.intro-where-period').getBoundingClientRect();
-              const bounds = root.current.getBoundingClientRect();
-              const x = dot.left - bounds.left + dot.width / 2;
-              const y = dot.top - bounds.top + dot.height / 2;
+              const dot = screenBox(root.current.querySelector('.intro-where-period'));
+              const x = dot.left + dot.width / 2;
+              const y = dot.top + dot.height / 2;
               return `circle(${radius ?? dot.width / 2}px at ${x}px ${y}px)`;
             };
-            tl.fromTo(incoming, { clipPath: circleFromPeriod() }, { clipPath: circleFromPeriod(Math.hypot(innerWidth, innerHeight)), duration: 1.4, ease: 'power3.inOut', immediateRender: false }, at);
+            tl.fromTo(incoming, { clipPath: circleFromPeriod() }, { clipPath: circleFromPeriod(Math.hypot(stage.offsetWidth, stage.offsetHeight)), duration: 1.4, ease: 'power3.inOut', immediateRender: false }, at);
           }
-          if (index === 4) tl.fromTo(incoming, { clipPath: 'inset(50% 0% 50% 0%)', y: 20 }, { clipPath: 'inset(0% 0% 0% 0%)', y: 0, duration: 1.2, ease: 'power3.inOut', immediateRender: false }, at);
-          tl.set(scenes[index - 1], { autoAlpha: 0 }, at + (index === 1 ? 1.5 : 1.3));
+          if (index === 4) tl.fromTo(incoming, { autoAlpha: 0 }, { autoAlpha: 1, duration: .85, ease: 'sine.inOut', immediateRender: false }, at);
+          tl.set(scenes[index - 1], { autoAlpha: 0 }, at + 1.5);
         }
       });
       // 단색 덮개 대신 02 자체를 원 안에서 드러낸다. 원이 커지는 동안 글자와 카드도 함께 보인다.
       const period = root.current.querySelector('.intro-opening-period');
-      const periodBox = period.getBoundingClientRect();
-      const pageBox = root.current.getBoundingClientRect();
-      const periodStyle = getComputedStyle(period);
-      const measure = document.createElement('canvas').getContext('2d');
-      measure.font = `${periodStyle.fontWeight} ${periodStyle.fontSize} ${periodStyle.fontFamily}`;
-      const glyph = measure.measureText('.');
-      const dotSize = Math.max(glyph.actualBoundingBoxLeft + glyph.actualBoundingBoxRight, glyph.actualBoundingBoxAscent + glyph.actualBoundingBoxDescent);
-      const baseline = (periodBox.height - glyph.fontBoundingBoxAscent - glyph.fontBoundingBoxDescent) / 2 + glyph.fontBoundingBoxAscent;
-      gsap.set('.intro-opening-dot-wipe', { left: periodBox.left - pageBox.left + (glyph.actualBoundingBoxRight - glyph.actualBoundingBoxLeft) / 2, top: periodBox.top - pageBox.top + baseline - (glyph.actualBoundingBoxAscent - glyph.actualBoundingBoxDescent) / 2, width: dotSize, height: dotSize, xPercent: -50, yPercent: -50, autoAlpha: 0 });
-      const pointX = periodBox.left - pageBox.left + (glyph.actualBoundingBoxRight - glyph.actualBoundingBoxLeft) / 2;
-      const pointY = periodBox.top - pageBox.top + baseline - (glyph.actualBoundingBoxAscent - glyph.actualBoundingBoxDescent) / 2;
+      const periodBox = screenBox(period);
+      const pageBox = { left: 0, top: 0, right: stage.offsetWidth, width: stage.offsetWidth, height: stage.offsetHeight };
+      const dotSize = Math.max(4, periodBox.width * .4);
+      const pointX = periodBox.left + periodBox.width / 2;
+      const pointY = periodBox.top + periodBox.height * .75;
       tl.set('.intro-opening-period', { opacity: 0 }, 9);
       tl.fromTo(scenes[1], { clipPath: `circle(${dotSize / 2}px at ${pointX}px ${pointY}px)` }, { clipPath: `circle(${Math.hypot(pageBox.width, pageBox.height)}px at ${pointX}px ${pointY}px)`, duration: 1.5, ease: 'sine.inOut', immediateRender: false }, 9);
       // 위·가운데·아래의 같은 글자가 빈자리를 이어받아 끊기지 않는 롤링을 만든다.
       gsap.utils.toArray('.intro-opening-roll-track').forEach((track, index) => {
         const direction = index % 2 === 0 ? 1 : -1;
-        const height = track.getBoundingClientRect().height;
+        const height = track.offsetHeight;
         // 한 칸을 지날 때 좌표만 되감는다. 앞뒤에 같은 글자가 있어 되감는 순간도 이어 보인다.
         const wrap = value => ((parseFloat(value) + height / 2) % height + height) % height - height / 2;
         // 속도를 단계별로 바꾸지 않는다. 빠른 시작부터 정지까지 한 곡선으로 계속 감속한다.
@@ -293,8 +320,10 @@ export default function CoverPage({ onEnter }) {
       tl.from('.intro-purpose', { opacity: 0, y: 24, duration: .6 }, .9);
       // 화면 오른쪽 바깥에서 출발하므로 화면 폭이 달라도 중간에 갑자기 나타나지 않는다.
       const robot = '.intro-opening-robot';
-      const robotBox = root.current.querySelector(robot).getBoundingClientRect();
-      gsap.set(robot, { x: pageBox.right - robotBox.left + 12, autoAlpha: 0, scale: 1, y: 0 });
+      const robotBox = designBox(root.current.querySelector(robot));
+      const canvasBox = canvas.getBoundingClientRect();
+      const screenRight = (stageBox().right - canvasBox.left) / (canvasBox.width / canvas.offsetWidth);
+      gsap.set(robot, { x: screenRight - robotBox.left + 12, autoAlpha: 0, scale: 1, y: 0 });
       tl.set(robot, { autoAlpha: 1 }, .4);
       tl.to(robot, { x: 0, duration: 3.2, ease: 'sine.out' }, .4);
       // 작은 원이 가속하며 커져 문장 전체를 감싼다.
@@ -339,22 +368,20 @@ export default function CoverPage({ onEnter }) {
       });
       // 지도만 먼저 보여준다. 공고 글자와 점의 등장·낙하 연출은 잠시 제외한다.
       tl.from(['.intro-where-heading', '.intro-map-description', '.intro-map-caption'], { opacity: 0, duration: .3, ease: 'sine.out' }, 18.65);
-      tl.to('.intro-map-image', { opacity: 1, duration: 1.2, ease: 'power2.out' }, 18.65);
       // 원본의 빠른 재구도와 긴 잔여 움직임을 연속 곡선으로 재현한다.
       tl.to('.intro-map-camera', { keyframes: mapCameraFrames(), ease: 'none' }, 18.65);
       tl.from(['.density-c', '.density-b', '.density-a'], { autoAlpha: 0, y: 32, duration: .7, stagger: 1.3, ease: 'back.out(1.35)' }, 19.8);
-      // 전환이 끝난 다음 로봇 윤곽이 위에서 아래로 드러난다. 초기 숨김도 명시해 미리 보이지 않는다.
-      tl.set('.intro-ai-robot', { autoAlpha: 1 }, 24.3);
-      tl.to('.intro-ai-robot', { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.2, ease: 'power3.out' }, 24.3);
+      // 로봇을 직선으로 잘라 드러내지 않고 온전한 실루엣으로 등장시킵니다.
+      tl.to('.intro-ai-robot', { autoAlpha: 1, y: 0, duration: .55, ease: 'power2.out' }, 23.05);
       // 04 heading follows the same absolute clock in IntroAiTypography.
 
 
       tl.from('.intro-ai-caption', { opacity: 0, duration: .6 }, 25.45);
       tl.to('.intro-ai-robot', { keyframes: [{ y: -9, duration: 1.6, ease: 'sine.inOut' }, { y: 0, duration: 1.9, ease: 'sine.inOut' }, { y: -5, duration: 1.4, ease: 'sine.inOut' }, { y: 0, duration: 1.2, ease: 'sine.inOut' }] }, 25.6);
       // 마지막은 효과를 더하지 않고 문장을 크게 찍은 뒤 시작 버튼에 시선을 모은다.
-      tl.from('.intro-end-title', { scale: 1.45, opacity: 0, duration: .6, ease: 'power4.out' }, 28.12);
-      tl.from('.intro-end-underline', { scaleX: 0, transformOrigin: 'left', duration: .6, ease: 'power2.out' }, 28.7);
-      tl.from('.intro-end-actions', { opacity: 0, duration: .6 }, 28.2);
+      tl.from('.intro-end-title', { scale: 1.15, opacity: 0, duration: .6, ease: 'power4.out' }, 27.25);
+      tl.from('.intro-end-underline', { scaleX: 0, transformOrigin: 'left', duration: .6, ease: 'power2.out' }, 27.7);
+      tl.from('.intro-end-actions', { opacity: 0, duration: .6 }, 27.6);
       // 장면마다 약 10초를 준다. 원래 시각을 한 번만 옮겨 중복 이동을 막는다.
       tl.getChildren(false, true, true).forEach(animation => {
         const at = animation.startTime();
@@ -370,16 +397,18 @@ export default function CoverPage({ onEnter }) {
   return <section className="cover-page intro-v2" ref={root} tabIndex={-1} aria-label="START IN 프로젝트 소개" data-chapter={chapter}>
     {showLoading && <IntroLoading robotReady={robotReady} onReveal={revealIntro} onComplete={finishLoading} />}
     <button className="intro-entry" onClick={enter}>서비스 바로가기 <Arrow /></button>
-    <div className="intro-scene intro-opening"><header className="intro-header"><span>START IN / PROJECT FILM</span></header><div className="intro-opening-layout">
+    <div className="intro-stage">
+    <IntroScene className="intro-opening"><header className="intro-header"><span>START IN / PROJECT FILM</span></header><div className="intro-opening-layout">
       <h1 aria-label="학습용 PORTFOLIO."><span className="intro-opening-fixed" aria-hidden="true">학습용</span><span className="intro-opening-word intro-opening-english" aria-hidden="true">{Array.from('PORTFOLIO').map((letter, index) => <span className="intro-opening-roll" key={index} style={{ '--letter-width': `${{ P: .64, O: .75, R: .7, T: .6, F: .57, L: .57, I: .28 }[letter]}em` }}><span className="intro-opening-roll-track"><span>{letter}</span><span>{letter}</span><span>{letter}</span></span></span>)}<span className="intro-opening-period">.</span></span></h1>
       <div className="intro-opening-detail"><p className="intro-project-title">START IN<br />프로젝트 소개 <Arrow direction="down" /></p><p className="intro-purpose">구직의 복잡함을 줄이는<br /><b>더 쉬운 탐색 경험을 만듭니다.</b></p><div className="intro-opening-robot-area"><div className="intro-opening-robot" aria-label="구직 과정을 정리하는 AI 로봇"><div className="intro-robot-visual"><Suspense fallback={<img src="/images/cute-home-robot-cutout.png" alt="" />}><IntroRobot3D timeline={timeline} onReady={markRobotReady} /></Suspense></div><p className="intro-robot-name">AI 취업코치</p><a href="https://sketchfab.com/3d-models/cute-home-robot-7b75f204eb3e42b6babd883773e0789d" target="_blank" rel="noreferrer">Cute Home Robot · Yandrack / CC BY</a></div></div></div>
-    </div><span className="intro-opening-caption">채용 탐색 서비스를 직접 설계하고 구현하는 프로젝트</span><i className="intro-opening-dot-wipe" aria-hidden="true" /></div>
-    <div className="intro-scene intro-why"><header className="intro-header"><span>START IN / PROJECT FILM</span></header><div className="intro-two-columns"><div className="intro-copy">
+    </div><span className="intro-opening-caption">채용 탐색 서비스를 직접 설계하고 구현하는 프로젝트</span><i className="intro-opening-dot-wipe" aria-hidden="true" /></IntroScene>
+    <IntroScene className="intro-why"><header className="intro-header"><span>START IN / PROJECT FILM</span></header><div className="intro-two-columns"><div className="intro-copy">
       <div className="intro-why-words"><i className="intro-why-ring" aria-hidden="true" /><i className="intro-why-ring intro-why-ring-ink" aria-hidden="true" /><IntroWhyTypography timeline={timeline} /><p className="intro-why-note"><span className="intro-why-note-line"><span>수많은 공고 사이에서</span></span><span className="intro-why-note-line"><span>나에게 맞는 기회를 찾는 방법.</span></span></p></div>
-    </div><div className="intro-scatter"><div className={`intro-marking-paper intro-notebook-${notebookVariant}`} aria-hidden="true"><img src={`/images/intro-notebook-${notebookVariant === 'narrow' ? 'trimmed' : notebookVariant}-${notebookVariant === 'open' ? 'v2' : 'v3'}.png`} alt="" fetchPriority="high" /></div><div className="intro-notebook-contents">{introConditions.map((condition, index) => <div className={`intro-job-slip intro-slip-${index}`} key={condition.title} data-x={(index % 2 ? 1 : -1) * 180} data-y={index * 40 - 100}><div className={`intro-cutout-group${index === 3 ? ' intro-cutout-long' : ''}`} aria-label={condition.title}>{magazineLetters[index].map((asset, letterIndex) => <span className="intro-cutout-letter" key={asset}><img src={`/images/intro-cutout-${asset}.png`} alt="" aria-hidden="true" style={{ rotate: `${[-3, 4, -2, 3][letterIndex]}deg` }} /></span>)}</div></div>)}</div></div></div></div>
-    <div className="intro-scene intro-where"><header className="intro-header"><span>START IN / PROJECT FILM</span></header><div className="intro-where-content"><div className="intro-where-heading"><h2>기회가 모인 곳을, <b>한눈에<i className="intro-where-period" aria-hidden="true" /></b></h2></div><div className="intro-map-block"><p className="intro-map-description">선택한 지역 안에서<br />조건에 맞는 공고의 분포를 비교해요.</p><div className="intro-map-stage"><div className="intro-map-camera"><img className="intro-map-image" src="/images/busan-map-wide.png" alt="부산 지역을 표현한 지도 일러스트" /><svg className="intro-job-word" viewBox="0 0 600 240" preserveAspectRatio="none" aria-hidden="true"><text x="300" y="120" textAnchor="middle" dominantBaseline="central">공고</text></svg><div className="intro-particles" aria-hidden="true">{particles.map((point, index) => <i className="intro-dot" key={index} style={{ left: point.x + '%', top: point.y + '%' }} data-end-x={point.endX} data-end-y={point.endY} data-group={point.group} />)}</div></div><span className="intro-density-label density-a">기회를 발견하고</span><span className="intro-density-label density-b">지역을 비교하고</span><span className="intro-density-label density-c">나의 선택으로</span></div></div></div></div>
-    <div className="intro-scene intro-personal"><header className="intro-header"><span>START IN / PROJECT FILM</span></header><div className="intro-two-columns"><div className="intro-copy"><span className="intro-kicker">04 / AI CAREER COACH</span><IntroAiTypography timeline={timeline} /></div><div className="intro-ai-art"><div className="intro-ai-robot"><Suspense fallback={<img src="/images/cute-home-robot-cutout.png" alt="" />}><IntroRobot3D timeline={timeline} startAt={30.7} endAt={40.4} revealDuration={1.2} showcase /></Suspense></div><div className="intro-ai-caption"><span>YOUR NEXT, TOGETHER.</span><b>AI 취업코치</b><small>AI 연동으로 이어갈 구직 경험</small><span className="intro-ai-credit" title="변경: 바닥 제외, 표시 각도 및 애니메이션 속도 조정"><a href="https://sketchfab.com/3d-models/cute-home-robot-7b75f204eb3e42b6babd883773e0789d" target="_blank" rel="noreferrer">Cute Home Robot · Yandrack / CC BY</a></span></div></div></div></div>
-    <div className="intro-scene intro-end"><header className="intro-header"><span>START IN / PROJECT FILM</span></header><div className="intro-end-content"><span className="intro-kicker">YOUR NEXT STARTS HERE</span><h2 className="intro-end-title">나의 다음을<br /><span>시작하다.<i className="intro-end-underline" /></span></h2><div className="intro-end-actions"><p>학습용 포트폴리오 · 데모 채용 데이터</p></div></div></div>
+    </div><div className="intro-scatter"><div className={`intro-marking-paper intro-notebook-${notebookVariant}`} aria-hidden="true"><img src={`/images/intro-notebook-${notebookVariant === 'narrow' ? 'trimmed' : notebookVariant}-${notebookVariant === 'open' ? 'v2' : 'v3'}.png`} alt="" fetchPriority="high" /></div><div className="intro-notebook-contents">{introConditions.map((condition, index) => <div className={`intro-job-slip intro-slip-${index}`} key={condition.title} data-x={(index % 2 ? 1 : -1) * 180} data-y={index * 40 - 100}><div className={`intro-cutout-group${index === 3 ? ' intro-cutout-long' : ''}`} aria-label={condition.title}>{magazineLetters[index].map((asset, letterIndex) => <span className="intro-cutout-letter" key={asset}><img src={`/images/intro-cutout-${asset}.png`} alt="" aria-hidden="true" style={{ rotate: `${[-3, 4, -2, 3][letterIndex]}deg` }} /></span>)}</div></div>)}</div></div></div></IntroScene>
+    <IntroScene className="intro-where"><header className="intro-header"><span>START IN / PROJECT FILM</span></header><div className="intro-where-content"><div className="intro-where-heading"><h2>기회가 모인 곳을, <b>한눈에<i className="intro-where-period" aria-hidden="true" /></b></h2></div><div className="intro-map-block"><p className="intro-map-description">선택한 지역 안에서<br />조건에 맞는 공고의 분포를 비교해요.</p><div className="intro-map-stage"><div className="intro-map-camera"><img className="intro-map-image" src="/images/busan-map-wide.png" alt="부산 지역을 표현한 지도 일러스트" /><svg className="intro-job-word" viewBox="0 0 600 240" preserveAspectRatio="none" aria-hidden="true"><text x="300" y="120" textAnchor="middle" dominantBaseline="central">공고</text></svg><div className="intro-particles" aria-hidden="true">{particles.map((point, index) => <i className="intro-dot" key={index} style={{ left: point.x + '%', top: point.y + '%' }} data-end-x={point.endX} data-end-y={point.endY} data-group={point.group} />)}</div></div><span className="intro-density-label density-a">기회를 발견하고</span><span className="intro-density-label density-b">지역을 비교하고</span><span className="intro-density-label density-c">나의 선택으로</span></div></div></div></IntroScene>
+    <IntroScene className="intro-personal"><header className="intro-header"><span>START IN / PROJECT FILM</span></header><div className="intro-two-columns"><div className="intro-copy"><span className="intro-kicker">04 / AI CAREER COACH</span><IntroAiTypography timeline={timeline} /></div><div className="intro-ai-art"><div className="intro-ai-robot"><Suspense fallback={<img src="/images/cute-home-robot-cutout.png" alt="" />}><IntroRobot3D timeline={timeline} startAt={29.45} endAt={40.4} revealDuration={0} showcase /></Suspense></div><div className="intro-ai-caption"><span>YOUR NEXT, TOGETHER.</span><b>AI 취업코치</b><small>AI 연동으로 이어갈 구직 경험</small><span className="intro-ai-credit" title="변경: 바닥 제외, 표시 각도 및 애니메이션 속도 조정"><a href="https://sketchfab.com/3d-models/cute-home-robot-7b75f204eb3e42b6babd883773e0789d" target="_blank" rel="noreferrer">Cute Home Robot · Yandrack / CC BY</a></span></div></div></div></IntroScene>
+    <IntroScene className="intro-end"><header className="intro-header"><span>START IN / PROJECT FILM</span></header><div className="intro-end-content"><span className="intro-kicker">YOUR NEXT STARTS HERE</span><h2 className="intro-end-title">나의 다음을<br /><span>시작하다.<i className="intro-end-underline" /></span></h2><div className="intro-end-actions"><p>학습용 포트폴리오 · 데모 채용 데이터</p></div></div></IntroScene>
+    </div>
     {introReady && <footer className="intro-footer">
       <nav className="intro-chapters" aria-label="인트로 장면 선택"><button onClick={replayLoading}>00 이름</button>{CHAPTERS.map((title, index) => <button key={title} className={chapter === index ? 'current' : ''} aria-current={chapter === index ? 'step' : undefined} onClick={() => goTo(STARTS[index] + (index > 1 ? 1.35 : 0))}>{String(index + 1).padStart(2, '0')} {['소개', '목적', '지도', 'AI', '시작'][index]}</button>)}</nav>
       <div className="intro-playback">

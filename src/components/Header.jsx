@@ -37,7 +37,7 @@ export default function Header() {
     try {
       if (await logout()) {
         logoutDialog.current?.close();
-        navigate('/');
+        navigate('/main', { replace: true });
       } else {
         setLogoutError('로그아웃하지 못했습니다. 잠시 후 다시 시도해 주세요.');
       }
@@ -87,8 +87,8 @@ export default function Header() {
             <button
               type="button"
               className="notification-button"
-              aria-label="MY 저장공고"
-              onClick={() => navigate('/my')}
+              aria-label="알림 기능 준비중"
+              onClick={() => navigate('/coming-soon?feature=알림')}
             >
               <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M5 17h14l-2-4V9a5 5 0 0 0-10 0v4l-2 4Zm5 4h4M12 2v2" />

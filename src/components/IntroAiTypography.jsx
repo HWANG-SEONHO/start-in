@@ -7,7 +7,7 @@ export default function IntroAiTypography({timeline}){
   document.fonts.ready.then(()=>{if(disposed)return;try{renderer=createAiTypography(canvas.current)}catch{setFailed(true);return}
    // First step: animate only the three opening text objects.
    const tick=()=>{if(disposed)return;const seconds=timeline.current?.time()??0;
-    const time=matchMedia('(prefers-reduced-motion: reduce)').matches?2.3:seconds-29.7;
+    const time=matchMedia('(prefers-reduced-motion: reduce)').matches?2.3:seconds-29.1;
     const resized=renderer.resize();if(time!==last||resized){try{renderer.render(time);canvas.current.dataset.motionTime=time.toFixed(3);last=time}catch{setFailed(true);return}}frame=requestAnimationFrame(tick)};tick();
   });return()=>{disposed=true;cancelAnimationFrame(frame);renderer?.destroy()};
  },[timeline]);

@@ -1,0 +1,51 @@
+.floating-robot { --panel-width: 200px; --robot-width: 180px; position: fixed; left: 10px; bottom: 14px; z-index: 9; width: var(--panel-width); display: flex; flex-direction: column; align-items: flex-start; pointer-events: none; }
+/* 접을 때는 폭만 바꾸고, 카드 높이와 로봇 위치는 유지합니다. */
+.floating-robot-list-link, .floating-robot-bubble { position: relative; width: var(--panel-width); height: 58px; box-sizing: border-box; overflow: hidden; border: 1px solid #e3dfef; border-radius: 12px; background: #fff; box-shadow: 0 4px 12px #18213812; transition: width .28s cubic-bezier(.22,1,.36,1); }
+.floating-robot-list-link { border-color: #d9e8e2; }
+.floating-robot-list-link { pointer-events: auto; }
+.floating-robot-list-link, .floating-robot-bubble { font-family: 'Malgun Gothic', sans-serif; -webkit-font-smoothing: auto; text-shadow: none; }
+.floating-robot-bubble { margin: 8px 0 10px; }
+.floating-robot-list-link.is-collapsed, .floating-robot-bubble.is-collapsed { width: 16px; }
+.floating-robot-list-link > div, .floating-robot-bubble > div { position: absolute; z-index: 1; left: 8px; top: 13px; width: calc(var(--panel-width) - 24px); min-width: 0; opacity: 1; visibility: visible; transition: opacity .16s ease .1s, visibility 0s; }
+.floating-robot-list-link.is-collapsed > div, .floating-robot-bubble.is-collapsed > div { opacity: 0; visibility: hidden; transition: opacity .08s ease, visibility 0s .08s; }
+.floating-robot-toggle { z-index: 2; }
+.floating-robot-list-link > div { top: 9px; }
+.floating-robot-toggle { position: absolute; right: 0; top: 0; width: 14px; height: 100%; min-height: 0; display: grid; place-items: center; padding: 0; border: 0; border-left: 1px solid #e8e3f2; border-radius: 0 11px 11px 0; background: #f7f5fc; box-shadow: none; color: #60429b; cursor: pointer; pointer-events: auto; }
+.floating-robot-toggle:hover { background: #edf1f5; color: #34445a; box-shadow: none; }
+.floating-robot-toggle:active { background: #e3e9ef; box-shadow: none; }
+.floating-robot-toggle:focus-visible { outline: 2px solid #168b73; outline-offset: 2px; }
+.floating-robot-list-link .floating-robot-toggle { background: #f3f7f5; border-left-color: #e1eae5; color: #007c60; }
+.floating-robot-list-link .floating-robot-toggle:hover { background: #e8f2ec; }
+.floating-robot-chevron { width: 10px; height: 10px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; transition: transform .2s ease; }
+.floating-robot-chevron.is-open { transform: rotate(180deg); }
+.floating-robot-message-indicator { position: absolute; right: 19px; top: 22px; z-index: 3; display: flex; flex-direction: column; gap: 3px; pointer-events: none; }
+.floating-robot-message-indicator i { display: block; width: 2px; height: 8px; border-radius: 1px; background: #d7cfea; transition: background-color .2s ease; }
+.floating-robot-message-indicator i.is-active { background: #6244ba; }
+.floating-robot-bubble.is-collapsed .floating-robot-message-indicator { visibility: hidden; }
+.floating-robot-message { margin: 0; }
+.floating-robot-message strong { display: block; margin: 0; color: #53319e; font-size: 12px; line-height: 17px; font-weight: 700; letter-spacing: 0; white-space: nowrap; }
+.floating-robot-message p { margin: 3px 0 0; color: #513487; font-size: 12px; line-height: 18px; font-weight: 600; letter-spacing: -.25px; white-space: nowrap; }
+.floating-robot-bubble > div { top: 12px; width: calc(var(--panel-width) - 24px); }
+.floating-robot-ready { display: inline-block; margin-left: 3px; padding: 0 2px; border-radius: 3px; background: #eee7fa; color: #50327f; font-size: 9px; line-height: 13px; font-weight: 700; vertical-align: 2px; }
+.site-shell .floating-robot-list-link .all-filtered-jobs { position: static; width: 100%; display: flex; flex-direction: column; gap: 4px; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; backdrop-filter: none; transform: none; }
+.site-shell .floating-robot-list-link .all-filtered-jobs:hover { background: transparent; color: #005c46; }
+.floating-robot-list-link .floating-jobs-title { display: flex; align-items: center; gap: 5px; min-width: 0; height: 18px; flex-shrink: 0; color: #00674f; font-size: 12px; line-height: 18px; font-weight: 700; white-space: nowrap; }
+.floating-robot-list-link .floating-jobs-title span { font-size: inherit; }
+.floating-robot-list-link .floating-jobs-title small { display: inline-block; min-width: 4.5ch; font-size: 11px; line-height: 18px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.floating-robot-list-link .floating-jobs-title b { margin-left: 2px; font-size: 13px; }
+.floating-robot-list-link .all-filtered-jobs > span { color: #005c46; font-size: 12px; line-height: 18px; font-weight: 600; letter-spacing: -.25px; white-space: nowrap; }
+.floating-robot-message strong, .floating-robot-message p, .floating-robot-list-link .all-filtered-jobs > span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+.floating-robot-visual { position: relative; width: var(--robot-width); height: 205px; filter: drop-shadow(0 7px 8px #18213820); animation: robot-float 4.8s ease-in-out infinite; }
+.floating-robot-visual .intro-robot-stage { position: relative; width: 100%; height: 100%; }
+.floating-robot-visual canvas, .floating-robot-visual img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.floating-robot-visual .intro-robot-fallback { position: absolute; inset: 0; }
+.floating-robot-visual [data-ready='true'] > .intro-robot-fallback { display: none; }
+.floating-robot-visual .floating-robot-close { position: absolute; z-index: 1; right: 20px; top: 7px; width: 20px; height: 20px; padding: 0; display: grid; place-items: center; border: 1px solid #dfe3ed; border-radius: 50%; background: #ffffffed; color: #5d6980; pointer-events: auto; cursor: pointer; box-shadow: 0 2px 5px #18213815; }
+.floating-robot-close:hover { background: #f2f0fc; }
+.floating-robot-close svg { width: 10px; height: 10px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; }
+.floating-robot-caption { position: absolute; left: calc(var(--robot-width) - 8px); bottom: 60px; width: auto; writing-mode: vertical-rl; text-orientation: mixed; display: flex; justify-content: center; text-align: center; }
+.floating-robot-credit { color: #7a8192; font-size: 8px; text-decoration: none; pointer-events: auto; }
+@keyframes robot-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+@keyframes robot-message-enter { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 700px) { .floating-robot { --robot-width: 110px; } .floating-robot-visual { height: 125px; } .floating-robot-toggle { width: 20px; } .floating-robot-list-link.is-collapsed, .floating-robot-bubble.is-collapsed { width: 22px; } .floating-robot-list-link > div, .floating-robot-bubble > div { width: calc(var(--panel-width) - 36px); } .floating-robot-visual .floating-robot-close { right: 8px; top: 13px; } }
+@media (prefers-reduced-motion: reduce) { .floating-robot-visual, .floating-robot-message { animation: none; } .floating-robot-list-link, .floating-robot-bubble, .floating-robot-chevron { transition: none; } }

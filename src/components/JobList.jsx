@@ -84,9 +84,11 @@ export default function JobList({
         {jobs.map(job => <JobCard key={job.id} job={job} />)}
 
         {!jobs.length && (
-          <p className="empty-results" role="status">
-            조건에 맞는 공고가 없습니다. 검색어나 조건을 변경해 보세요.
-          </p>
+          <div className="job-empty-state" role="status">
+            <svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="14" cy="14" r="9" /><path d="m21 21 7 7M10 14h8" /></svg>
+            <strong>조건에 맞는 공고가 없습니다</strong>
+            <p>검색어를 짧게 바꾸거나 선택한 조건을 줄여보세요.</p>
+          </div>
         )}
       </div>
 

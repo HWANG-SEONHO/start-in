@@ -93,7 +93,6 @@ function UnavailablePage() {
     <main className="service-page">
       <h1>{featureName} 준비중</h1>
       <p>아직 제공하지 않는 기능입니다. 현재는 조건 검색, 공고 상세, 저장과 개인 지원현황을 이용할 수 있습니다.</p>
-      <Link className="primary-action" to="/jobs">채용공고 찾기</Link>
     </main>
   );
 }

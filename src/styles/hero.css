@@ -38,7 +38,8 @@
 .suggestion-row button { height: 32px; padding: 0 15px; border: 1px solid #e0e7f3; border-radius: 18px; font-size: 13px; color: #586786; background: white; white-space: nowrap; letter-spacing: -.35px; }
 .suggestion-row button > span { font-size: 23px; vertical-align: -1px; line-height: 0; margin-left: 9px; }
 .suggestion-row .suggestion-highlight { color: #00a17e; background: #f8fffc; }
-.more-suggestions { position: absolute; right: -5px; top: 20px; display: grid; place-items: center; width: 34px; height: 34px; border: 1px solid #e0e7f3; border-radius: 50%; background: #fff; color: #009d7b; font-size: 29px; line-height: 1; padding: 0 0 3px; }
+.more-suggestions { position: absolute; right: -5px; top: 50%; transform: translateY(-50%); display: grid; place-items: center; width: 34px; height: 34px; border: 1px solid #e0e7f3; border-radius: 50%; background: #fff; color: #009d7b; padding: 0; }
+.more-suggestions svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 
 @media (max-width: 1700px) and (min-width: 1001px) {
   .hero-introduction { left: 3%; }

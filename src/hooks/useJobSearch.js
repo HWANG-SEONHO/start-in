@@ -5,7 +5,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { rememberHomeSearch } from '../services/homeSearch';
-import { defaultFilters, filterGroups } from '../data/filters';
+import { defaultFilters, filterGroups, sortRegions } from '../data/filters';
 import { api, getJobs } from '../services/api';
 
 const VALID_SORTS = ['latest', 'salary', 'size'];
@@ -29,7 +29,9 @@ function readFilters(params) {
         .filter(([key]) => key in filterGroups)
         .map(([key, values]) => [
           key,
-          Array.isArray(values)
+          key === 'region' && Array.isArray(values)
+            ? sortRegions(values)
+            : Array.isArray(values)
             ? values.filter(value => (
               filterGroups[key].options.includes(value)
               && value !== filterGroups[key].neutral
@@ -72,7 +74,7 @@ function readDistricts(params) {
   }
 }
 
-// 메인 화면은 도시마다 페이지 번호가 다를 수 있으므로 { 부산: 1, 서울: 2 }처럼 읽습니다.
+// 메인 화면은 도시마다 페이지 번호가 다를 수 있으므로 { 서울: 1, 부산: 2 }처럼 읽습니다.
 function readRegionPages(params) {
   try {
     const parsed = JSON.parse(params.get('pages') || '{}');
@@ -171,7 +173,7 @@ export function useJobSearch({ home = false } = {}) {
       ? request.filters.region
       : filterGroups.region.options;
 
-    // 메인 화면은 부산/서울처럼 지역별 카드가 따로 있으므로 지역마다 요청을 하나씩 만듭니다.
+    // 메인 화면은 서울/부산처럼 지역별 카드가 따로 있으므로 지역마다 요청을 하나씩 만듭니다.
     // /jobs 일반 화면은 전체 결과 하나만 요청합니다.
     // 빠르게 연속 선택하면 마지막 조건만 조회합니다. 체크 표시와 URL은 즉시 바뀝니다.
     const timer = setTimeout(() => {
@@ -287,7 +289,7 @@ export function useJobSearch({ home = false } = {}) {
     // 무관이면 모두 비우고, 이미 고른 값이면 빼고, 새 값이면 더합니다.
     // 이렇게 만든 목록을 URL에 저장하면 화면과 다음 검색이 같은 조건을 사용합니다.
     let nextValues;
-    if (value === filterGroups[field].neutral) {
+    if (value === filterGroups[field].neutral || (field === 'region' && value === '전체')) {
       nextValues = [];
     } else if (currentValues.includes(value)) {
       nextValues = currentValues.filter(item => item !== value);
@@ -295,7 +297,7 @@ export function useJobSearch({ home = false } = {}) {
       nextValues = [...currentValues, value];
     }
 
-    updateSearchParams({ ...filters, [field]: nextValues });
+    updateSearchParams({ ...filters, [field]: field === 'region' ? sortRegions(nextValues) : nextValues });
   }
 
   // 지도/목록에서 구·군을 선택합니다.
@@ -386,7 +388,7 @@ export function useJobSearch({ home = false } = {}) {
   // AI가 해석한 조건을 사용자가 읽을 수 있는 한 줄 설명으로 바꿉니다.
   const aiDescription = ai && typeof ai === 'object'
     ? [
-        ...(Array.isArray(ai.regions) ? ai.regions : []),
+        ...(Array.isArray(ai.regions) ? sortRegions(ai.regions) : []),
         ai.category,
         ai.experience,
         ai.work_mode,

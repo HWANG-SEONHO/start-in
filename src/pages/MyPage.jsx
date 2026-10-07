@@ -278,14 +278,15 @@ function AccountWorkspace() {
 
 // 바깥 MyPage는 로그인 여부만 확인하고 실제 화면은 AccountWorkspace에 맡깁니다.
 export default function MyPage() {
-  const { user, ready } = useAccount();
+  const { user, ready, loggedOut } = useAccount();
 
   if (!ready) {
     return <main className="service-page" role="status">계정을 확인하는 중입니다…</main>;
   }
 
   if (!user) {
-    return <Navigate to="/login" replace state={{ from: '/my' }} />;
+    // 직접 로그아웃은 메인으로, 비로그인 접근·세션 만료는 로그인으로 보냅니다.
+    return <Navigate to={loggedOut ? '/main' : '/login'} replace state={{ from: '/my' }} />;
   }
 
   // user.id를 key로 주면 다른 계정으로 바뀔 때 내부 상태도 새로 시작합니다.

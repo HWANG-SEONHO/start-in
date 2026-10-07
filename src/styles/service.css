@@ -1,7 +1,7 @@
 /* 학습용 설명: service.css는 화면의 모양을 정하는 파일입니다.
    HTML/React가 '무엇을 보여줄지' 정하면 CSS는 '크기·간격·배치·글꼴을 어떻게 보일지' 정합니다. */
 
-.service-page { width: min(1220px, calc(100% - 48px)); margin: 32px auto; padding: 32px; border: 1px solid #dcebe5; border-radius: 16px; background: white; line-height: 1.7; }
+.service-page { container-type: inline-size; width: min(1220px, calc(100% - 48px)); margin: 32px auto; padding: 32px; border: 1px solid #dcebe5; border-radius: 16px; background: white; line-height: 1.7; }
 .service-page h1 { font-size: 28px; margin: 12px 0; }
 .service-page h2 { font-size: 21px; margin: 20px 0 12px; }
 .service-page a { color: #007c60; }
@@ -38,7 +38,7 @@
 .delete-confirm { display: flex; align-items: center; gap: 10px; margin-top: 12px; color: #a22c38; }
 .company-directory { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 .company-directory > a { border: 1px solid #dcebe5; padding: 20px; border-radius: 10px; }
-.company-directory h2 { margin-top: 0; }
+.company-directory h2 { margin-top: 0; overflow-wrap: anywhere; word-break: keep-all; }
 .company-directory p { color: #62768a; margin-bottom: 16px; }
 .service-toast { position: fixed; z-index: 10; bottom: 24px; left: 50%; transform: translateX(-50%); max-width: min(640px, 90vw); padding: 16px 20px; background: #183c33; color: white; border-radius: 10px; box-shadow: 0 6px 20px #12372933; }
 .service-toast button { color: white; background: transparent; border: 0; margin-left: 12px; font-size: 20px; }
@@ -50,7 +50,7 @@
 .page-search-heading form { display: flex; gap: 10px; width: 550px; }
 .page-search-heading button { flex-shrink: 0; }
 .full-job-list { max-width: 100%; margin: 18px auto; }
-.pagination { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 8px; font-size: 13px; color: #62768a; }
+.pagination { display: flex; align-items: center; justify-content: center; gap: 16px; min-height: 32px; margin-top: 8px; font-size: 13px; color: #62768a; }
 .pagination button { border: 1px solid #c3ded3; border-radius: 7px; padding: 5px 12px; background: #eff9f5; color: #007c60; }
 .resume-panel { max-width: 720px; }
 .resume-current { margin: 18px 0; padding: 16px; border: 1px solid #dcebe5; border-radius: 8px; overflow-wrap: anywhere; }

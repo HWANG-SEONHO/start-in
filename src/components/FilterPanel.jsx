@@ -63,7 +63,10 @@ export default function FilterPanel({ filters, onToggle, onReset, summary }) {
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 21h20M4 21V5l9-3v19M13 9h7v12M7 7v2m3-3v2M7 12v2m3-3v2M7 17v2m3-3v2m6-7v2m0 3v2" /></svg>
             <span>지역</span>
           </div>
-          <div className="filter-options">{renderOptions('region')}</div>
+          <div className="filter-options">
+            <button type="button" className={`filter-option${!filters.region?.length || filters.region.length === filterGroups.region.options.length ? ' is-selected' : ''}`} aria-label="지역 전체" aria-pressed={!filters.region?.length || filters.region.length === filterGroups.region.options.length} onClick={() => onToggle('region', '전체')}>전체</button>
+            {renderOptions('region')}
+          </div>
         </div>
 
         <div className="filter-row">

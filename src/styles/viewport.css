@@ -1,0 +1,109 @@
+/* 인트로 장면과 실제 크기의 조작부를 분리합니다. 모바일은 기존 세로 구성을 유지합니다. */
+.intro-stage { position: absolute; inset: 0; }
+.intro-v2 .intro-entry { bottom: calc(var(--intro-controls-height, 96px) + 30px); width: max-content; max-width: calc(100% - 32px); white-space: nowrap; }
+.intro-scene-content { position: absolute; inset: 0; }
+.intro-end .intro-scene-content { display: grid; place-items: center; }
+.intro-entry { box-shadow: inset 0 1px 0 #fff, 0 4px 18px #18213812; transition: background .18s ease, box-shadow .18s ease; }
+.intro-entry:hover { background: #fff; box-shadow: inset 0 1px 0 #fff, 0 6px 22px #18213822; }
+.intro-play-toggle { background: linear-gradient(180deg,#34405b,#182138); box-shadow: inset 0 1px 0 #ffffff40, 0 2px 6px #18213820; }
+.intro-play-toggle:hover { filter: brightness(1.15); }
+.intro-chapters button:hover { background: #424cd512; color: #424cd5; opacity: 1; }
+
+@media (min-width: 901px) {
+  .intro-scene-content {
+    --intro-vw: 19.2px;
+    --intro-vh: 10.8px;
+    inset: auto;
+    left: 50%;
+    top: 50%;
+    width: 1920px;
+    height: 1080px;
+    transform: translate(-50%, -50%) scale(var(--intro-scale, 1));
+    transform-origin: center;
+  }
+  .intro-stage .intro-opening-layout { inset: 13% 6% 25%; gap: 60px; }
+  .intro-stage .intro-opening h1 { font-size: 180px; }
+  .intro-stage .intro-opening-caption { bottom: 24%; font-size: 18px; }
+  .intro-stage .intro-project-title { padding: 24px; }
+  .intro-stage .intro-purpose { margin-top: 30px !important; }
+  .intro-stage .intro-opening-robot { width: 280px; height: 260px; }
+  .intro-stage .intro-two-columns { inset: 12% 6% 24%; width: auto; }
+  .intro-stage .intro-why .intro-copy { margin-left: 50px; transform: translateY(-50px); }
+  .intro-stage .intro-why-ring { width: 690px; border-width: 28px; }
+  .intro-stage .intro-why .intro-scatter { width: 78%; translate: -52px -3%; }
+  .intro-stage .intro-why .intro-why-note { top: 68%; right: 12%; font-size: 22px; }
+  .intro-stage .intro-why .intro-job-slip { padding: 0; }
+  .intro-stage .intro-where .intro-map-block { top: 34%; bottom: 26%; }
+  .intro-stage .intro-end-content { transform: translateY(-85px); }
+  .intro-footer { bottom: 16px; gap: 8px; padding: 10px 18px; }
+  .intro-entry { bottom: 124px; }
+}
+
+/* 일반 1080p 모니터의 브라우저 표시 높이에서도 첫 결과를 충분히 보여줍니다. */
+@media (min-width: 1701px) and (max-height: 980px) {
+  .hero-background { height: 290px; background-position: center top; }
+  .hero-section { height: 232px; }
+  .hero-introduction { top: 8px; }
+  .hero-eyebrow { font-size: 17px; line-height: 22px; }
+  .hero-introduction h1 { font-size: 37px; line-height: 38px; letter-spacing: -2.4px; }
+  .hero-description { font-size: 14px; line-height: 19px; margin-top: 4px; }
+  .hero-statistics { margin-top: 7px; }
+  .hero-stat strong { font-size: 20px; line-height: 23px; }
+  .hero-stat span { font-size: 11px; line-height: 14px; }
+  .ai-search-panel { top: 8px; height: 218px; padding: 12px 18px; }
+  .search-panel-heading { height: 32px; margin-bottom: 8px; }
+  .search-panel-title h2 { font-size: 23px; }
+  .ai-search-field { height: 50px; }
+  .ask-ai-button { height: 42px; }
+  .search-guidance { margin: 6px 0; line-height: 17px; }
+  .suggestion-row { margin-top: 4px; }
+  .suggestion-row button { height: 28px; }
+  .search-page-main-home .filter-panel { height: auto; padding: 6px 32px; }
+  .search-page-main-home .filter-heading { height: 34px; }
+  .search-page-main-home .filter-row { height: 30px; }
+  .search-page-main-home .filter-option { height: 25px; }
+  .search-page-main-home .filter-reset { bottom: -14px; height: 32px; }
+  .search-page-main-home .results-layout > section { min-height: 350px; }
+  .search-page-main-home .map-section { display: flex; flex-direction: column; contain: size; }
+  .search-page-main-home .map-image-frame { flex: 1; height: auto; min-height: 0; }
+  .search-page-main-home .job-list-section { padding-top: 8px; padding-bottom: 8px; }
+  .search-page-main-home .job-list-heading { height: auto; min-height: 58px; }
+  .search-page-main-home .job-card { height: auto; min-height: 42px; }
+}
+
+/* 좁은 화면에서는 행을 숨기지 않고 줄바꿈해 페이지를 아래로 늘립니다. */
+@media (max-width: 1700px) {
+  .filter-panel { height: auto; }
+  .filter-row { height: auto; min-height: 35px; padding: 3px 0; }
+  .filter-options { flex-wrap: wrap; }
+}
+
+@media (max-width: 700px) {
+  .intro-stage .intro-opening-layout,
+  .intro-stage .intro-two-columns {
+    inset: 9% 7% calc(var(--intro-controls-height, 210px) + 115px);
+    gap: 12px;
+    justify-content: center;
+  }
+  .intro-stage .intro-opening h1 { font-size: 12vw; }
+  .intro-stage .intro-project-title { font-size: 22px; padding: 12px; }
+  .intro-stage .intro-purpose { font-size: 13px; margin-top: 12px !important; }
+  .intro-stage .intro-opening-robot-area { margin-top: 8px; }
+  .intro-stage .intro-opening-robot { width: 130px; height: 115px; }
+  .intro-stage .intro-robot-name { font-size: 12px; }
+  .intro-stage .intro-opening-robot a { bottom: -18px; font-size: 6px; }
+  .intro-stage .intro-where-heading { top: 10%; }
+  .intro-stage .intro-where .intro-map-block {
+    top: 35%; bottom: calc(var(--intro-controls-height, 210px) + 115px);
+  }
+  .intro-stage .intro-map-description { bottom: calc(100% + 12px); }
+  .intro-stage .intro-why .intro-copy { margin: 0; transform: none; }
+  .intro-stage .intro-why-motion { width: 65vw; margin: auto; }
+  .intro-stage .intro-why-ring { width: 230px; border-width: 14px; }
+  .intro-stage .intro-why .intro-scatter { width: 47%; translate: 0 0; align-self: center; }
+  .intro-stage .intro-why .intro-notebook-contents .intro-job-slip { height: 28%; }
+  .intro-stage .intro-personal .intro-two-columns { justify-content: center; }
+  .intro-stage .intro-ai-typography { width: min(100%, 28vh); margin: auto; }
+  .intro-stage .intro-personal .intro-ai-art { height: 160px; flex: 0 0 160px; }
+  .intro-stage .intro-personal .intro-ai-robot { height: 90px; top: 0; }
+}

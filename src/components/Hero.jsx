@@ -150,7 +150,7 @@ export default function Hero({
         {/* 추천 문구는 검색 실행이 아니라 입력 예시입니다. */}
         <div className="search-suggestions">
           <div className="suggestion-row">
-            <button type="button" className="suggestion-highlight" onClick={() => chooseSuggestion('부산 신입 채용')}>부산 신입 채용 <span>›</span></button>
+            <button type="button" className="suggestion-highlight" onClick={() => chooseSuggestion('서울 신입 채용')}>서울 신입 채용 <span>›</span></button>
             <button type="button" onClick={() => chooseSuggestion('재택 가능한 일자리')}>재택 가능한 일자리 <span>›</span></button>
             <button type="button" onClick={() => chooseSuggestion('복지 좋은 중소기업')}>복지 좋은 중소기업 <span>›</span></button>
             <button type="button" onClick={() => chooseSuggestion('면접 후기 좋은 회사')}>면접 후기 좋은 회사</button>
@@ -169,7 +169,7 @@ export default function Hero({
             onClick={() => setHelpOpen(value => !value)}
             aria-label="추천 검색어 더 보기"
           >
-            ›
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 6 6-6 6" /></svg>
           </button>
         </div>
       </div>
