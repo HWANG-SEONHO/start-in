@@ -6,5 +6,22 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
-  return { plugins: [react()], server: { proxy: { '/api': { target: env.BACKEND_URL || 'http://127.0.0.1:8000', changeOrigin: true } } } };
+  return {
+    plugins: [react()],
+    server: { proxy: { '/api': { target: env.BACKEND_URL || 'http://127.0.0.1:8000', changeOrigin: true } } },
+    build: {
+      rollupOptions: {
+        output: {
+          // 로봇 연출 수정 때 3D 엔진까지 다시 받지 않도록 역할별로 분리합니다.
+          onlyExplicitManualChunks: true,
+          manualChunks(id) {
+            const path = id.replaceAll('\\', '/');
+            if (path.includes('/node_modules/three/build/three.core.js')) return 'three-core';
+            if (path.includes('/node_modules/three/build/three.module.js')) return 'three-renderer';
+            if (path.includes('/node_modules/three/examples/jsm/')) return 'three-loaders';
+          },
+        },
+      },
+    },
+  };
 });
