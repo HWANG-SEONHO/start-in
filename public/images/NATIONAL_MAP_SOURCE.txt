@@ -1,0 +1,6 @@
+Boundary data: Statistics Korea, SGIS / southkorea-maps
+https://github.com/southkorea/southkorea-maps/tree/master/kostat/2018/json
+Collected: 2018-12-24. Licensed under Korea Open Government License Type 1 (attribution).
+https://www.kogl.or.kr/info/license.do
+Province paths are simplified for this illustrative prototype. District centroids derive from the 2018 polygons.
+Artwork is generated for START IN and is decorative, not a source of actual road/building coordinates.

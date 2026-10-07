@@ -76,7 +76,8 @@ function readAiConditions(params) {
   }
 }
 export function useJobSearch({
-  home = false
+  home = false,
+  unified = false
 } = {}) {
   // useSearchParams는 현재 URL의 ?뒤 값을 React에서 읽고 바꾸게 해줍니다.
   const [params, setParams] = useSearchParams();
@@ -125,6 +126,7 @@ export function useJobSearch({
     pages,
     page,
     home,
+    unified,
     revision,
     ai
   });
@@ -139,7 +141,7 @@ export function useJobSearch({
     // /jobs 일반 화면은 전체 결과 하나만 요청합니다.
     // 빠르게 연속 선택하면 마지막 조건만 조회합니다. 체크 표시와 URL은 즉시 바뀝니다.
     const timer = setTimeout(() => {
-      const requests = request.home ? selectedRegions.map(region => getJobs({
+      const requests = request.home && !request.unified ? selectedRegions.map(region => getJobs({
         ...request,
         sort: request.regionSorts[region] || request.sort,
         filters: {
@@ -199,6 +201,7 @@ export function useJobSearch({
     cancelInterpretation();
     setParams({
       filters: JSON.stringify(nextFilters),
+      ...(params.get('map') === 'legacy' ? { map: 'legacy' } : {}),
       ...(nextQuery ? {
         q: nextQuery
       } : {}),
@@ -362,6 +365,7 @@ export function useJobSearch({
   // 이 hook을 쓰는 SearchPage가 필요한 값과 함수만 한 묶음으로 돌려줍니다.
   return {
     filters,
+    ai,
     regions: displayRegions,
     districts,
     selectDistrict,
