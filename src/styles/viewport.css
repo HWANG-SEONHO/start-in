@@ -39,28 +39,28 @@
   .intro-entry { bottom: 124px; }
 }
 
-/* 일반 1080p 모니터의 브라우저 표시 높이에서도 첫 결과를 충분히 보여줍니다. */
+/* 900~910px 표시 높이에서 상단의 여유와 첫 결과 노출을 함께 확보합니다. */
 @media (min-width: 1701px) and (max-height: 980px) {
-  .hero-background { height: 290px; background-position: center top; }
-  .hero-section { height: 232px; }
-  .hero-introduction { top: 8px; }
+  .hero-background { height: 318px; background-position: center top; }
+  .hero-section { height: 260px; }
+  .hero-introduction { top: 14px; }
   .hero-eyebrow { font-size: 17px; line-height: 22px; }
-  .hero-introduction h1 { font-size: 37px; line-height: 38px; letter-spacing: -2.4px; }
+  .hero-introduction h1 { font-size: 40px; line-height: 41px; letter-spacing: -2.4px; }
   .hero-description { font-size: 14px; line-height: 19px; margin-top: 4px; }
-  .hero-statistics { margin-top: 7px; }
+  .hero-statistics { margin-top: 10px; }
   .hero-stat strong { font-size: 20px; line-height: 23px; }
   .hero-stat span { font-size: 11px; line-height: 14px; }
-  .ai-search-panel { top: 8px; height: 218px; padding: 12px 18px; }
-  .search-panel-heading { height: 32px; margin-bottom: 8px; }
+  .ai-search-panel { top: 14px; height: 238px; padding: 16px 18px; }
+  .search-panel-heading { height: 36px; margin-bottom: 10px; }
   .search-panel-title h2 { font-size: 23px; }
   .ai-search-field { height: 50px; }
   .ask-ai-button { height: 42px; }
-  .search-guidance { margin: 6px 0; line-height: 17px; }
-  .suggestion-row { margin-top: 4px; }
-  .suggestion-row button { height: 28px; }
-  .search-page-main-home .filter-panel { height: auto; padding: 6px 32px; }
-  .search-page-main-home .filter-heading { height: 34px; }
-  .search-page-main-home .filter-row { height: 30px; }
+  .search-guidance { margin: 8px 0; line-height: 17px; }
+  .suggestion-row { margin-top: 6px; }
+  .suggestion-row button { height: 30px; }
+  .search-page-main-home .filter-panel { height: auto; padding: 8px 32px; }
+  .search-page-main-home .filter-heading { height: 38px; }
+  .search-page-main-home .filter-row { height: 33px; }
   .search-page-main-home .filter-option { height: 25px; }
   .search-page-main-home .filter-reset { bottom: -14px; height: 32px; }
   .search-page-main-home .results-layout > section { min-height: 350px; }

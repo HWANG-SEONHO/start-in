@@ -93,6 +93,21 @@
 .site-shell .login-button:hover, .site-shell .notification-button:hover { filter: brightness(1.04); box-shadow: inset 0 2px 0 #fff, inset 0 -2px 0 #a6b4ca80, 0 2px 0 #9caac055, 0 5px 9px #18213830; }
 .site-shell .login-button:active, .site-shell .notification-button:active { filter: brightness(.97); box-shadow: inset 0 2px 4px #18213822; }
 .site-shell .join-button:hover:not(:disabled) { filter: none; background-image: linear-gradient(180deg,#77e1ca 0%,#20b998 43%,#009d78 47%,#006e54 100%); box-shadow: inset 0 2px 0 #ffffffb3, inset 0 -2px 0 #004e3b80, 0 2px 0 #00543f66, 0 4px 7px #18213826; }
+.site-shell .header-actions .join-button {
+  color: var(--brand-navy);
+  background: linear-gradient(180deg,#fff 0%,#f6f8ff 43%,#e7ebf4 48%,#d2d9e7 100%);
+  border-color: #bec9da;
+  box-shadow: inset 0 2px 0 #fff, inset 0 -2px 0 #b2bed180, 0 2px 0 #9caac055, 0 4px 7px #18213822;
+  text-shadow: none;
+}
+.site-shell .header-actions .join-button:hover:not(:disabled) {
+  filter: none;
+  color: #006b51;
+  background: linear-gradient(180deg,#fff,#f0faf5 43%,#e5f3ec 48%,#cde4d7);
+  border-color: #9fcbb7;
+  box-shadow: inset 0 2px 0 #fff, inset 0 -2px 0 #a6b4ca80, 0 2px 0 #9caac055, 0 5px 9px #18213830;
+}
+.site-shell .header-actions .join-button:active:not(:disabled) { filter: brightness(.97); box-shadow: inset 0 2px 4px #18213822; }
 .site-shell .login-button:hover, .site-shell .notification-button:hover { filter: none; background: linear-gradient(180deg,#fff,#f0faf5 43%,#e5f3ec 48%,#cde4d7); border-color: #9fcbb7; color: #006b51; }
 .site-shell .search-help-panel button:hover, .site-shell .filter-reset:hover, .site-shell .pagination button:hover:not(:disabled), .site-shell .more-suggestions:hover { background: #e6f5ed; border-color: #a4cdbb; color: #007c60; }
 .site-shell .map-view-options button:hover:not(.map-view-selected) { background: #e6f5ed; color: #007c60; }
@@ -110,3 +125,13 @@
 .job-empty-state strong { color: var(--brand-navy); font-size: 16px; }
 .job-empty-state p { margin: 0; color: var(--brand-copy); font-size: 14px; line-height: 1.6; }
 @media(prefers-reduced-motion:reduce){.site-shell .ask-ai-button,.site-shell .join-button,.site-shell .service-page .primary-action{transition:none}}
+
+/* 개인 준비 화면: 탭은 선택 상태, 실행 버튼은 역할에 맞는 색으로 구분합니다. */
+.site-shell .my-tabs button { min-height: 44px; padding: 10px 20px; font-weight: 750; border-radius: 10px; background: linear-gradient(180deg,#fff,#e9edf5); box-shadow: inset 0 1px 0 #fff,0 2px 5px #18213812; }
+.site-shell .my-tabs button[aria-pressed='true'] { background: linear-gradient(180deg,#42516e,#182138); color: #fff; border-color: #31405c; box-shadow: inset 0 1px 0 #ffffff50,0 3px 8px #18213820; }
+.site-shell .action-row .action-save,.site-shell .resume-file-picker button { min-height: 42px; padding: 10px 18px; font-weight: 700; border-color: #63bda4; background: linear-gradient(180deg,#f8fffc,#dbeee5); color: #006b51; box-shadow: inset 0 1px 0 #fff,0 2px 5px #18213812; }
+.site-shell .service-page .action-danger { min-height: 42px; padding: 10px 18px; border-color: #d9b7bd; background: linear-gradient(180deg,#fff9fa,#f2e2e5); color: #9b3748; font-weight: 700; box-shadow: inset 0 1px 0 #fff,0 2px 5px #18213812; }
+.site-shell .service-page .primary-action { font-weight: 750; min-height: 44px; box-shadow: inset 0 1px 0 #ffffff60,0 3px 8px #18213820; }
+.site-shell .page-search-heading button { min-height: 42px; font-weight: 700; background: linear-gradient(180deg,#36bc98,#008763); border-color: #64bda5; color: #fff; box-shadow: inset 0 1px 0 #ffffff80,0 3px 6px #18213820; }
+.site-shell .action-save:hover:not(:disabled),.site-shell .resume-file-picker button:hover:not(:disabled),.site-shell .service-page .primary-action:hover:not(:disabled),.site-shell .page-search-heading button:hover:not(:disabled) { filter: brightness(1.05); }
+.site-shell .service-page .action-danger:hover:not(:disabled) { background: #f4dce2; border-color: #bf8591; }

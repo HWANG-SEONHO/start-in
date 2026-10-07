@@ -78,6 +78,11 @@ export default function App() {
         />
       </Routes>
     </div>}
+    {document.documentElement.classList.contains('mobile-version') && !showCover && <nav className="mobile-bottom-nav" aria-label="모바일 빠른 메뉴">
+      <Link to="/main" aria-current={pathname === '/main' ? 'page' : undefined}>홈</Link>
+      <Link to="/jobs" aria-current={pathname.startsWith('/jobs') ? 'page' : undefined}>공고 검색</Link>
+      <Link to="/my" aria-current={pathname === '/my' ? 'page' : undefined}>내 준비</Link>
+    </nav>}
     {transition && <div className={`intro-route-transition ${transition}`} aria-hidden="true"><b>나의 기회로<svg className="intro-transition-arrow" viewBox="0 0 32 32" fill="none"><path d="M16 27V5M7 14l9-9 9 9" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg></b><small>YOUR NEXT STARTS HERE</small></div>}
     </>
   );

@@ -2,9 +2,12 @@
 // 큰 흐름: filters의 현재 값 확인 → 버튼의 선택색 결정 → 클릭하면 부모의 onToggle 호출.
 
 import '../styles/filter.css';
+import { useState } from 'react';
 import { filterGroups } from '../data/filters';
 
 export default function FilterPanel({ filters, onToggle, onReset, summary }) {
+  // 모바일에서는 지역부터 보여주고, 나머지 조건은 사용자가 펼쳐서 고릅니다.
+  const [expanded, setExpanded] = useState(false);
   // field 하나(예: region)의 모든 선택지를 버튼으로 바꿉니다.
   function renderOptions(field) {
     const { options, neutral } = filterGroups[field];
@@ -57,7 +60,7 @@ export default function FilterPanel({ filters, onToggle, onReset, summary }) {
       </div>
 
       {/* 아래부터 한 줄씩 지역/직무/학력… 필터를 배치합니다. */}
-      <div className="filter-rows">
+      <div id="search-filter-rows" className={`filter-rows${expanded ? ' is-expanded' : ''}`}>
         <div className="filter-row">
           <div className="filter-row-label">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 21h20M4 21V5l9-3v19M13 9h7v12M7 7v2m3-3v2M7 12v2m3-3v2M7 17v2m3-3v2m6-7v2m0 3v2" /></svg>
@@ -139,6 +142,9 @@ export default function FilterPanel({ filters, onToggle, onReset, summary }) {
           </div>
         </div>
       </div>
+      <button className="mobile-filter-toggle" type="button" aria-expanded={expanded} aria-controls="search-filter-rows" onClick={() => setExpanded(value => !value)}>
+        {expanded ? '상세 조건 접기' : '직무·급여 등 상세 조건 펼치기'}
+      </button>
     </section>
   );
 }

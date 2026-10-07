@@ -101,8 +101,8 @@ function ApplicationEditor({ application, index, isNew = false, onSaved }) {
         </label>
 
         <div className="action-row">
-          <button disabled={busy} onClick={() => askConfirm('save')}>변경 저장</button>
-          <button disabled={busy} onClick={() => askConfirm('cancel')}>지원 취소</button>
+          <button className="action-save" disabled={busy} onClick={() => askConfirm('save')}>변경 저장</button>
+          <button className="action-danger" disabled={busy} onClick={() => askConfirm('cancel')}>지원 취소</button>
         </div>
 
         {message && <p role="status">{message}</p>}

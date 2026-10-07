@@ -24,6 +24,24 @@ function SocialButtons({ compact = false }) {
   </div>;
 }
 
+// 소개 문구도 이미지가 아닌 실제 글자로 그려 화면 크기에 맞게 읽히게 합니다.
+const authBenefits = [
+  ['search', '조건에 맞는 공고', '지역·직무·급여를 고르고 지도와 목록을 함께 비교하세요.'],
+  ['document', '지원 준비를 한곳에서', '저장한 공고, 지원 기록과 PDF 이력서를 함께 관리하세요.'],
+  ['robot', 'AI로 조건 검색', '원하는 근무 조건을 문장으로 입력해 검색을 시작하세요.'],
+];
+
+function AuthBenefits({ register }) {
+  return <section className={register ? 'auth-benefits' : 'auth-intro-features'} aria-label="스타트인 서비스 장점">
+    {register && <h2>가입 후 이용할 수 있는 서비스</h2>}
+    {authBenefits.map(([icon, title, description]) => <article key={icon}>
+      <span className={`auth-benefit-icon${icon === 'robot' ? ' is-ai' : ''}`}><AuthIcon type={icon} /></span>
+      <div><h3>{title}</h3><p>{description}</p></div>
+    </article>)}
+    {register && <div className="auth-benefit-footer"><strong>관심 공고에서 다음 기회까지.</strong><p>조건을 비교하고, 마음에 드는 공고를 저장하고, 지원 준비를 이어가세요.</p></div>}
+  </section>;
+}
+
 export default function AuthPage({ register = false }) {
   const { user, acceptSession } = useAccount();
   const location = useLocation();
@@ -88,9 +106,11 @@ export default function AuthPage({ register = false }) {
   }
 
   return (
-    <main ref={scene} className={`auth-scene auth-prototype ${register ? 'auth-register' : 'auth-login'}`}>
-      <div className="auth-photo" aria-hidden="true"><img src={register ? '/images/auth-register-reference.png' : '/images/auth-login-reference.png'} alt="" /></div>
+    <main ref={scene} className={`auth-scene ${register ? 'auth-register' : 'auth-login'}`}>
+      <div className="auth-photo" aria-hidden="true"><img src={register ? '/images/auth-register-photo.png' : '/images/auth-login-photo.png'} alt="" /></div>
       <div className="auth-layout">
+        {register ? <header className="auth-register-heading"><h1>회원가입</h1><p>나에게 맞는 공고를 저장하고,<br />지원 준비를 한곳에서 이어가세요.</p></header> :
+          <section className="auth-introduction"><p className="auth-eyebrow">YOUR NEXT STARTS HERE</p><h1>좋은 시작이<br /><em>좋은 내일</em>을 만듭니다.</h1><p>내 조건으로 찾고,<br />내 선택으로 준비하는 커리어.</p><AuthBenefits /></section>}
         <section className="auth-card" aria-labelledby="auth-card-title">
           <header><h2 id="auth-card-title">{register ? '기본 정보 입력' : '로그인'}</h2>{!register && <p>저장한 공고와 지원현황을 이어서 확인하세요.</p>}</header>
           <form onSubmit={submit} aria-busy={busy}>
@@ -101,7 +121,7 @@ export default function AuthPage({ register = false }) {
               {register && <label>비밀번호 확인 <b>*</b><span className="auth-input"><AuthIcon type="lock" /><input name="confirmPassword" type={showPassword ? 'text' : 'password'} autoComplete="new-password" placeholder="비밀번호를 다시 입력해 주세요" minLength={10} maxLength={128} required disabled={busy} /></span></label>}
             </div>
             {!register && <div className="auth-form-tools"><span>이메일 계정으로 로그인</span><button type="button" disabled>비밀번호 찾기 <small>준비중</small></button></div>}
-            {register && <div className="auth-demo-notice"><strong>학습용 데모 계정을 만듭니다.</strong><p>다른 사이트의 비밀번호나 민감한 정보는 입력하지 마세요.</p></div>}
+            {register && <div className="auth-demo-notice"><strong>학습용 데모 계정을 만듭니다.</strong></div>}
             <p className="auth-error" role={error ? 'alert' : undefined}>{error || '\u00a0'}</p>
             <button className="auth-submit" type="submit" disabled={busy}>{busy ? '처리 중…' : register ? '가입하기' : '로그인'}</button>
           </form>
@@ -109,6 +129,7 @@ export default function AuthPage({ register = false }) {
           <SocialButtons compact={register} />
           <div className="auth-switch"><span>{register ? '이미 계정이 있으신가요?' : '아직 계정이 없으신가요?'}</span><Link to={register ? '/login' : '/register'} state={{ from }}>{register ? '로그인하기' : '회원가입하기'} <span aria-hidden="true">›</span></Link></div>
         </section>
+        {register && <AuthBenefits register />}
       </div>
     </main>
   );

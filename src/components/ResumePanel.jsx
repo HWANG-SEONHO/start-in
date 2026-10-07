@@ -104,7 +104,7 @@ export default function ResumePanel() {
               {(resume.data.size / 1024).toFixed(1)}KB
               {' '}
               <a href={resumeDownloadUrl}>현재 PDF 다운로드</a>
-              <button disabled={busy} onClick={() => setConfirmDelete(true)}>이력서 삭제</button>
+              <button className="action-danger" disabled={busy} onClick={() => setConfirmDelete(true)}>이력서 삭제</button>
             </div>
           ) : (
             <p>등록된 이력서가 없습니다.</p>
@@ -119,6 +119,7 @@ export default function ResumePanel() {
                 ref={fileInput}
                 className="resume-file-input"
                 type="file"
+                aria-labelledby="resume-file-label"
                 name="file"
                 accept=".pdf,application/pdf"
                 hidden
@@ -149,7 +150,7 @@ export default function ResumePanel() {
           {confirmDelete && (
             <div className="delete-confirm">
               보관 중인 이력서를 삭제할까요?
-              <button disabled={busy} onClick={remove}>삭제 확인</button>
+              <button className="action-danger" disabled={busy} onClick={remove}>삭제 확인</button>
               <button disabled={busy} onClick={() => setConfirmDelete(false)}>유지</button>
             </div>
           )}
