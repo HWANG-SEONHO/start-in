@@ -1,0 +1,20 @@
+name: Backup Artifact
+on:
+  push:
+    branches:
+      - backup-2026-10-07
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact snapshot
+        uses: actions/checkout@v4
+        with:
+          ref: db047fec5f1538767bb02af891e217f59cf27237
+      - name: Upload source backup
+        uses: actions/upload-artifact@v4
+        with:
+          name: START-IN_backup-2026-10-07
+          path: .
+          include-hidden-files: true
+          retention-days: 30
