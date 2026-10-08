@@ -59,7 +59,7 @@ from .schemas import (
 # React 개발서버처럼 이 API를 호출해도 되는 웹주소 목록입니다.
 ORIGINS = os.getenv(
     'CORS_ORIGINS',
-    'http://127.0.0.1:5173,http://localhost:5173',
+    'http://127.0.0.1:5175,http://localhost:5175',
 ).split(',')
 
 # HTTPS 배포에서는 COOKIE_SECURE=true로 두어 쿠키가 안전한 연결에서만 움직이게 합니다.

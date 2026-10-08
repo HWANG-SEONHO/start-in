@@ -3,9 +3,31 @@ import atlas from '../data/nationalMap.json';
 import { getJobs } from '../services/api';
 import '../styles/national-map.css';
 
+// 일러스트 구도에 맞춘 표시 위치입니다. 실제 행정경계 좌표와 구분합니다.
+const artworkAnchors = {
+  서울:[307,134], 인천:[285,145], 경기:[330,121], 강원:[449,80],
+  충남:[286,205], 세종:[342,193], 대전:[350,216], 충북:[388,179],
+  전북:[315,266], 광주:[293,306], 전남:[324,338], 경북:[472,210],
+  대구:[454,263], 경남:[437,309], 울산:[522,280], 부산:[516,310], 제주:[298,402],
+};
+const illustrationRegions = atlas.regions.map(region => {
+  const anchor = artworkAnchors[region.name];
+  const project = ([x,y]) => [anchor[0]+80+(x-region.center[0])*.45,anchor[1]+(y-region.center[1])*.45];
+  return {...region,center:[anchor[0]+80,anchor[1]],bounds:[...project(region.bounds.slice(0,2)),...project(region.bounds.slice(2))]};
+});
+function districtCenter(region, center) {
+  const original = atlas.regions.find(point => point.name === region);
+  const anchor = artworkAnchors[region];
+  return [anchor[0]+80+(center[0]-original.center[0])*.45,anchor[1]+(center[1]-original.center[1])*.45];
+}
+
 // 지도는 하나만 유지합니다. 선택한 경계의 합집합에 카메라를 맞춥니다.
 function fitCamera(regions, width, height) {
-  const boxes = regions.length ? regions.map(r => r.bounds) : [[80,0,880,900]];
+  if (!regions.length) {
+    const scale = Math.min(width/800,height/450);
+    return {scale,x:(width-800*scale)/2,y:(height-450*scale)/2};
+  }
+  const boxes = regions.length ? regions.map(r => r.bounds) : [[80,0,880,450]];
   const left = Math.min(...boxes.map(b => b[0])) - 80;
   const top = Math.min(...boxes.map(b => b[1]));
   const right = Math.max(...boxes.map(b => b[2])) - 80;
@@ -60,18 +82,18 @@ export default function NationalMap({ search }) {
   useEffect(()=>{
     if (previousSelection.current !== selectedKey) overview.current = false;
     previousSelection.current = selectedKey;
-    setCamera(fitCamera(overview.current ? [] : atlas.regions.filter(r=>selected.includes(r.name)),size.width,size.height));
+    setCamera(fitCamera(overview.current ? [] : illustrationRegions.filter(r=>selected.includes(r.name)),size.width,size.height));
   },[selectedKey,size.width,size.height]);
 
   const counts=country || search.results[0]?.district_counts || {};
   const showDistricts=camera.scale>1.4 && selected.length>0 && selected.length<=3;
   const points=useMemo(()=>{
-    if(!showDistricts) return atlas.regions.map(r=>({...r,id:r.name,showCount:selected.includes(r.name),count:counts[r.name] ? Object.values(counts[r.name]).reduce((a,b)=>a+b,0) : country ? 0 : null}));
+    if(!showDistricts) return illustrationRegions.map(r=>({...r,id:r.name,showCount:selected.includes(r.name),count:counts[r.name] ? Object.values(counts[r.name]).reduce((a,b)=>a+b,0) : country ? 0 : null}));
     return selected.flatMap(region=>Object.entries(counts[region] || {}).map(([name,count])=>{
       const matches=atlas.districts.filter(d=>d.region===region&&(d.name===name||d.name.endsWith(name)||d.name.startsWith(name)));
       if(!matches.length) return null;
       const center=[0,1].map(i=>matches.reduce((sum,d)=>sum+d.center[i],0)/matches.length);
-      return {id:region+'/'+name,name,region,count,center,showCount:true};
+      return {id:region+'/'+name,name,region,count,center:districtCenter(region,center),showCount:true};
     }).filter(Boolean));
   },[counts,selectedKey,showDistricts]);
   const labels=placeLabels(points,camera,size.width,size.height);
@@ -96,13 +118,11 @@ export default function NationalMap({ search }) {
     else search.toggle('region',point.name);
   }
   return <section className="national-map" aria-label="전국 채용 지도">
-    <header><div><small>OPPORTUNITIES, CONNECTED</small><h2>기회를 잇는 전국 지도</h2></div><button onClick={()=>{overview.current=true;setCamera(fitCamera([],size.width,size.height));}}>전국 보기</button></header>
+    <header><div><small>NATIONWIDE JOBS</small><h2>전국 채용 지도</h2></div><button onClick={()=>{overview.current=true;setCamera(fitCamera([],size.width,size.height));}}>전국 보기</button></header>
     <div ref={frame} className={`national-map-frame${dragging?' is-dragging':''}`} onPointerDown={beginDrag} onPointerMove={moveDrag} onPointerUp={endDrag} onPointerCancel={endDrag}>
       <div className="national-map-world" style={{transform:`translate(${camera.x}px,${camera.y}px) scale(${camera.scale})`}}>
-        <svg viewBox="80 0 800 900" width="800" height="900" aria-hidden="true">
-
-          <image href="/images/national-illustration-v6.webp" x="80" y="0" width="800" height="900" preserveAspectRatio="none"/>
-          {atlas.regions.map(r=><path key={r.name} d={r.path} className={selected.includes(r.name)?'is-selected':'is-unselected'}/>)}
+        <svg viewBox="80 0 800 450" width="800" height="450" aria-hidden="true">
+          <image href="/images/national-illustration-clean-v1.png" x="80" y="0" width="800" height="450" preserveAspectRatio="xMidYMid meet"/>
         </svg>
       </div>
       <svg className="national-map-leaders" width={size.width} height={size.height} aria-hidden="true">{labels.filter(p=>p.showCount).map(p=><line key={p.id} x1={p.anchorX} y1={p.anchorY} x2={p.x} y2={p.y}/>)}</svg>

@@ -6,7 +6,7 @@ $pythonPath = Join-Path $projectPath '.runtime/python/python.exe'
 if (!(Test-Path -LiteralPath $pythonPath)) { $pythonPath = Join-Path $projectPath '.venv/Scripts/python.exe' }
 if (!(Test-Path -LiteralPath $pythonPath)) { throw 'Python 환경을 먼저 준비해 주세요.' }
 $env:DATABASE_URL = 'sqlite:///' + ($projectPath.Replace('\', '/') + '/backend/startin.db')
-$env:CORS_ORIGINS = 'http://127.0.0.1:5173,http://localhost:5173'
+$env:CORS_ORIGINS = 'http://127.0.0.1:5175,http://localhost:5175'
 $env:COOKIE_SECURE = 'false'
 $env:BACKEND_URL = 'http://127.0.0.1:8000'
 # 파일 복사 중 Windows가 감시 핸들을 잠가도 서버가 종료되지 않도록 합니다.
@@ -20,7 +20,7 @@ function Test-LocalServer([string]$url) {
 if (!(Test-LocalServer 'http://127.0.0.1:8000/api/health')) {
   Start-Process -FilePath $pythonPath -ArgumentList '-m','uvicorn','backend.app.main:app','--host','127.0.0.1','--port','8000' -WorkingDirectory $projectPath -WindowStyle Hidden -RedirectStandardOutput '.cache/local-api.stdout.log' -RedirectStandardError '.cache/local-api.stderr.log' | Out-Null
 }
-if (!(Test-LocalServer 'http://127.0.0.1:5173/main')) {
-  Start-Process -FilePath (Get-Command node).Source -ArgumentList 'node_modules/vite/bin/vite.js','--host','127.0.0.1','--port','5173','--strictPort' -WorkingDirectory $projectPath -WindowStyle Hidden -RedirectStandardOutput '.cache/local-web.stdout.log' -RedirectStandardError '.cache/local-web.stderr.log' | Out-Null
+if (!(Test-LocalServer 'http://127.0.0.1:5175/main')) {
+  Start-Process -FilePath (Get-Command node).Source -ArgumentList 'node_modules/vite/bin/vite.js','--host','127.0.0.1','--port','5175','--strictPort' -WorkingDirectory $projectPath -WindowStyle Hidden -RedirectStandardOutput '.cache/local-web.stdout.log' -RedirectStandardError '.cache/local-web.stderr.log' | Out-Null
 }
-Write-Output '프런트: http://localhost:5173/main / API: http://127.0.0.1:8000'
+Write-Output '프런트: http://127.0.0.1:5175/main / API: http://127.0.0.1:8000'

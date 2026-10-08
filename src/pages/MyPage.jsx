@@ -36,7 +36,7 @@ function ApplicationEditor({
   const dialogTitleId = `application-confirm-title-${application.id}`;
   const dialogDescriptionId = `application-confirm-description-${application.id}`;
 
-  // 저장/지원취소 버튼을 누르면 바로 서버에 보내지 않고 먼저 확인창을 엽니다.
+  // 저장 버튼과 우측 상단 X는 서버에 보내기 전에 확인창을 엽니다.
   function askConfirm(action) {
     setMessage('');
     setConfirmAction(action);
@@ -58,7 +58,7 @@ function ApplicationEditor({
       await api(`/me/applications/${application.job.id}`, options);
       confirmDialog.current?.close();
       // 사용자가 요청한 짧은 성공 팝업입니다.
-      setNotice(remove ? '취소되었습니다.' : '저장되었습니다.');
+      setNotice(remove ? '지원 기록을 삭제했습니다.' : '저장되었습니다.');
 
       // 부모 목록을 다시 불러와 화면과 DB를 같은 상태로 맞춥니다.
       onSaved();
@@ -71,16 +71,21 @@ function ApplicationEditor({
   const removing = confirmAction === 'cancel';
   const allowedStatuses = ['준비중', '지원완료', '서류통과', '면접', '최종합격', '불합격', '취소'];
   return <article className={`application-item${isNew ? ' is-new-application' : ''}`}>
+      <button type="button" className="application-remove" aria-label={`${application.job.title} 지원 기록 삭제`} title="지원 기록 삭제" disabled={busy} onClick={() => askConfirm('cancel')}>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
+      </button>
       {/* 사용자가 요청한 1, 2, 3... 번호입니다. */}
       <div className="application-number" aria-label={`${index + 1}번째 지원 기록`}>
         {index + 1}
       </div>
 
       <div className="application-content">
-        <Link to={`/jobs/${application.job.id}`}>
-          <strong>{application.job.title}</strong>
-        </Link>
-        {isNew && <span className="application-new-badge">방금 추가</span>}
+        <div className="application-heading">
+          <Link to={`/jobs/${application.job.id}`}>
+            <strong>{application.job.title}</strong>
+          </Link>
+          {isNew && <span className="application-new-badge">방금 추가</span>}
+        </div>
         <p>{application.job.company} · {application.job.region}</p>
 
         <label>
@@ -97,13 +102,12 @@ function ApplicationEditor({
 
         <div className="action-row">
           <button className="action-save" disabled={busy} onClick={() => askConfirm('save')}>변경 저장</button>
-          <button className="action-danger" disabled={busy} onClick={() => askConfirm('cancel')}>지원 취소</button>
         </div>
 
         {message && <p role="status">{message}</p>}
       </div>
 
-      {/* 로그아웃 팝업과 같은 모양을 쓰는 저장/지원취소 확인 dialog입니다. */}
+      {/* 기록 삭제는 확인 후 실행하며, 실제 기업의 지원 접수에는 영향을 주지 않습니다. */}
       <dialog ref={confirmDialog} className="logout-dialog application-dialog" aria-labelledby={dialogTitleId} aria-describedby={dialogDescriptionId} aria-busy={busy} onCancel={event => {
       if (busy) event.preventDefault();
     }} onClick={event => {
@@ -119,7 +123,7 @@ function ApplicationEditor({
           </div>
 
           <h2 id={dialogTitleId}>
-            {removing ? '지원을 취소하시겠습니까?' : '저장하시겠습니까?'}
+            {removing ? '지원 기록을 삭제할까요?' : '저장하시겠습니까?'}
           </h2>
 
           <p id={dialogDescriptionId}>
@@ -138,7 +142,7 @@ function ApplicationEditor({
             </button>
 
             <button type="button" className="logout-confirm" disabled={busy} onClick={() => save(removing)}>
-              {busy ? '처리 중…' : removing ? '지원 취소' : '저장'}
+              {busy ? '처리 중…' : removing ? '기록 삭제' : '저장'}
             </button>
           </div>
         </div>
@@ -185,7 +189,7 @@ function AccountWorkspace() {
       {tab === 'saved' && <>
           {savedJobs.map(job => <JobCard key={job.id} job={job} />)}
           {!savedJobs.length && <p className="empty-results">
-              저장한 공고가 없습니다. <Link to="/jobs">공고를 찾아 저장해 보세요.</Link>
+              저장한 공고가 없습니다.{'\u00a0'}<Link to="/jobs">공고를 찾아 저장해 보세요.</Link>
             </p>}
         </>}
 

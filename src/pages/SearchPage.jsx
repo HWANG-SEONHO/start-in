@@ -7,8 +7,6 @@ import Header from '../components/Header';
 import Hero from '../components/Hero';
 import FilterPanel from '../components/FilterPanel';
 import MapSection from '../components/MapSection';
-import { lazy, Suspense } from 'react';
-const NationalMap = lazy(() => import('../components/NationalMap'));
 import JobList from '../components/JobList';
 import FloatingRobot from '../components/FloatingRobot';
 import { useJobSearch } from '../hooks/useJobSearch';
@@ -18,9 +16,8 @@ export default function SearchPage({
 }) {
   // 검색에 필요한 대부분의 상태와 동작은 useJobSearch 한 곳에 모아 두었습니다.
   const location = useLocation();
-  const legacy = new URLSearchParams(location.search).get('map') === 'legacy';
-  const regionalMode = home && legacy;
-  const search = useJobSearch({ home, unified: home && !legacy });
+  const regionalMode = home;
+  const search = useJobSearch({ home });
 
   // 지도에서 선택한 구·군을 "부산 해운대구" 같은 표시용 글자로 바꿉니다.
   const selectedDistrictLabels = filterGroups.region.options.flatMap(region => (search.districts[region] || []).map(name => `${region} ${name}`));
@@ -89,10 +86,7 @@ export default function SearchPage({
         <FilterPanel filters={search.filters} onToggle={search.toggle} summary={filterSummary} onReset={search.reset} />
 
         {/* 첫 로딩 / 오류 / 정상 결과 중 현재 상태 하나만 보여줍니다. */}
-        {home && !legacy ? <div className="results-layout unified-results">
-          <Suspense fallback={<div className="national-map" role="status">전국 지도를 준비하는 중입니다…</div>}><NationalMap search={search} /></Suspense>
-          {search.error ? <RequestError message={search.error} onRetry={search.retry}/> : search.results[0] ? jobList(search.results[0], search.filters.region?.length ? search.filters.region.join(' · ') : '전국') : <p className="request-status" role="status">공고를 불러오는 중입니다…</p>}
-        </div> : search.loading && !search.refreshingSort ? <p className="request-status" role="status">공고를 불러오는 중입니다…</p> : search.error ? <RequestError message={search.error} onRetry={search.retry} /> : home ?
+        {search.loading && !search.refreshingSort ? <p className="request-status" role="status">공고를 불러오는 중입니다…</p> : search.error ? <RequestError message={search.error} onRetry={search.retry} /> : home ?
       // 메인은 선택한 지역마다 "지도 + 공고 5개" 한 줄을 만듭니다.
       search.regions.map((region, index) => {
         const result = search.results[index];

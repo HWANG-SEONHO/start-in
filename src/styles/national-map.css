@@ -3,8 +3,8 @@
 .national-map header small { display:block; font-size:9px; font-weight:700; letter-spacing:1.7px; color:#538477; margin-bottom:6px; }
 .national-map h2 { font-size:22px; letter-spacing:-.7px; }
 .national-map header button { flex-shrink:0; border:1px solid #d5e4df; border-radius:8px; padding:9px 12px; background:#f3f9f6; color:#00755b; font-weight:700; }
-.national-map-frame { height:450px; position:relative; overflow:hidden; isolation:isolate; border-radius:12px; background:#29ace7 url("/images/national-ocean-v2.webp") center / cover no-repeat; touch-action:none; cursor:grab; }
-.national-map-world { position:absolute; width:800px; height:900px; transform-origin:0 0; transition:transform .85s cubic-bezier(.22,.75,.2,1); pointer-events:none; }
+.national-map-frame { height:450px; position:relative; overflow:hidden; isolation:isolate; border-radius:12px; background:#0b5182; touch-action:none; cursor:grab; }
+.national-map-world { position:absolute; width:800px; height:450px; transform-origin:0 0; transition:transform .85s cubic-bezier(.22,.75,.2,1); pointer-events:none; }
 .national-map-world path { fill:#fff; fill-opacity:.03; stroke:#fff; stroke-opacity:.35; stroke-width:1; }
 .national-map-world path.is-selected { fill:#d7ffbf; fill-opacity:.18; stroke:#087866; stroke-width:2; vector-effect:non-scaling-stroke; }
 .national-map-leaders { position:absolute; inset:0; pointer-events:none; }
@@ -34,7 +34,7 @@
 @media(max-width:700px) { .national-map { padding:14px; } .national-map-frame { height:410px; } .national-map h2 { font-size:18px; } .unified-results>.job-list-section { min-height:0; } .unified-results .job-cards { max-height:none; overflow:visible; } }
 @media(prefers-reduced-motion:reduce) { .national-map-world,.national-map-label { transition:none; } }
 
-.national-map-world svg { mask-image:linear-gradient(to right,transparent,#000 4%,#000 96%,transparent),linear-gradient(to bottom,transparent,#000 3%,#000 97%,transparent); mask-composite:intersect; }
+.national-map-world svg { display:block; }
 .national-map-world path.is-unselected { fill:none; stroke:none; }
 .national-map-world path.is-selected { fill-opacity:.08; stroke-opacity:.75; stroke-width:1.5; }
 .national-map-label.is-region-name { width:auto; min-width:46px; min-height:26px; padding:5px 9px; background:#ffffffde; border-color:#ffffffa0; box-shadow:0 2px 7px #13457818; }

@@ -152,3 +152,16 @@
 }
 .site-shell .auth-switch a:active { filter: brightness(.97); box-shadow: inset 0 2px 4px #18213822; }
 .site-shell .auth-switch a:focus-visible { outline: 2px solid #168b73; outline-offset: 3px; }
+
+/* 로그아웃·지원 기록 확인창도 기존 실행 버튼의 마감을 공유합니다. */
+.site-shell .logout-dialog { border: 1px solid #d8e0eb; border-top: 3px solid #182138; border-radius: 18px; background: #fff; box-shadow: 0 20px 60px #18213833; }
+.site-shell .logout-dialog .logout-dialog-icon { border: 1px solid #cde6dc; background: linear-gradient(180deg,#f5fcf8,#e0f2e9); box-shadow: inset 0 1px 0 #fff; }
+.site-shell .logout-dialog p { color: #56647c; }
+.site-shell .logout-dialog .logout-dialog-actions button { min-height: 44px; padding: 10px 18px; border-radius: 9px; font-size: 14px; font-weight: 700; letter-spacing: -.2px; line-height: 1.3; transition: background .18s,border-color .18s,box-shadow .18s; }
+.site-shell .logout-dialog .logout-dialog-actions .logout-cancel { color: #182138; border: 1px solid #bec9da; background: linear-gradient(180deg,#fff 0%,#f6f8ff 43%,#e7ebf4 48%,#d2d9e7 100%); box-shadow: inset 0 2px 0 #fff,inset 0 -2px 0 #b2bed180,0 2px 0 #9caac055,0 4px 7px #18213822; text-shadow: none; }
+.site-shell .logout-dialog .logout-dialog-actions .logout-cancel:hover:not(:disabled) { color: #006b51; border-color: #9fcbb7; background: linear-gradient(180deg,#fff,#f0faf5 43%,#e5f3ec 48%,#cde4d7); box-shadow: inset 0 2px 0 #fff,inset 0 -2px 0 #a6b4ca80,0 2px 0 #9caac055,0 5px 9px #18213830; }
+.site-shell .logout-dialog .logout-dialog-actions .logout-confirm { color: #fff; border: 1px solid #59cbb0; background: linear-gradient(180deg,#68dbc0 0%,#19b38f 43%,#009a75 47%,#006b51 100%); box-shadow: inset 0 2px 0 #ffffffb3,inset 0 -2px 0 #004e3b80,0 2px 0 #00543f66,0 4px 7px #18213826; text-shadow: 0 1px 1px #004b3b80; }
+.site-shell .logout-dialog .logout-dialog-actions .logout-confirm:hover:not(:disabled) { background: linear-gradient(180deg,#77e1ca 0%,#20b998 43%,#009d78 47%,#006e54 100%); box-shadow: inset 0 2px 0 #ffffffb3,inset 0 -2px 0 #004e3b80,0 2px 0 #00543f66,0 5px 9px #18213830; }
+.site-shell .logout-dialog .logout-dialog-actions button:active:not(:disabled) { filter: none; box-shadow: inset 0 2px 4px #18213822; }
+.site-shell .logout-dialog .logout-dialog-actions button:disabled { opacity: .55; cursor: not-allowed; }
+@media(prefers-reduced-motion:reduce) { .site-shell .logout-dialog .logout-dialog-actions button { transition: none; } }

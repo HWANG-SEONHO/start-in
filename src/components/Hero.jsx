@@ -119,12 +119,12 @@ export default function Hero({
             <path d="m10 1 9 4v7c0 4-6 8-9 9-3-1-9-5-9-9V5z" fill="currentColor" />
             <path d="m5 10 3 3 6-6" fill="none" stroke="white" strokeWidth="2" />
           </svg>
-          {searching ? '검색조건을 해석하고 있습니다…' : guidance || '원하는 조건을 입력하세요. AI 연결이 없으면 키워드 검색으로 이어집니다.'}
+          {searching ? '검색조건을 해석하고 있습니다…' : guidance || '지역·직무·급여 등 원하는 조건을 입력해 주세요.'}
         </p>
 
         {helpOpen && <div className="search-help-panel" role="status">
-            추천검색어를 누르면 예시 문구만 입력됩니다. 검색을 누르면 AI 연결 시 입력 문구를 해석하고,
-            직접 선택한 필터와 함께 적용합니다. 키가 없거나 실패하면 키워드 검색합니다. 후기 분석은 제공하지 않습니다.
+            기업명, 직무, 기술 키워드나 원하는 근무 조건을 입력해 보세요.
+            추천검색어로 시작하거나 아래 상세조건을 함께 선택해 공고를 좁혀볼 수 있습니다.
             <button type="button" onClick={() => setHelpOpen(false)}>닫기</button>
           </div>}
 
