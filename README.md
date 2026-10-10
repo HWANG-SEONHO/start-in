@@ -6,7 +6,7 @@
 
 출퇴근하고 싶은 지역에는 어떤 일이 많은지, 직무나 급여 조건을 더하면 선택지가 얼마나 줄어드는지 지도와 공고 목록으로 함께 확인할 수 있습니다. React·FastAPI·DB를 연결하며 화면 설계부터 API, 인증, 배포까지 경험한 학습·포트폴리오 프로젝트입니다.
 
-<a href="https://start-in-web.onrender.com/"><img src="assets/icons/globe-outline-v2.svg" width="16" alt=""> 배포 웹사이트 바로가기</a>
+<a href="https://s-i.onrender.com/"><img src="assets/icons/globe-outline-v2.svg" width="16" alt=""> 배포 웹사이트 바로가기</a>
 
 ## 프로젝트가 발전한 과정
 
