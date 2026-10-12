@@ -8,7 +8,13 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   return {
     plugins: [react()],
-    server: { port: 5175, strictPort: true, proxy: { '/api': { target: env.BACKEND_URL || 'http://127.0.0.1:8000', changeOrigin: true } } },
+    server: {
+      port: 5175,
+      strictPort: true,
+      proxy: { '/api': { target: env.BACKEND_URL || 'http://127.0.0.1:8000', changeOrigin: true } },
+      // 캡처·다운로드 검증 파일은 앱 소스가 아니므로 감시하지 않습니다.
+      watch: { ignored: ['**/.cache/**', '**/_local-backups/**', '**/_local-personal-updates/**'], usePolling: true, interval: 250 },
+    },
     build: {
       rollupOptions: {
         output: {

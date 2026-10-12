@@ -14,3 +14,34 @@ __pycache__/
 test-results/
 playwright-report/
 sentinel-v6-review/
+
+# 공개하지 않는 로컬 자료 (2026-10-11 정리) — 파일은 지우지 않고 Git에서만 제외
+*.db
+*.db-*
+_local-*/
+시안/
+이전자료/
+작업지시/
+AGENTS.md
+output/
+docs/references/
+docs/WORK_STATE_ARCHIVE_*.md
+docs/WEBBOOK_*.md
+docs/EFFECT_BOOK*.md
+docs/RENDER_SHORT_ADDRESSES_*.md
+docs/TASK_INSTRUCTIONS_*.md
+docs/RESTORE_CONTEXT_*.md
+docs/INTRO_CONTEXT_*.txt
+docs/INTRO_DEVLOG_NOTION_*.md
+docs/LOCAL_SERVER_*.md
+docs/FULLSTACK_AGENT_ROUTE_*.md
+docs/GLITCH_*.md
+public/ai-motion-lab/
+public/effect-book/
+public/intro-archive/
+public/type-motion-lab/
+public/webbook/
+verification/webbook-theme-system/
+
+# 내부 작업 기록 (로컬에만 둔다)
+docs/WORK_STATE.md
