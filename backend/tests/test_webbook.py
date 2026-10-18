@@ -8,7 +8,7 @@ from fastapi.testclient import TestClient
 from backend.app import webbook as w
 
 ASSET = 'assets/style/palette/001-real-folder/asset.json'
-INPUT = {'version': 2, 'items': {'purpose': 0, 'typeLogo': 8, 'space': None},
+INPUT = {'version': 3, 'items': {'first': 1, 'type': 4, 'hero': None},
          'defects': ['F01'], 'verdict': '수정', 'reference': '기준', 'comment': '학교 채점'}
 HEADERS = {'X-Webbook-Passcode': 'test-only-passcode'}
 
@@ -72,9 +72,9 @@ def test_wrong_passcode_and_id(setup):
 
 
 @pytest.mark.parametrize('patch', [
-    {'version': 1}, {'items': []}, {'items': {'fake': 1}}, {'items': {'purpose': True}},
-    {'items': {'purpose': '8'}}, {'items': {'purpose': 11}}, {'items': {'purpose': 1.5}},
-    {'items': {'purpose': -1}}, {'defects': ['F11']}, {'defects': ['F01', 'F01']},
+    {'version': 1}, {'items': []}, {'items': {'fake': 1}}, {'items': {'first': True}},
+    {'items': {'first': '4'}}, {'items': {'first': 6}}, {'items': {'first': 1.5}},
+    {'items': {'first': 0}}, {'defects': ['F05']}, {'defects': ['F01', 'F01']},
     {'defects': [None]}, {'verdict': '합격'}, {'comment': 'x' * 2001},
     {'reference': '😀' * 251}, {'comment': None},
 ])
@@ -112,14 +112,14 @@ def test_save_contents_sha_v1_and_create(setup):
         response = client.post('/webbook/scores/palette-001', headers=HEADERS, json=INPUT)
         assert response.status_code == 200, response.text
         saved = response.json()
-        assert saved['v1'] == {'design': 8, 'comment': 'v1 기록'}
+        assert saved['old'] == {'design': 8, 'comment': 'v1 기록'}
         assert all(saved[k] == v for k, v in INPUT.items())
         assert puts[-1][1]['message'] == '채점: palette-001 (웹)'
     assert puts[0][1]['sha'] == 'old-sha'
     files.pop('scores/palette-001.json')
     assert client.post('/webbook/scores/palette-001', headers=HEADERS, json=INPUT).status_code == 200
     assert 'sha' not in puts[-1][1]
-    assert 'v1' not in files['scores/palette-001.json'][0]
+    assert 'old' not in files['scores/palette-001.json'][0]
     assert files[ASSET][0]['name'] == '원본'
 
 

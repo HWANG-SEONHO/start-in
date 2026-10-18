@@ -15,8 +15,8 @@ import httpx
 from fastapi import APIRouter, HTTPException, Request, Response
 
 router = APIRouter(prefix='/webbook')
-KEYS = {'purpose', 'first', 'typeSmall', 'typeLogo', 'typeHier', 'typeMix',
-        'color', 'layout', 'image', 'space', 'ui', 'finish', 'motion'}
+VERSION = 3
+KEYS = {'first', 'type', 'color', 'layout', 'hero', 'finish'}
 # 이 집합은 webbook/book/rubric.js의 RUBRIC_KEYS와 테스트로 대조한다.
 STATUSES = {'approved', 'review', 'hold'}
 write_lock = asyncio.Lock()
@@ -58,20 +58,20 @@ def js_length(value):
 
 
 def validate_score(data):
-    valid = isinstance(data, dict) and data.get('version') == 2
+    valid = isinstance(data, dict) and data.get('version') == VERSION
     if valid:
         items, defects = data.get('items'), data.get('defects')
         valid = (isinstance(items, dict)
                  and all(k in KEYS and (v is None or (type(v) in (int, float)
-                         and 0 <= v <= 10 and math.isfinite(v) and v == int(v))) for k, v in items.items())
+                         and 1 <= v <= 5 and math.isfinite(v) and v == int(v))) for k, v in items.items())
                  and isinstance(defects, list)
-                 and all(isinstance(v, str) and re.fullmatch(r'F(0[1-9]|10)', v) for v in defects)
+                 and all(isinstance(v, str) and re.fullmatch(r'F0[1-4]', v) for v in defects)
                  and len(set(defects)) == len(defects)
                  and 'verdict' in data and data['verdict'] in (None, '승인', '수정', '탈락')
                  and isinstance(data.get('reference'), str) and js_length(data['reference']) <= 500
                  and isinstance(data.get('comment'), str) and js_length(data['comment']) <= 2000)
     if not valid:
-        raise HTTPException(400, 'v2 점수 형식이 올바르지 않습니다. 항목은 0~10 정수 또는 null, 결함은 F01~F10 중복 없이, 판정은 승인·수정·탈락 또는 null, 레퍼런스 500자·의견 2000자 이하로 입력하세요.')
+        raise HTTPException(400, '점수 형식이 올바르지 않습니다. 항목은 1~5 정수 또는 null, 결함은 F01~F04 중복 없이, 판정은 승인·수정·탈락 또는 null, 레퍼런스 500자·의견 2000자 이하로 입력하세요.')
 
 
 class GitHub:
@@ -189,9 +189,10 @@ async def post_score(id: str, request: Request):
         await gh.asset(id)
 
         def transform(previous):
-            v1 = previous.get('v1') if previous and previous.get('version') == 2 else previous
+            # 옛 판(v1·v2) 점수는 old 아래 보존한다.
+            old = previous.get('old') if previous and previous.get('version') == VERSION else previous
             return {**{k: data[k] for k in ('version', 'items', 'defects', 'verdict', 'reference', 'comment')},
-                    'updated': datetime.now(KST).strftime('%Y-%m-%d %H:%M'), **({'v1': v1} if isinstance(v1, (dict, list)) or v1 else {})}
+                    'updated': datetime.now(KST).strftime('%Y-%m-%d %H:%M'), **({'old': old} if isinstance(old, (dict, list)) or old else {})}
 
         return result(await gh.update(f'scores/{id}.json', f'채점: {id} (웹)', transform))
 
