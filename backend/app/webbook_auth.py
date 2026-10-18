@@ -338,7 +338,7 @@ async def webbook_file(request: Request, relative_path: str):
         html = html.replace('https://start-in-api.onrender.com/webbook', '/b-api/webbook')
         html = html.replace(
             '<script type="module" src="book.js"></script>',
-            "<script>window.WEBBOOK_STATIC={base:'/b/',apiBase:'/b-api/webbook'};</script>\n<script type=\"module\" src=\"book.js\"></script>",
+            "<script>window.WEBBOOK_STATIC={base:'/b/',apiBase:'/b-api'};</script>\n<script type=\"module\" src=\"book.js\"></script>",
         )
         content = html.encode('utf-8')
     headers = {
