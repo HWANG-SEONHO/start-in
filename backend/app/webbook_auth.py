@@ -30,10 +30,120 @@ LOGIN_PAGE = """<!doctype html>
 <html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>웹북 로그인</title>
 <style>
-*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:#f5f6f8;color:#20242c;font:16px/1.5 system-ui,'Malgun Gothic',sans-serif}
-main{width:min(420px,calc(100% - 32px));padding:36px;background:#fff;border:1px solid #e2e5ea;border-radius:14px;box-shadow:0 16px 48px #20242c12}
-h1{font-size:24px;margin:0 0 8px}p{margin:0 0 24px;color:#626b78}label{display:block;font-weight:600;margin-bottom:8px}input{width:100%;height:48px;padding:0 14px;border:1px solid #cbd1da;border-radius:8px;font:inherit}input:focus{outline:3px solid #315bd833;border-color:#315bd8}button{width:100%;height:48px;margin-top:16px;border:0;border-radius:8px;background:#202a3a;color:#fff;font:600 16px inherit;cursor:pointer}button:disabled{opacity:.6;cursor:wait}#message{min-height:24px;margin:12px 0 0;color:#b42318;font-size:14px}
-</style><main><h1>웹북</h1><p>계속하려면 비밀번호를 입력하세요.</p><form id="login"><label for="passcode">비밀번호</label><input id="passcode" name="passcode" type="password" autocomplete="current-password" required autofocus><button>들어가기</button><p id="message" role="status" aria-live="polite"></p></form></main>
+:root{--bg:#1c1c1e;--side:#141416;--panel:#2a2a2e;--line:#3a3a40;--text:#f4f4f6;--sub:#c4c4cc;--icon:#8d8d96;--violet:#7b2ff7;--violet-hover:#8c47ff;--ring:#a77bff;--error:#ff8a80;
+--n:168px;--l:132px;--ear:60px;--ear-out:22px;--dot:18px;--step:28px;--icon-size:78px;--name:24px;--desc:16px;--label-h:88px;--card:540px;--pad:44px}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,'Malgun Gothic',sans-serif;overflow-x:hidden}
+svg{display:block}
+.side{position:fixed;inset:0 auto 0 0;width:88px;background:var(--side);display:flex;flex-direction:column;align-items:center;padding-top:22px;gap:26px}
+.mark{font-size:26px;font-weight:900;letter-spacing:-1px;margin-bottom:12px}
+.side span{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:14px;color:#e6e6ea}
+.side i{display:grid;place-items:center;width:40px;height:40px;border-radius:9px}
+.side .on i{background:#2f2f34}
+.side svg{width:24px;height:24px;fill:none;stroke:#e6e6ea;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.bar{position:fixed;top:20px;height:56px;display:flex;align-items:center;gap:16px;padding:0 24px;background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.bar svg{width:20px;height:20px;fill:none;stroke:var(--sub);stroke-width:2;stroke-linecap:round}
+.title{left:108px;font-size:22px}
+.state{right:20px;font-size:16px;color:var(--sub);padding:0 8px 0 8px;gap:0}
+.state>span{display:flex;align-items:center;gap:8px;padding:0 16px;height:56px}
+.state>span+span{border-left:1px solid var(--line)}
+.chip{height:40px!important;margin:0 8px;background:#38383e;border-radius:8px;color:var(--text)}
+.switch{width:40px;height:22px;border-radius:11px;background:#4a4a52;position:relative}
+.switch::after{content:"";position:absolute;left:3px;top:3px;width:16px;height:16px;border-radius:50%;background:#f4f4f6}
+.state b{color:var(--text);font-size:17px}
+.stage{min-height:100vh;margin-left:88px;display:flex;align-items:center;justify-content:center;padding:96px 24px 110px}
+.flow{display:flex;align-items:flex-start;padding-top:var(--label-h)}
+.mod{position:relative;width:var(--n);flex:none;text-align:center}
+.node{position:relative;z-index:1;width:var(--n);height:var(--n);border-radius:50%;background:var(--c);display:grid;place-items:center}
+.mod::before,.mod::after{content:"";position:absolute;top:calc(var(--n) / 2);width:var(--ear);height:var(--ear);margin-top:calc(var(--ear) / -2);border-radius:50%;background:var(--d);z-index:0}
+.mod::before{left:calc(var(--ear-out) * -1)}
+.mod::after{right:calc(var(--ear-out) * -1)}
+.mod:first-child::before{display:none}
+.node>svg{width:var(--icon-size);height:var(--icon-size);fill:#fff}
+.lock .node{animation:pulse 2.4s ease-out infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 #ef413666}70%,100%{box-shadow:0 0 0 18px #ef413600}}
+.clock{position:absolute;left:-14px;bottom:-10px;width:40%;aspect-ratio:1;border-radius:50%;background:#fbe7a6;border:4px solid #f5c342;display:grid;place-items:center}
+.clock svg{width:70%;height:70%;fill:none;stroke:#9a7a1c;stroke-width:2.4;stroke-linecap:round}
+.name{margin-top:22px;font-size:var(--name);font-weight:700;display:flex;justify-content:center;align-items:center;gap:8px;white-space:nowrap}
+.name em{font-style:normal;font-size:14px;font-weight:700;height:24px;line-height:24px;padding:0 7px;border-radius:6px;background:#3a3a40}
+.desc{margin-top:6px;font-size:var(--desc);color:var(--sub);white-space:nowrap}
+.link{position:relative;width:var(--l);height:var(--n);flex:none;display:flex;align-items:center;justify-content:center;gap:calc(var(--step) - var(--dot))}
+.link i{width:var(--dot);height:var(--dot);border-radius:50%;background:var(--d);opacity:.55;animation:run 1.2s linear infinite;animation-delay:calc(var(--k) * .3s + var(--j) * .4s)}
+.link i:nth-child(1){--k:0}.link i:nth-child(2){--k:1}.link i:nth-child(3){--k:2;background:var(--d2)}
+@keyframes run{0%,100%{opacity:.55}25%{opacity:1}50%{opacity:.55}}
+.wrench{position:absolute;left:50%;top:calc(50% + 34px);margin-left:-10px;width:20px;height:20px;fill:var(--icon)}
+.to-card{width:var(--l);height:calc(var(--n) + var(--label-h) * 2);flex:none;position:relative;display:flex;align-items:center;justify-content:center;gap:calc(var(--step) - var(--dot))}
+.to-card i{width:var(--dot);height:var(--dot);border-radius:50%;background:#90302b;opacity:.55;animation:run 1.2s linear infinite;animation-delay:calc(var(--k) * .3s + 1.2s)}
+.to-card i:nth-child(2){--k:0}.to-card i:nth-child(3){--k:1}.to-card i:nth-child(4){--k:2}
+.pill{position:absolute;left:50%;top:calc(50% - 66px);transform:translateX(-50%);height:30px;padding:0 12px;border-radius:15px;background:var(--panel);border:1px solid var(--line);font-size:14px;color:var(--sub);white-space:nowrap;display:flex;align-items:center;gap:6px}
+.card{width:var(--card);flex:none;padding:var(--pad);background:var(--panel);border:1px solid var(--line);border-radius:20px;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+.head{display:flex;align-items:center;gap:16px;margin-bottom:32px}
+.badge{width:72px;height:72px;flex:none;border-radius:50%;background:#ef4136;display:grid;place-items:center}
+.badge svg{width:34px;height:34px;fill:#fff}
+h1{margin:0;font-size:36px;line-height:1.15;font-weight:800;letter-spacing:-.5px}
+.head p{margin:4px 0 0;font-size:17px;color:var(--sub)}
+label{display:block;font-size:17px;font-weight:700;margin-bottom:10px}
+input{width:100%;height:64px;padding:0 18px;background:var(--bg);border:2px solid #46464e;border-radius:12px;color:var(--text);font:inherit;font-size:20px;outline:2px solid transparent}
+input:focus{border-color:var(--ring);box-shadow:0 0 0 4px #7b2ff755}
+button{width:100%;height:68px;margin-top:20px;border:0;border-radius:12px;background:var(--violet);color:#fff;font:inherit;font-size:20px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px;transition:background .15s,transform .15s}
+button svg{width:20px;height:20px;fill:#fff}
+button:hover{background:var(--violet-hover);transform:translateY(-1px)}
+button:active{transform:none}
+button:focus-visible{outline:3px solid var(--ring);outline-offset:3px}
+button:disabled{opacity:.6;cursor:wait;transform:none}
+#message{min-height:24px;margin:14px 0 0;color:var(--error);font-size:16px}
+.tools{position:fixed;left:calc(50% + 44px);bottom:28px;transform:translateX(-50%);height:60px;display:flex;align-items:center;gap:20px;padding:0 20px;background:var(--panel);border:1px solid var(--line);border-radius:12px}
+.tools svg{width:22px;height:22px;fill:none;stroke:var(--icon);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+@media (max-width:1799px){:root{--n:140px;--l:104px;--ear:50px;--ear-out:18px;--dot:15px;--step:26px;--icon-size:64px;--name:21px;--label-h:84px;--card:460px;--pad:36px}}
+@media (max-width:1599px){
+:root{--n:120px;--l:88px;--ear:42px;--ear-out:15px;--dot:12px;--step:22px;--icon-size:54px;--name:19px;--desc:15px;--label-h:70px;--card:520px}
+.stage{flex-direction:column;padding:110px 32px 48px}
+.flow{padding-top:0}
+.to-card{width:auto;height:96px;flex-direction:column}
+.pill{left:calc(50% + 20px);top:50%;transform:translateY(-50%)}
+.tools,.lock::after{display:none}}
+@media (max-width:1023px){:root{--n:96px;--l:64px;--ear:34px;--ear-out:12px;--dot:10px;--step:18px;--icon-size:44px;--name:17px;--desc:14px}.state{display:none}}
+@media (max-width:767px){
+:root{--n:54px;--l:40px;--ear:20px;--ear-out:5px;--dot:7px;--step:11px;--icon-size:26px;--card:100%;--pad:24px}
+.side,.state,.wrench,.clock,.name,.desc{display:none}
+.title{left:16px;right:16px;top:16px;height:48px;font-size:17px;padding:0 16px;gap:12px}
+.stage{margin-left:0;padding:96px 16px 32px}
+.to-card{height:80px}
+.lock .node{animation-name:pulse-sm}
+.badge{width:56px;height:56px}.badge svg{width:28px;height:28px}
+h1{font-size:28px}.head{margin-bottom:24px}.head p{font-size:16px}
+input{height:60px;font-size:18px}button{height:64px;font-size:18px}}
+@keyframes pulse-sm{0%{box-shadow:0 0 0 0 #ef413666}70%,100%{box-shadow:0 0 0 8px #ef413600}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+<nav class="side" aria-hidden="true">
+<div class="mark">웹</div>
+<span><i><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"/></svg></i>홈</span>
+<span class="on"><i><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg></i>자산</span>
+<span><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></svg></i>채점</span>
+<span><i><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg></i>기록</span>
+<span><i><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg></i>설정</span>
+</nav>
+<div class="bar title" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>웹북 · 로그인 시나리오<svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></div>
+<div class="bar state" aria-hidden="true"><span class="chip"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>12시간 유지</span><span><i class="switch"></i><b>잠김</b></span><span>? 도움말</span></div>
+<main class="stage">
+<div class="flow" role="img" aria-label="웹북 → 자산 → 채점 → 잠금">
+<div class="mod" style="--c:#f5c342;--d:#93782f" aria-hidden="true"><div class="node"><svg viewBox="0 0 24 24"><path d="M2 5.5C4.6 4.3 7.7 4.3 11 6v14c-3.3-1.7-6.4-1.7-9-.5zM22 5.5C19.4 4.3 16.3 4.3 13 6v14c3.3-1.7 6.4-1.7 9-.5z"/></svg><div class="clock"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 6.5V12l4 2.5"/></svg></div></div><div class="name">웹북<em>1</em></div><div class="desc">자산 창고 열기</div></div>
+<div class="link" style="--d:#93782f;--d2:#17653f;--j:0" aria-hidden="true"><i></i><i></i><i></i><svg class="wrench" viewBox="0 0 24 24"><path d="M21 6.5a5.5 5.5 0 0 1-7.3 5.2L6 19.4a2 2 0 0 1-2.8-2.8l7.7-7.7A5.5 5.5 0 0 1 17.5 2l-3.3 3.3.9 2.6 2.6.9z"/></svg></div>
+<div class="mod" style="--c:#12a05c;--d:#17653f" aria-hidden="true"><div class="node"><svg viewBox="0 0 24 24"><path d="M5 2h10l5 5v15H5zM14 2.5V8h5.5z" opacity=".95"/><path d="M8 11h9v8H8z" fill="#12a05c"/><path d="M8.8 11.8h3.2v2.4H8.8zM13 11.8h3.2v2.4H13zM8.8 15.2h3.2v2.9H8.8zM13 15.2h3.2v2.9H13z"/></svg></div><div class="name">자산<em>133</em></div><div class="desc">목록 불러오기</div></div>
+<div class="link" style="--d:#17653f;--d2:#487635;--j:1" aria-hidden="true"><i></i><i></i><i></i><svg class="wrench" viewBox="0 0 24 24"><path d="M21 6.5a5.5 5.5 0 0 1-7.3 5.2L6 19.4a2 2 0 0 1-2.8-2.8l7.7-7.7A5.5 5.5 0 0 1 17.5 2l-3.3 3.3.9 2.6 2.6.9z"/></svg></div>
+<div class="mod" style="--c:#6cbf47;--d:#487635" aria-hidden="true"><div class="node"><svg viewBox="0 0 24 24"><path d="M9.2 18.6 3.4 12.8l2.5-2.5 3.3 3.3 8.9-8.9 2.5 2.5z"/></svg></div><div class="name">채점<em>6</em></div><div class="desc">6항목 × 5단계</div></div>
+<div class="link" style="--d:#487635;--d2:#90302b;--j:2" aria-hidden="true"><i></i><i></i><i></i><svg class="wrench" viewBox="0 0 24 24"><path d="M21 6.5a5.5 5.5 0 0 1-7.3 5.2L6 19.4a2 2 0 0 1-2.8-2.8l7.7-7.7A5.5 5.5 0 0 1 17.5 2l-3.3 3.3.9 2.6 2.6.9z"/></svg></div>
+<div class="mod lock" style="--c:#ef4136;--d:#90302b" aria-hidden="true"><div class="node"><svg viewBox="0 0 24 24"><path d="M7 10V7.5a5 5 0 0 1 10 0V10h1.5a1.5 1.5 0 0 1 1.5 1.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 20.5v-9A1.5 1.5 0 0 1 5.5 10zm2.6 0h4.8V7.5a2.4 2.4 0 0 0-4.8 0zM12 13.5a1.8 1.8 0 0 0-1 3.3V19h2v-2.2a1.8 1.8 0 0 0-1-3.3z"/></svg></div><div class="name">잠금<em>1</em></div><div class="desc">비밀번호 확인</div></div>
+</div>
+<div class="to-card" aria-hidden="true"><span class="pill">비밀번호 확인 ▽</span><i></i><i></i><i></i></div>
+<section class="card">
+<div class="head"><div class="badge" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 10V7.5a5 5 0 0 1 10 0V10h1.5a1.5 1.5 0 0 1 1.5 1.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 20.5v-9A1.5 1.5 0 0 1 5.5 10zm2.6 0h4.8V7.5a2.4 2.4 0 0 0-4.8 0z"/></svg></div><div><h1>웹북 열기</h1><p>잠금 · 소유자 비밀번호</p></div></div>
+<form id="login"><label for="passcode">비밀번호</label><input id="passcode" name="passcode" type="password" autocomplete="current-password" required autofocus><button><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.5.9l12-7.5a1 1 0 0 0 0-1.8l-12-7.5A1 1 0 0 0 7 4.5z"/></svg>실행하고 들어가기</button><p id="message" role="status" aria-live="polite"></p></form>
+</section>
+</main>
+<div class="tools" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5M4 9h11a5 5 0 0 1 0 10h-3"/></svg><svg viewBox="0 0 24 24"><path d="m15 14 5-5-5-5M20 9H9a5 5 0 0 0 0 10h3"/></svg><svg viewBox="0 0 24 24"><path d="M6 6h.01M12 6h.01M18 6h.01M6 12h.01M12 12h.01M18 12h.01M6 18h.01M12 18h.01M18 18h.01" stroke-width="3"/></svg><svg viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9V16h7v-2.1A6 6 0 0 0 12 3z"/></svg><svg viewBox="0 0 24 24"><path d="M5 5v14M14 5l-4 14M19 9a3 3 0 1 1 0 6 3 3 0 0 1 0-6z"/></svg><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.4-5.7L4 8.5M4 4v4.5h4.5M12 8v4l3 2"/></svg></div>
 <script>
 const form=document.querySelector('#login'),field=document.querySelector('#passcode'),message=document.querySelector('#message'),button=form.querySelector('button');
 form.addEventListener('submit',async e=>{e.preventDefault();button.disabled=true;message.textContent='';try{const r=await fetch('/b/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({passcode:field.value})});const data=await r.json().catch(()=>({}));if(!r.ok){message.textContent=data.detail||'로그인할 수 없습니다.';return}field.value='';location.reload()}catch{message.textContent='연결을 확인하고 다시 시도하세요.'}finally{button.disabled=false}});
