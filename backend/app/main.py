@@ -30,6 +30,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import delete, inspect, select, text
 from sqlalchemy.exc import IntegrityError, OperationalError
 from .webbook import router as webbook_router
+from .webbook_auth import router as webbook_auth_router, valid_cookie
 from sqlalchemy.orm import Session as OrmSession
 
 from .ai_search import (
@@ -205,6 +206,7 @@ app.add_middleware(
 
 
 app.include_router(webbook_router)
+app.include_router(webbook_auth_router)
 
 
 # 데이터를 바꾸는 요청의 출처를 확인하고 기본 보안 header를 붙입니다.
@@ -214,6 +216,13 @@ async def protect_origin(request: Request, call_next):
     from fastapi.responses import JSONResponse
 
     changing_methods = {'POST', 'PUT', 'PATCH', 'DELETE'}
+
+    # Gate all score and asset APIs behind the Webbook owner login.
+    if request.url.path.startswith('/webbook/'):
+        if not valid_cookie(request):
+            return JSONResponse({'detail': '웹북 로그인이 필요합니다.'}, status_code=401,
+                                headers={'Cache-Control': 'no-store'})
+        request.state.webbook_session_authenticated = True
 
     if request.method in changing_methods:
         origin = request.headers.get('origin')

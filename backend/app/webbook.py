@@ -30,6 +30,8 @@ def check_id(id):
 
 
 def authorize(request):
+    if getattr(request.state, 'webbook_session_authenticated', False):
+        return
     expected = os.getenv('WEBBOOK_PASSCODE', '')
     received = request.headers.get('X-Webbook-Passcode', '')
     # UTF-8 문자열도 길이가 고정된 digest끼리 시간 일정 비교한다.
