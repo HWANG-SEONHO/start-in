@@ -363,6 +363,26 @@ async def _github_file(relative_path: str) -> tuple[bytes, str] | None:
         await client.aclose()
 
 
+async def _github_pushed(client: httpx.AsyncClient, repo: str, branch: str, paths: list[str]) -> dict[str, str]:
+    """자산 폴더마다 마지막 커밋 시각을 GraphQL 한 번으로 읽는다. 실패하면 빈 값(목록은 그대로 보인다)."""
+    if not paths:
+        return {}
+    owner, name = repo.split('/', 1)
+    fields = ' '.join(
+        f'a{i}: history(first: 1, path: {json.dumps(p)}) {{ nodes {{ committedDate }} }}'
+        for i, p in enumerate(paths)
+    )
+    query = (f'query {{ repository(owner: {json.dumps(owner)}, name: {json.dumps(name)}) '
+             f'{{ object(expression: {json.dumps(branch)}) {{ ... on Commit {{ {fields} }} }} }} }}')
+    try:
+        response = await client.post('https://api.github.com/graphql', json={'query': query})
+        commit = response.json()['data']['repository']['object']
+        return {p: commit[f'a{i}']['nodes'][0]['committedDate']
+                for i, p in enumerate(paths) if (commit.get(f'a{i}') or {}).get('nodes')}
+    except Exception:
+        return {}
+
+
 async def _github_catalog(token: str, repo: str, branch: str) -> tuple[bytes, str]:
     key = (repo, branch, 'catalog.json')
     cached = github_cache.get(key)
@@ -408,6 +428,10 @@ async def _github_catalog(token: str, repo: str, branch: str) -> tuple[bytes, st
                 'entry': f'{folder_path}/index.html',
                 'subName': sub_names.get(sub, sub), 'groupName': group_names.get(group, group),
             })
+        pushed = await _github_pushed(client, repo, branch, [item['path'] for item in assets])
+        for item in assets:
+            if item['path'] in pushed:
+                item['pushed'] = pushed[item['path']]
         assets.sort(key=lambda item: item['id'])
         content = json.dumps({'taxonomy': taxonomy, 'assets': assets, 'problems': []}, ensure_ascii=False).encode()
         github_cache[key] = (time.monotonic() + 300, content)
