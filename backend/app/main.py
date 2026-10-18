@@ -28,7 +28,8 @@ from fastapi import (
 )
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import delete, inspect, select, text
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, OperationalError
+from .webbook import router as webbook_router
 from sqlalchemy.orm import Session as OrmSession
 
 from .ai_search import (
@@ -61,6 +62,7 @@ ORIGINS = os.getenv(
     'CORS_ORIGINS',
     'http://127.0.0.1:5175,http://localhost:5175',
 ).split(',')
+ORIGINS = list(dict.fromkeys([o.strip() for o in ORIGINS if o.strip()] + ['https://s-i.onrender.com']))
 
 # HTTPS 배포에서는 COOKIE_SECURE=true로 두어 쿠키가 안전한 연결에서만 움직이게 합니다.
 COOKIE_SECURE = os.getenv('COOKIE_SECURE', 'false').lower() == 'true'
@@ -174,8 +176,15 @@ async def lifespan(_):
     # 자동 테스트는 자체 임시 DB를 주입하므로 실제 로컬 DB를 만지지 않습니다.
     if get_db not in app.dependency_overrides:
         prepare_local_database()
-    with engine.connect() as connection:
-        connection.execute(select(1))
+    try:
+        with engine.connect() as connection:
+            connection.execute(select(1))
+    except OperationalError:
+        if not (os.getenv('WEBBOOK_GITHUB_TOKEN') and os.getenv('WEBBOOK_PASSCODE')):
+            raise
+        # DB 만료 후에도 GitHub 기반 웹북은 계속 제공한다.
+        import logging
+        logging.getLogger(__name__).warning('DB 연결 불가: GitHub 기반 웹북 API는 계속 제공합니다.')
     yield
 
 
@@ -191,8 +200,11 @@ app.add_middleware(
     allow_origins=ORIGINS,
     allow_credentials=True,
     allow_methods=['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
-    allow_headers=['Content-Type', 'X-CSRF-Token'],
+    allow_headers=['Content-Type', 'X-CSRF-Token', 'X-Webbook-Passcode'],
 )
+
+
+app.include_router(webbook_router)
 
 
 # 데이터를 바꾸는 요청의 출처를 확인하고 기본 보안 header를 붙입니다.
@@ -546,7 +558,14 @@ def build_district_counts(jobs):
 @app.get('/api/health')
 def health(db=Depends(get_db)):
     """서버와 DB가 살아 있는지 빠르게 확인합니다."""
-    db.execute(select(1))
+    try:
+        db.execute(select(1))
+    except OperationalError:
+        if not (os.getenv('WEBBOOK_GITHUB_TOKEN') and os.getenv('WEBBOOK_PASSCODE')):
+            raise
+        # 기존 health check를 사용하는 배포도 DB 만료 후 웹북을 계속 제공한다.
+        return {'status': 'ok', 'database': 'unavailable', 'webbook': 'github',
+                'ai_enabled': bool(os.getenv('OPENAI_API_KEY'))}
     return {
         'status': 'ok',
         'database': engine.dialect.name,
