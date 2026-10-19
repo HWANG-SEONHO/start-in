@@ -326,19 +326,28 @@ async def _github_tree(client: httpx.AsyncClient, repo: str, branch: str) -> dic
     return paths
 
 
-async def _github_file(relative_path: str) -> tuple[bytes, str] | None:
+def _asset_headers(etag: str) -> dict[str, str]:
+    return {
+        'ETag': etag,
+        'Cache-Control': 'private, no-cache',
+        'X-Content-Type-Options': 'nosniff',
+        'Vary': 'Cookie',
+        'Accept-Ranges': 'bytes',
+    }
+
+
+async def _github_file(relative_path: str, if_none_match: str = '') -> tuple[bytes, str, str | None] | Response | None:
     token = os.getenv('WEBBOOK_GITHUB_TOKEN', '')
     repo = os.getenv('WEBBOOK_REPO', 'HWANG-SEONHO/webbook')
     branch = os.getenv('WEBBOOK_BRANCH', 'main')
     if not token:
         return None
     if relative_path == 'catalog.json':
-        return await _github_catalog(token, repo, branch)
+        content, mime = await _github_catalog(token, repo, branch)
+        return content, mime, None
     source_path = relative_path if relative_path.startswith('assets/') else f'book/{relative_path}'
     key = (repo, branch, source_path)
     cached = github_cache.get(key)
-    if cached and cached[0] > time.monotonic():
-        return cached[1], _mime(relative_path)
     client = httpx.AsyncClient(timeout=30, headers={
         'Authorization': f'Bearer {token}', 'Accept': 'application/vnd.github+json',
         'X-GitHub-Api-Version': '2022-11-28',
@@ -348,6 +357,11 @@ async def _github_file(relative_path: str) -> tuple[bytes, str] | None:
         sha = tree.get(source_path)
         if not sha:
             return None
+        etag = f'"{sha}"'
+        if if_none_match == etag:
+            return Response(status_code=304, headers=_asset_headers(etag))
+        if cached and cached[0] > time.monotonic() and cached[2] == sha:
+            return cached[1], _mime(relative_path), etag
         response = await client.get(f'https://api.github.com/repos/{quote(repo, safe="/")}/git/blobs/{sha}')
         if response.status_code == 404:
             return None
@@ -357,8 +371,8 @@ async def _github_file(relative_path: str) -> tuple[bytes, str] | None:
         if data.get('encoding') != 'base64' or not isinstance(data.get('content'), str):
             raise HTTPException(502, '웹북 파일 형식이 올바르지 않습니다.')
         content = base64.b64decode(data['content'])
-        github_cache[key] = (time.monotonic() + 300, content)
-        return content, _mime(relative_path)
+        github_cache[key] = (time.monotonic() + 300, content, sha)
+        return content, _mime(relative_path), etag
     finally:
         await client.aclose()
 
@@ -461,10 +475,24 @@ async def webbook_file(request: Request, relative_path: str):
         raise HTTPException(404, '파일을 찾을 수 없습니다.')
     item = await _local_file(relative_path)
     if item is None:
-        item = await _github_file(relative_path)
+        item = await _github_file(relative_path, request.headers.get('if-none-match', ''))
+    else:
+        content, mime = item
+        etag = f'"{hashlib.sha1(content).hexdigest()}"'
+        item = content, mime, etag if relative_path != 'catalog.json' else None
+    if isinstance(item, Response):
+        return item
     if item is None:
         raise HTTPException(503, '웹북 파일의 서버 경로가 설정되지 않았습니다.')
-    content, mime = item
+    content, mime, etag = item
+    headers = _asset_headers(etag) if etag else {
+        'Cache-Control': 'private, no-store',
+        'X-Content-Type-Options': 'nosniff',
+        'Vary': 'Cookie',
+        'Accept-Ranges': 'bytes',
+    }
+    if etag and request.headers.get('if-none-match') == etag:
+        return Response(status_code=304, headers=headers)
     if relative_path == 'index.html':
         html = content.decode('utf-8')
         if '<base ' not in html:
@@ -475,12 +503,6 @@ async def webbook_file(request: Request, relative_path: str):
             "<script>window.WEBBOOK_STATIC={base:'/b/',apiBase:'/b-api'};</script>\n<script type=\"module\" src=\"book.js\"></script>",
         )
         content = html.encode('utf-8')
-    headers = {
-        'Cache-Control': 'private, no-store',
-        'X-Content-Type-Options': 'nosniff',
-        'Vary': 'Cookie',
-        'Accept-Ranges': 'bytes',
-    }
     range_header = request.headers.get('range', '')
     if range_header:
         match = re.fullmatch(r'bytes=(\d*)-(\d*)', range_header.strip())
