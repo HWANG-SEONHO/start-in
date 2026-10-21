@@ -2,6 +2,7 @@
 
 import base64
 import asyncio
+import gzip
 import hashlib
 import hmac
 import json
@@ -25,6 +26,9 @@ LOCK_SECONDS = 15 * 60
 failures = {}
 github_cache = {}
 github_tree_cache = {}
+# 같은 sha의 파일 내용은 바뀌지 않으므로 계속 써도 된다. 목록을 다시 만들 때 바뀐 파일만 받는다.
+github_blob_cache = {}
+CATALOG_TTL = 300
 
 LOGIN_PAGE = """<!doctype html>
 <html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -310,10 +314,10 @@ def _mime(relative_path: str) -> str:
     }.get(Path(relative_path).suffix.lower(), 'application/octet-stream')
 
 
-async def _github_tree(client: httpx.AsyncClient, repo: str, branch: str) -> dict[str, str]:
+async def _github_tree(client: httpx.AsyncClient, repo: str, branch: str, fresh: bool = False) -> dict[str, str]:
     key = (repo, branch)
     cached = github_tree_cache.get(key)
-    if cached and cached[0] > time.monotonic():
+    if cached and cached[0] > time.monotonic() and not fresh:
         return cached[1]
     response = await client.get(f'https://api.github.com/repos/{quote(repo, safe="/")}/git/trees/{quote(branch, safe="")}', params={'recursive': '1'})
     if response.status_code != 200:
@@ -343,11 +347,21 @@ async def _github_file(relative_path: str, if_none_match: str = '') -> tuple[byt
     if not token:
         return None
     if relative_path == 'catalog.json':
-        content, mime = await _github_catalog(token, repo, branch)
-        return content, mime, None
+        return await _github_catalog(token, repo, branch)
     source_path = relative_path if relative_path.startswith('assets/') else f'book/{relative_path}'
     key = (repo, branch, source_path)
     cached = github_cache.get(key)
+    # 이미 기억한 파일이면 GitHub 연결(SSL 준비에 0.5초 안팎)을 만들지 않고 바로 돌려준다
+    tree_cached = github_tree_cache.get((repo, branch))
+    if tree_cached and tree_cached[0] > time.monotonic():
+        sha = tree_cached[1].get(source_path)
+        if not sha:
+            return None
+        etag = f'"{sha}"'
+        if if_none_match == etag:
+            return Response(status_code=304, headers=_asset_headers(etag))
+        if cached and cached[2] == sha:
+            return cached[1], _mime(relative_path), etag
     client = httpx.AsyncClient(timeout=30, headers={
         'Authorization': f'Bearer {token}', 'Accept': 'application/vnd.github+json',
         'X-GitHub-Api-Version': '2022-11-28',
@@ -397,35 +411,50 @@ async def _github_pushed(client: httpx.AsyncClient, repo: str, branch: str, path
         return {}
 
 
-async def _github_catalog(token: str, repo: str, branch: str) -> tuple[bytes, str]:
-    key = (repo, branch, 'catalog.json')
-    cached = github_cache.get(key)
-    if cached and cached[0] > time.monotonic():
-        return cached[1], 'application/json; charset=utf-8'
+async def _build_catalog(token: str, repo: str, branch: str) -> dict:
+    """자산 정보와 점수를 한 번에 모은다. 파일은 sha로 기억해 바뀐 것만 GitHub에서 받는다."""
     client = httpx.AsyncClient(timeout=30, headers={
         'Authorization': f'Bearer {token}', 'Accept': 'application/vnd.github+json',
         'X-GitHub-Api-Version': '2022-11-28',
     }, limits=httpx.Limits(max_connections=20, max_keepalive_connections=10))
     try:
-        tree = await _github_tree(client, repo, branch)
+        tree = await _github_tree(client, repo, branch, fresh=True)
         taxonomy_sha = tree.get('assets/taxonomy.json')
         if not taxonomy_sha:
             raise HTTPException(502, '웹북 분류 파일을 찾지 못했습니다.')
+        gate = asyncio.Semaphore(16)
 
         async def blob(sha):
-            response = await client.get(f'https://api.github.com/repos/{quote(repo, safe="/")}/git/blobs/{sha}')
+            if sha in github_blob_cache:
+                return github_blob_cache[sha]
+            async with gate:
+                response = await client.get(f'https://api.github.com/repos/{quote(repo, safe="/")}/git/blobs/{sha}')
             if response.status_code != 200:
                 raise HTTPException(502, '웹북 목록을 만들기 위한 파일을 읽지 못했습니다.')
-            item = response.json()
-            return base64.b64decode(item['content'])
+            content = base64.b64decode(response.json()['content'])
+            github_blob_cache[sha] = content
+            return content
 
         taxonomy = json.loads(await blob(taxonomy_sha))
-        rows = []
+        rows, scores = [], {}
         for entry_path, sha in tree.items():
             match = re.fullmatch(r'assets/([a-z0-9-]+)/([a-z0-9-]+)/([0-9]{3}-[a-z0-9-]+)/asset\.json', entry_path)
             if match:
                 rows.append((entry_path, sha, match.groups()))
+            score = re.fullmatch(r'scores/([a-z0-9]+-[0-9]{3})\.json', entry_path)
+            if score:
+                scores[score.group(1)] = sha
         metadata = await asyncio.gather(*(blob(sha) for _, sha, _ in rows))
+        score_ids = list(scores)
+        score_raw = await asyncio.gather(*(blob(scores[i]) for i in score_ids))
+        score_data = {}
+        for sid, raw in zip(score_ids, score_raw):
+            try:
+                value = json.loads(raw)
+            except ValueError:
+                continue
+            if isinstance(value, dict):
+                score_data[sid] = {k: value[k] for k in ('version', 'items', 'defects') if k in value}
         group_names = {g['id']: g['name'] for g in taxonomy.get('groups', [])}
         sub_names = {s['id']: s['name'] for g in taxonomy.get('groups', []) for s in g.get('subs', [])}
         assets = []
@@ -437,21 +466,90 @@ async def _github_catalog(token: str, repo: str, branch: str) -> tuple[bytes, st
             folder_path = meta_path.rsplit('/', 1)[0]
             if f'{folder_path}/index.html' not in tree:
                 continue
-            assets.append({
+            item = {
                 **meta, 'no': int(number), 'path': folder_path,
                 'entry': f'{folder_path}/index.html',
                 'subName': sub_names.get(sub, sub), 'groupName': group_names.get(group, group),
-            })
+            }
+            if meta['id'] in score_data:
+                item['scoreData'] = score_data[meta['id']]
+            assets.append(item)
         pushed = await _github_pushed(client, repo, branch, [item['path'] for item in assets])
         for item in assets:
             if item['path'] in pushed:
                 item['pushed'] = pushed[item['path']]
         assets.sort(key=lambda item: item['id'])
-        content = json.dumps({'taxonomy': taxonomy, 'assets': assets, 'problems': []}, ensure_ascii=False).encode()
-        github_cache[key] = (time.monotonic() + 300, content)
-        return content, 'application/json; charset=utf-8'
+        return {'taxonomy': taxonomy, 'assets': assets, 'problems': [], 'scoresIncluded': True}
     finally:
         await client.aclose()
+
+
+def _encode_catalog(state: dict) -> None:
+    state['content'] = json.dumps(state['data'], ensure_ascii=False).encode()
+    state['gzip'] = gzip.compress(state['content'], 6)
+
+
+def patch_catalog(asset_id: str, **fields) -> None:
+    """저장 직후 기억해 둔 목록에도 바로 반영한다(새로고침해도 방금 바꾼 점수·상태가 보인다)."""
+    for key, state in list(github_cache.items()):
+        if len(key) != 3 or key[2] != 'catalog.json' or not isinstance(state, dict):
+            continue
+        state.setdefault('patches', {})[asset_id] = (time.monotonic(), fields)
+        for item in state['data']['assets']:
+            if item.get('id') == asset_id:
+                item.update(fields)
+        _encode_catalog(state)
+
+
+async def _refresh_catalog(key, token, repo, branch) -> None:
+    state = github_cache[key]
+    began = time.monotonic()
+    try:
+        data = await _build_catalog(token, repo, branch)
+        # 만드는 사이(또는 GitHub 반영 지연 30초 안)에 저장된 변경은 다시 덮어 쓴다
+        patches = {k: v for k, v in state.get('patches', {}).items() if v[0] >= began - 30}
+        for item in data['assets']:
+            if item.get('id') in patches:
+                item.update(patches[item['id']][1])
+        state.update(data=data, patches=patches, expires=time.monotonic() + CATALOG_TTL)
+        _encode_catalog(state)
+    except Exception:
+        state['expires'] = time.monotonic() + 60
+    finally:
+        state['task'] = None
+
+
+def prewarm_catalog() -> None:
+    """서버가 켜질 때 목록을 뒤에서 미리 만들어, 첫 방문자가 10초 넘게 기다리지 않게 한다."""
+    token = os.getenv('WEBBOOK_GITHUB_TOKEN', '')
+    if not token or os.getenv('WEBBOOK_STATIC_DIR'):
+        return
+    repo = os.getenv('WEBBOOK_REPO', 'HWANG-SEONHO/webbook')
+    branch = os.getenv('WEBBOOK_BRANCH', 'main')
+
+    async def run():
+        try:
+            await _github_catalog(token, repo, branch)
+            # 화면 파일(book/*.js·css·html)도 미리 받아 둔다
+            tree = github_tree_cache.get((repo, branch), (0, {}))[1]
+            names = [p[5:] for p in tree if p.startswith('book/') and p.count('/') == 1 and p.endswith(('.js', '.css', '.html'))]
+            await asyncio.gather(*(_github_file(name) for name in names), return_exceptions=True)
+        except Exception:
+            pass  # 실패하면 첫 요청 때 다시 만든다
+    asyncio.create_task(run())
+
+
+async def _github_catalog(token: str, repo: str, branch: str) -> dict:
+    """목록은 기억해 둔 것을 바로 돌려주고, 5분이 지났으면 뒤에서 새로 만든다(기다리게 하지 않는다)."""
+    key = (repo, branch, 'catalog.json')
+    state = github_cache.get(key)
+    if not isinstance(state, dict):
+        state = {'data': await _build_catalog(token, repo, branch), 'expires': time.monotonic() + CATALOG_TTL, 'task': None}
+        _encode_catalog(state)
+        github_cache[key] = state
+    elif state['expires'] <= time.monotonic() and not state.get('task'):
+        state['task'] = asyncio.create_task(_refresh_catalog(key, token, repo, branch))
+    return state
 
 
 @router.get('/b')
@@ -484,6 +582,12 @@ async def webbook_file(request: Request, relative_path: str):
         return item
     if item is None:
         raise HTTPException(503, '웹북 파일의 서버 경로가 설정되지 않았습니다.')
+    if isinstance(item, dict):
+        # 목록(약 1MB)은 gzip으로 보내면 1/6 정도로 준다
+        headers = {'Cache-Control': 'private, no-store', 'X-Content-Type-Options': 'nosniff', 'Vary': 'Cookie, Accept-Encoding'}
+        if 'gzip' in request.headers.get('accept-encoding', ''):
+            return Response(item['gzip'], media_type='application/json; charset=utf-8', headers={**headers, 'Content-Encoding': 'gzip'})
+        return Response(item['content'], media_type='application/json; charset=utf-8', headers=headers)
     content, mime, etag = item
     headers = _asset_headers(etag) if etag else {
         'Cache-Control': 'private, no-store',

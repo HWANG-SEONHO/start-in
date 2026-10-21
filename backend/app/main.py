@@ -30,7 +30,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import delete, inspect, select, text
 from sqlalchemy.exc import IntegrityError, OperationalError
 from .webbook import router as webbook_router
-from .webbook_auth import router as webbook_auth_router, valid_cookie
+from .webbook_auth import prewarm_catalog, router as webbook_auth_router, valid_cookie
 from sqlalchemy.orm import Session as OrmSession
 
 from .ai_search import (
@@ -186,6 +186,8 @@ async def lifespan(_):
         # DB 만료 후에도 GitHub 기반 웹북은 계속 제공한다.
         import logging
         logging.getLogger(__name__).warning('DB 연결 불가: GitHub 기반 웹북 API는 계속 제공합니다.')
+    if get_db not in app.dependency_overrides:
+        prewarm_catalog()
     yield
 
 

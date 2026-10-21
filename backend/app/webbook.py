@@ -14,6 +14,8 @@ from urllib.parse import quote
 import httpx
 from fastapi import APIRouter, HTTPException, Request, Response
 
+from .webbook_auth import patch_catalog
+
 router = APIRouter(prefix='/webbook')
 VERSION = 3
 KEYS = {'first', 'type', 'color', 'layout', 'hero', 'finish'}
@@ -196,7 +198,9 @@ async def post_score(id: str, request: Request):
             return {**{k: data[k] for k in ('version', 'items', 'defects', 'verdict', 'reference', 'comment')},
                     'updated': datetime.now(KST).strftime('%Y-%m-%d %H:%M'), **({'old': old} if isinstance(old, (dict, list)) or old else {})}
 
-        return result(await gh.update(f'scores/{id}.json', f'채점: {id} (웹)', transform))
+        saved = await gh.update(f'scores/{id}.json', f'채점: {id} (웹)', transform)
+    patch_catalog(id, scoreData={k: saved[k] for k in ('version', 'items', 'defects') if k in saved})
+    return result(saved)
 
 
 @router.post('/assets/{id}/status')
