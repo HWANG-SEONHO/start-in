@@ -454,7 +454,7 @@ async def _build_catalog(token: str, repo: str, branch: str) -> dict:
             except ValueError:
                 continue
             if isinstance(value, dict):
-                score_data[sid] = {k: value[k] for k in ('version', 'items', 'defects') if k in value}
+                score_data[sid] = {k: value[k] for k in ('version', 'items', 'defects', 'updated') if k in value}
         group_names = {g['id']: g['name'] for g in taxonomy.get('groups', [])}
         sub_names = {s['id']: s['name'] for g in taxonomy.get('groups', []) for s in g.get('subs', [])}
         assets = []
