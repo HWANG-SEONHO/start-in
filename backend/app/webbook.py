@@ -199,7 +199,7 @@ async def post_score(id: str, request: Request):
                     'updated': datetime.now(KST).strftime('%Y-%m-%d %H:%M'), **({'old': old} if isinstance(old, (dict, list)) or old else {})}
 
         saved = await gh.update(f'scores/{id}.json', f'채점: {id} (웹)', transform)
-    patch_catalog(id, scoreData={k: saved[k] for k in ('version', 'items', 'defects') if k in saved})
+    patch_catalog(id, scoreData={k: saved[k] for k in ('version', 'items', 'defects', 'updated') if k in saved})
     return result(saved)
 
 
