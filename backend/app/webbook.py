@@ -188,7 +188,7 @@ async def post_score(id: str, request: Request):
     data = await body(request)
     validate_score(data)
     async with write_lock, GitHub() as gh:
-        await gh.asset(id)
+        await gh.asset_path(id)  # 자산 존재만 확인(나무 목록 60초 캐시) — asset.json까지 읽으면 GitHub 왕복이 하나 더 는다
 
         def transform(previous):
             # 옛 판(v1·v2) 점수는 old 아래 보존한다.
