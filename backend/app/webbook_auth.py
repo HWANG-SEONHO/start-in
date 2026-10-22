@@ -99,7 +99,7 @@ button:disabled{opacity:.6;cursor:wait;transform:none}
 #message{min-height:24px;margin:14px 0 0;color:var(--error);font-size:16px}
 .tools{position:fixed;left:calc(50% + 44px);bottom:28px;transform:translateX(-50%);height:60px;display:flex;align-items:center;gap:20px;padding:0 20px;background:var(--panel);border:1px solid var(--line);border-radius:12px}
 .tools svg{width:22px;height:22px;fill:none;stroke:var(--icon);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-/* 실행 모션: 들어오면 원이 차례로 실행돼 켜지고(회전 고리→색→처리 말풍선), Lock에서 멈춰 기다린다. 맞으면 초록 체크, 틀리면 Lock만 흔들린다 */
+/* 실행 모션: 들어오면 모든 원이 켜진 채 Lock에서 기다린다. 맞으면 초록 체크, 틀리면 Lock만 흔들린다 */
 .node>svg{grid-area:1/1;transition:opacity .25s,transform .35s cubic-bezier(.34,1.56,.64,1)}
 .node{transition:filter .5s,transform .55s cubic-bezier(.34,1.56,.64,1),background .35s}
 .mod::before,.mod::after{transition:filter .5s,background .35s}
@@ -119,6 +119,7 @@ button:disabled{opacity:.6;cursor:wait;transform:none}
 .m .to-card:not(.on) .pill{opacity:0}
 .lock .ok-ico{opacity:0;transform:scale(.4)}
 .lock.ok{--d:#17653f}
+.lock.ok::before,.lock.ok::after{background:#17653f}
 .lock.ok .node{background:#12a05c;animation:none}
 .lock.ok .ok-ico{opacity:1;transform:none}
 .lock.ok .node>svg:not(.ok-ico){opacity:0;transform:scale(.4)}
@@ -185,7 +186,7 @@ const mods=[...document.querySelectorAll('.mod')],links=[...document.querySelect
 const still=matchMedia('(prefers-reduced-motion:reduce)').matches,wait=ms=>new Promise(r=>setTimeout(r,still?0:ms));
 mods.forEach(m=>{const b=document.createElement('b');b.className='op';b.textContent='1';m.querySelector('.node').append(b)});
 // 들어오면 시나리오를 한 번 실행한다: 원마다 회전 고리 → 색이 켜지며 처리 말풍선 → 연결선이 흐름. Lock에서 멈춰 기다린다
-(async()=>{await wait(350);for(let i=0;i<mods.length;i++){const m=mods[i];m.classList.add('run');await wait(i<3?520:420);m.classList.remove('run');m.classList.add('lit');if(i<3){m.classList.add('done');links[i].classList.add('on');await wait(240)}}toCard.classList.add('on')})();
+mods.forEach((m,i)=>{m.classList.add('lit');if(i<3){m.classList.add('done');links[i].classList.add('on')}});toCard.classList.add('on');
 lock.addEventListener('animationend',e=>{if(e.animationName==='shake')lock.classList.remove('bad')});
 function fail(text){lock.classList.remove('run','bad');lock.querySelector('.op').textContent='!';void lock.offsetWidth;lock.classList.add('bad');message.textContent=text}
 form.addEventListener('submit',async e=>{e.preventDefault();button.disabled=true;message.textContent='';lock.classList.remove('bad','ok');lock.classList.add('run');const t=Date.now();try{const r=await fetch('/b/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({passcode:field.value})});const data=await r.json().catch(()=>({}));await wait(450-(Date.now()-t));if(!r.ok){fail(data.detail||'Sign-in failed.');return}field.value='';lock.classList.remove('run');lock.querySelector('.op').textContent='1';lock.classList.add('ok');card.classList.add('ok');await wait(500);card.classList.add('leave');await wait(450);location.reload()}catch{fail('Check your connection and try again.')}finally{button.disabled=false}});
