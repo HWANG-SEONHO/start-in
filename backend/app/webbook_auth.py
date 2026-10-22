@@ -99,6 +99,36 @@ button:disabled{opacity:.6;cursor:wait;transform:none}
 #message{min-height:24px;margin:14px 0 0;color:var(--error);font-size:16px}
 .tools{position:fixed;left:calc(50% + 44px);bottom:28px;transform:translateX(-50%);height:60px;display:flex;align-items:center;gap:20px;padding:0 20px;background:var(--panel);border:1px solid var(--line);border-radius:12px}
 .tools svg{width:22px;height:22px;fill:none;stroke:var(--icon);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+/* 실행 모션: 들어오면 원이 차례로 실행돼 켜지고(회전 고리→색→처리 말풍선), Lock에서 멈춰 기다린다. 맞으면 초록 체크, 틀리면 Lock만 흔들린다 */
+.node>svg{grid-area:1/1;transition:opacity .25s,transform .35s cubic-bezier(.34,1.56,.64,1)}
+.node{transition:filter .5s,transform .55s cubic-bezier(.34,1.56,.64,1),background .35s}
+.mod::before,.mod::after{transition:filter .5s,background .35s}
+.name,.desc{transition:opacity .4s}
+.m .mod:not(.lit) .node,.m .mod:not(.lit)::before,.m .mod:not(.lit)::after{filter:grayscale(1) brightness(.42)}
+.m .mod:not(.lit) .node{transform:scale(.9);animation:none}
+.m .mod:not(.lit) .name,.m .mod:not(.lit) .desc{opacity:.4}
+.node::after{content:"";position:absolute;inset:-9px;border-radius:50%;border:3px solid transparent;border-top-color:#fff;border-right-color:#ffffff55;opacity:0;transition:opacity .2s}
+.run .node::after{opacity:1;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(1turn)}}
+.op{position:absolute;top:0;right:0;z-index:2;min-width:max(20px,calc(var(--n) * .24));height:max(20px,calc(var(--n) * .24));padding:0 4px;border-radius:999px;background:#fff;color:#1c1c1e;font:700 max(11px,calc(var(--n) * .11))/1 system-ui,sans-serif;display:grid;place-items:center;box-shadow:0 4px 12px rgba(0,0,0,.35);transform:scale(0);transition:transform .4s cubic-bezier(.34,1.56,.64,1)}
+.done .op,.ok .op,.bad .op{transform:none}
+.bad .op{background:var(--error)}
+.link i,.to-card i{transition:opacity .3s}
+.m .link:not(.on) i,.m .to-card:not(.on) i{animation:none;opacity:.15}
+.pill{transition:opacity .4s}
+.m .to-card:not(.on) .pill{opacity:0}
+.lock .ok-ico{opacity:0;transform:scale(.4)}
+.lock.ok{--d:#17653f}
+.lock.ok .node{background:#12a05c;animation:none}
+.lock.ok .ok-ico{opacity:1;transform:none}
+.lock.ok .node>svg:not(.ok-ico){opacity:0;transform:scale(.4)}
+.lock.bad .node{animation:shake .42s cubic-bezier(.36,.07,.19,.97)}
+@keyframes shake{20%,60%{translate:-8px 0}40%,80%{translate:8px 0}}
+.card{transition:opacity .45s,transform .45s}
+.card.leave{opacity:0;transform:translateY(12px) scale(.98)}
+.badge{transition:background .35s}
+.card.ok .badge{background:#12a05c}
+.ok~.to-card i,.flow:has(.ok)+.to-card i{background:#17653f}
 @media (max-width:1799px){:root{--n:140px;--l:104px;--ear:50px;--ear-out:18px;--dot:15px;--step:26px;--icon-size:64px;--name:21px;--label-h:84px;--card:460px;--pad:36px}}
 @media (max-width:1599px){
 :root{--n:120px;--l:88px;--ear:42px;--ear-out:15px;--dot:12px;--step:22px;--icon-size:54px;--name:19px;--desc:15px;--label-h:70px;--card:520px}
@@ -121,6 +151,7 @@ input{height:60px;font-size:18px}button{height:64px;font-size:18px}}
 @keyframes pulse-sm{0%{box-shadow:0 0 0 0 #ef413666}70%,100%{box-shadow:0 0 0 8px #ef413600}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
+<script>document.documentElement.classList.add('m')</script>
 <nav class="side" aria-hidden="true">
 <div class="mark">W</div>
 <span><i><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"/></svg></i>Home</span>
@@ -139,7 +170,7 @@ input{height:60px;font-size:18px}button{height:64px;font-size:18px}}
 <div class="link" style="--d:#17653f;--d2:#487635;--j:1" aria-hidden="true"><i></i><i></i><i></i><svg class="wrench" viewBox="0 0 24 24"><path d="M21 6.5a5.5 5.5 0 0 1-7.3 5.2L6 19.4a2 2 0 0 1-2.8-2.8l7.7-7.7A5.5 5.5 0 0 1 17.5 2l-3.3 3.3.9 2.6 2.6.9z"/></svg></div>
 <div class="mod" style="--c:#6cbf47;--d:#487635" aria-hidden="true"><div class="node"><svg viewBox="0 0 24 24"><path d="M9.2 18.6 3.4 12.8l2.5-2.5 3.3 3.3 8.9-8.9 2.5 2.5z"/></svg></div><div class="name">Review<em>6</em></div><div class="desc">6 criteria × 5 levels</div></div>
 <div class="link" style="--d:#487635;--d2:#90302b;--j:2" aria-hidden="true"><i></i><i></i><i></i><svg class="wrench" viewBox="0 0 24 24"><path d="M21 6.5a5.5 5.5 0 0 1-7.3 5.2L6 19.4a2 2 0 0 1-2.8-2.8l7.7-7.7A5.5 5.5 0 0 1 17.5 2l-3.3 3.3.9 2.6 2.6.9z"/></svg></div>
-<div class="mod lock" style="--c:#ef4136;--d:#90302b" aria-hidden="true"><div class="node"><svg viewBox="0 0 24 24"><path d="M7 10V7.5a5 5 0 0 1 10 0V10h1.5a1.5 1.5 0 0 1 1.5 1.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 20.5v-9A1.5 1.5 0 0 1 5.5 10zm2.6 0h4.8V7.5a2.4 2.4 0 0 0-4.8 0zM12 13.5a1.8 1.8 0 0 0-1 3.3V19h2v-2.2a1.8 1.8 0 0 0-1-3.3z"/></svg></div><div class="name">Lock<em>1</em></div><div class="desc">Check passcode</div></div>
+<div class="mod lock" style="--c:#ef4136;--d:#90302b" aria-hidden="true"><div class="node"><svg viewBox="0 0 24 24"><path d="M7 10V7.5a5 5 0 0 1 10 0V10h1.5a1.5 1.5 0 0 1 1.5 1.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 20.5v-9A1.5 1.5 0 0 1 5.5 10zm2.6 0h4.8V7.5a2.4 2.4 0 0 0-4.8 0zM12 13.5a1.8 1.8 0 0 0-1 3.3V19h2v-2.2a1.8 1.8 0 0 0-1-3.3z"/></svg><svg class="ok-ico" viewBox="0 0 24 24"><path d="M9.2 18.6 3.4 12.8l2.5-2.5 3.3 3.3 8.9-8.9 2.5 2.5z"/></svg></div><div class="name">Lock<em>1</em></div><div class="desc">Check passcode</div></div>
 </div>
 <div class="to-card" aria-hidden="true"><span class="pill">Checking passcode ▽</span><i></i><i></i><i></i></div>
 <section class="card">
@@ -150,7 +181,14 @@ input{height:60px;font-size:18px}button{height:64px;font-size:18px}}
 <div class="tools" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5M4 9h11a5 5 0 0 1 0 10h-3"/></svg><svg viewBox="0 0 24 24"><path d="m15 14 5-5-5-5M20 9H9a5 5 0 0 0 0 10h3"/></svg><svg viewBox="0 0 24 24"><path d="M6 6h.01M12 6h.01M18 6h.01M6 12h.01M12 12h.01M18 12h.01M6 18h.01M12 18h.01M18 18h.01" stroke-width="3"/></svg><svg viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9V16h7v-2.1A6 6 0 0 0 12 3z"/></svg><svg viewBox="0 0 24 24"><path d="M5 5v14M14 5l-4 14M19 9a3 3 0 1 1 0 6 3 3 0 0 1 0-6z"/></svg><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.4-5.7L4 8.5M4 4v4.5h4.5M12 8v4l3 2"/></svg></div>
 <script>
 const form=document.querySelector('#login'),field=document.querySelector('#passcode'),message=document.querySelector('#message'),button=form.querySelector('button');
-form.addEventListener('submit',async e=>{e.preventDefault();button.disabled=true;message.textContent='';try{const r=await fetch('/b/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({passcode:field.value})});const data=await r.json().catch(()=>({}));if(!r.ok){message.textContent=data.detail||'Sign-in failed.';return}field.value='';location.reload()}catch{message.textContent='Check your connection and try again.'}finally{button.disabled=false}});
+const mods=[...document.querySelectorAll('.mod')],links=[...document.querySelectorAll('.link')],toCard=document.querySelector('.to-card'),card=document.querySelector('.card'),lock=mods[3];
+const still=matchMedia('(prefers-reduced-motion:reduce)').matches,wait=ms=>new Promise(r=>setTimeout(r,still?0:ms));
+mods.forEach(m=>{const b=document.createElement('b');b.className='op';b.textContent='1';m.querySelector('.node').append(b)});
+// 들어오면 시나리오를 한 번 실행한다: 원마다 회전 고리 → 색이 켜지며 처리 말풍선 → 연결선이 흐름. Lock에서 멈춰 기다린다
+(async()=>{await wait(350);for(let i=0;i<mods.length;i++){const m=mods[i];m.classList.add('run');await wait(i<3?520:420);m.classList.remove('run');m.classList.add('lit');if(i<3){m.classList.add('done');links[i].classList.add('on');await wait(240)}}toCard.classList.add('on')})();
+lock.addEventListener('animationend',e=>{if(e.animationName==='shake')lock.classList.remove('bad')});
+function fail(text){lock.classList.remove('run','bad');lock.querySelector('.op').textContent='!';void lock.offsetWidth;lock.classList.add('bad');message.textContent=text}
+form.addEventListener('submit',async e=>{e.preventDefault();button.disabled=true;message.textContent='';lock.classList.remove('bad','ok');lock.classList.add('run');const t=Date.now();try{const r=await fetch('/b/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({passcode:field.value})});const data=await r.json().catch(()=>({}));await wait(450-(Date.now()-t));if(!r.ok){fail(data.detail||'Sign-in failed.');return}field.value='';lock.classList.remove('run');lock.querySelector('.op').textContent='1';lock.classList.add('ok');card.classList.add('ok');await wait(500);card.classList.add('leave');await wait(450);location.reload()}catch{fail('Check your connection and try again.')}finally{button.disabled=false}});
 </script></html>"""
 
 
