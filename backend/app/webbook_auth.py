@@ -41,7 +41,7 @@ html,body{height:100%}
 body{margin:0;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,'Malgun Gothic',sans-serif;overflow-x:hidden}
 svg{display:block}
 .side{position:fixed;inset:0 auto 0 0;width:88px;background:var(--side);display:flex;flex-direction:column;align-items:center;padding-top:22px;gap:26px}
-.mark{font-size:26px;font-weight:900;letter-spacing:-1px;margin-bottom:12px}
+.mark{width:48px;height:48px;display:grid;place-items:center;border:2px solid var(--sub);border-radius:10px;font-size:24px;font-weight:900;letter-spacing:-1px;margin-bottom:12px}
 .side span{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:14px;color:#e6e6ea}
 .side i{display:grid;place-items:center;width:40px;height:40px;border-radius:9px}
 .side .on i{background:#2f2f34}
@@ -69,6 +69,8 @@ svg{display:block}
 @keyframes pulse{0%{box-shadow:0 0 0 0 #ef413666}70%,100%{box-shadow:0 0 0 18px #ef413600}}
 .clock{position:absolute;left:-14px;bottom:-10px;width:40%;aspect-ratio:1;border-radius:50%;background:#fbe7a6;border:4px solid #f5c342;display:grid;place-items:center}
 .clock svg{width:70%;height:70%;fill:none;stroke:#9a7a1c;stroke-width:2.4;stroke-linecap:round}
+.clock .mh,.clock .hh{transform-origin:12px 12px;animation:spin 6s linear infinite}
+.clock .hh{animation-duration:72s}
 .name{margin-top:22px;font-size:var(--name);font-weight:700;display:flex;justify-content:center;align-items:center;gap:8px;white-space:nowrap}
 .name em{font-style:normal;font-size:14px;font-weight:700;height:24px;line-height:24px;padding:0 7px;border-radius:6px;background:#3a3a40}
 .desc{margin-top:6px;font-size:var(--desc);color:var(--sub);white-space:nowrap}
@@ -99,7 +101,7 @@ button:disabled{opacity:.6;cursor:wait;transform:none}
 #message{min-height:24px;margin:14px 0 0;color:var(--error);font-size:16px}
 .tools{position:fixed;left:calc(50% + 44px);bottom:28px;transform:translateX(-50%);height:60px;display:flex;align-items:center;gap:20px;padding:0 20px;background:var(--panel);border:1px solid var(--line);border-radius:12px}
 .tools svg{width:22px;height:22px;fill:none;stroke:var(--icon);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-/* 실행 모션: 들어오면 모든 원이 켜진 채 Lock에서 기다린다. 맞으면 초록 체크, 틀리면 Lock만 흔들린다 */
+/* 실행 모션: 들어오면 모든 원이 켜진 채 Lock에서 기다린다. 맞으면 초록 체크 뒤 카드가 Lock으로 빨려 들어가고, 틀리면 Lock만 흔들린다 */
 .node>svg{grid-area:1/1;transition:opacity .25s,transform .35s cubic-bezier(.34,1.56,.64,1)}
 .node{transition:filter .5s,transform .55s cubic-bezier(.34,1.56,.64,1),background .35s}
 .mod::before,.mod::after{transition:filter .5s,background .35s}
@@ -126,7 +128,9 @@ button:disabled{opacity:.6;cursor:wait;transform:none}
 .lock.bad .node{animation:shake .42s cubic-bezier(.36,.07,.19,.97)}
 @keyframes shake{20%,60%{translate:-8px 0}40%,80%{translate:8px 0}}
 .card{transition:opacity .45s,transform .45s}
-.card.leave{opacity:0;transform:translateY(12px) scale(.98)}
+.card.leave{opacity:0;transform:var(--fly,translateY(12px) scale(.98));transition:transform .55s cubic-bezier(.55,0,.8,.2),opacity .25s ease-in .3s}
+.lock.ok.got .node{animation:gulp .5s cubic-bezier(.34,1.56,.64,1)}
+@keyframes gulp{35%{transform:scale(1.14)}100%{transform:none}}
 .badge{transition:background .35s}
 .card.ok .badge{background:#12a05c}
 .ok~.to-card i,.flow:has(.ok)+.to-card i{background:#17653f}
@@ -165,7 +169,7 @@ input{height:60px;font-size:18px}button{height:64px;font-size:18px}}
 <div class="bar state" aria-hidden="true"><span class="chip"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>24h session</span><span><i class="switch"></i><b>Locked</b></span><span>? Help</span></div>
 <main class="stage">
 <div class="flow" role="img" aria-label="Webbook → Samples → Review → Lock">
-<div class="mod" style="--c:#f5c342;--d:#93782f" aria-hidden="true"><div class="node"><svg viewBox="0 0 24 24"><path d="M2 5.5C4.6 4.3 7.7 4.3 11 6v14c-3.3-1.7-6.4-1.7-9-.5zM22 5.5C19.4 4.3 16.3 4.3 13 6v14c3.3-1.7 6.4-1.7 9-.5z"/></svg><div class="clock"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 6.5V12l4 2.5"/></svg></div></div><div class="name">Webbook<em>1</em></div><div class="desc">Open the library</div></div>
+<div class="mod" style="--c:#f5c342;--d:#93782f" aria-hidden="true"><div class="node"><svg viewBox="0 0 24 24"><path d="M2 5.5C4.6 4.3 7.7 4.3 11 6v14c-3.3-1.7-6.4-1.7-9-.5zM22 5.5C19.4 4.3 16.3 4.3 13 6v14c3.3-1.7 6.4-1.7 9-.5z"/></svg><div class="clock"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path class="hh" d="M12 12l4 2.5"/><path class="mh" d="M12 12V6.5"/></svg></div></div><div class="name">Webbook<em>1</em></div><div class="desc">Open the library</div></div>
 <div class="link" style="--d:#93782f;--d2:#17653f;--j:0" aria-hidden="true"><i></i><i></i><i></i><svg class="wrench" viewBox="0 0 24 24"><path d="M21 6.5a5.5 5.5 0 0 1-7.3 5.2L6 19.4a2 2 0 0 1-2.8-2.8l7.7-7.7A5.5 5.5 0 0 1 17.5 2l-3.3 3.3.9 2.6 2.6.9z"/></svg></div>
 <div class="mod" style="--c:#12a05c;--d:#17653f" aria-hidden="true"><div class="node"><svg viewBox="0 0 24 24"><path d="M5 2h10l5 5v15H5zM14 2.5V8h5.5z" opacity=".95"/><path d="M8 11h9v8H8z" fill="#12a05c"/><path d="M8.8 11.8h3.2v2.4H8.8zM13 11.8h3.2v2.4H13zM8.8 15.2h3.2v2.9H8.8zM13 15.2h3.2v2.9H13z"/></svg></div><div class="name">Samples<em>192</em></div><div class="desc">Load the list</div></div>
 <div class="link" style="--d:#17653f;--d2:#487635;--j:1" aria-hidden="true"><i></i><i></i><i></i><svg class="wrench" viewBox="0 0 24 24"><path d="M21 6.5a5.5 5.5 0 0 1-7.3 5.2L6 19.4a2 2 0 0 1-2.8-2.8l7.7-7.7A5.5 5.5 0 0 1 17.5 2l-3.3 3.3.9 2.6 2.6.9z"/></svg></div>
@@ -189,7 +193,7 @@ mods.forEach(m=>{const b=document.createElement('b');b.className='op';b.textCont
 mods.forEach((m,i)=>{m.classList.add('lit');if(i<3){m.classList.add('done');links[i].classList.add('on')}});toCard.classList.add('on');
 lock.addEventListener('animationend',e=>{if(e.animationName==='shake')lock.classList.remove('bad')});
 function fail(text){lock.classList.remove('run','bad');lock.querySelector('.op').textContent='!';void lock.offsetWidth;lock.classList.add('bad');message.textContent=text}
-form.addEventListener('submit',async e=>{e.preventDefault();button.disabled=true;message.textContent='';lock.classList.remove('bad','ok');lock.classList.add('run');const t=Date.now();try{const r=await fetch('/b/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({passcode:field.value})});const data=await r.json().catch(()=>({}));await wait(450-(Date.now()-t));if(!r.ok){fail(data.detail||'Sign-in failed.');return}field.value='';lock.classList.remove('run');lock.querySelector('.op').textContent='1';lock.classList.add('ok');card.classList.add('ok');await wait(500);card.classList.add('leave');await wait(450);location.reload()}catch{fail('Check your connection and try again.')}finally{button.disabled=false}});
+form.addEventListener('submit',async e=>{e.preventDefault();button.disabled=true;message.textContent='';lock.classList.remove('bad','ok');lock.classList.add('run');const t=Date.now();try{const r=await fetch('/b/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({passcode:field.value})});const data=await r.json().catch(()=>({}));await wait(450-(Date.now()-t));if(!r.ok){fail(data.detail||'Sign-in failed.');return}field.value='';lock.classList.remove('run');lock.querySelector('.op').textContent='1';lock.classList.add('ok');card.classList.add('ok');await wait(500);const a=card.getBoundingClientRect(),b=lock.querySelector('.node').getBoundingClientRect();card.style.setProperty('--fly',`translate(${b.left+b.width/2-a.left-a.width/2}px,${b.top+b.height/2-a.top-a.height/2}px) scale(.08)`);card.classList.add('leave');await wait(550);lock.classList.add('got');await wait(500);location.reload()}catch{fail('Check your connection and try again.')}finally{button.disabled=false}});
 </script></html>"""
 
 
