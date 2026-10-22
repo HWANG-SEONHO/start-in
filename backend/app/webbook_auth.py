@@ -19,7 +19,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 
 router = APIRouter()
 COOKIE_NAME = 'webbook_access'
-SESSION_SECONDS = 12 * 60 * 60
+SESSION_SECONDS = 24 * 60 * 60
 MAX_FAILURES = 5
 FAILURE_WINDOW_SECONDS = 15 * 60
 LOCK_SECONDS = 15 * 60
@@ -31,8 +31,8 @@ github_blob_cache = {}
 CATALOG_TTL = 300
 
 LOGIN_PAGE = """<!doctype html>
-<html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>웹북 로그인</title>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Webbook · Sign in</title>
 <style>
 :root{--bg:#1c1c1e;--side:#141416;--panel:#2a2a2e;--line:#3a3a40;--text:#f4f4f6;--sub:#c4c4cc;--icon:#8d8d96;--violet:#7b2ff7;--violet-hover:#8c47ff;--ring:#a77bff;--error:#ff8a80;
 --n:168px;--l:132px;--ear:60px;--ear-out:22px;--dot:18px;--step:28px;--icon-size:78px;--name:24px;--desc:16px;--label-h:88px;--card:540px;--pad:44px}
@@ -122,35 +122,35 @@ input{height:60px;font-size:18px}button{height:64px;font-size:18px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 <nav class="side" aria-hidden="true">
-<div class="mark">웹</div>
-<span><i><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"/></svg></i>홈</span>
-<span class="on"><i><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg></i>자산</span>
-<span><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></svg></i>채점</span>
-<span><i><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg></i>기록</span>
-<span><i><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg></i>설정</span>
+<div class="mark">W</div>
+<span><i><svg viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9h-5v-6H9v6H4z"/></svg></i>Home</span>
+<span class="on"><i><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg></i>Samples</span>
+<span><i><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></svg></i>Review</span>
+<span><i><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg></i>History</span>
+<span><i><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg></i>Settings</span>
 </nav>
-<div class="bar title" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>웹북 · 로그인 시나리오<svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></div>
-<div class="bar state" aria-hidden="true"><span class="chip"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>12시간 유지</span><span><i class="switch"></i><b>잠김</b></span><span>? 도움말</span></div>
+<div class="bar title" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>Webbook · Sign-in scenario<svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg></div>
+<div class="bar state" aria-hidden="true"><span class="chip"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>24h session</span><span><i class="switch"></i><b>Locked</b></span><span>? Help</span></div>
 <main class="stage">
-<div class="flow" role="img" aria-label="웹북 → 자산 → 채점 → 잠금">
-<div class="mod" style="--c:#f5c342;--d:#93782f" aria-hidden="true"><div class="node"><svg viewBox="0 0 24 24"><path d="M2 5.5C4.6 4.3 7.7 4.3 11 6v14c-3.3-1.7-6.4-1.7-9-.5zM22 5.5C19.4 4.3 16.3 4.3 13 6v14c3.3-1.7 6.4-1.7 9-.5z"/></svg><div class="clock"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 6.5V12l4 2.5"/></svg></div></div><div class="name">웹북<em>1</em></div><div class="desc">자산 창고 열기</div></div>
+<div class="flow" role="img" aria-label="Webbook → Samples → Review → Lock">
+<div class="mod" style="--c:#f5c342;--d:#93782f" aria-hidden="true"><div class="node"><svg viewBox="0 0 24 24"><path d="M2 5.5C4.6 4.3 7.7 4.3 11 6v14c-3.3-1.7-6.4-1.7-9-.5zM22 5.5C19.4 4.3 16.3 4.3 13 6v14c3.3-1.7 6.4-1.7 9-.5z"/></svg><div class="clock"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 6.5V12l4 2.5"/></svg></div></div><div class="name">Webbook<em>1</em></div><div class="desc">Open the library</div></div>
 <div class="link" style="--d:#93782f;--d2:#17653f;--j:0" aria-hidden="true"><i></i><i></i><i></i><svg class="wrench" viewBox="0 0 24 24"><path d="M21 6.5a5.5 5.5 0 0 1-7.3 5.2L6 19.4a2 2 0 0 1-2.8-2.8l7.7-7.7A5.5 5.5 0 0 1 17.5 2l-3.3 3.3.9 2.6 2.6.9z"/></svg></div>
-<div class="mod" style="--c:#12a05c;--d:#17653f" aria-hidden="true"><div class="node"><svg viewBox="0 0 24 24"><path d="M5 2h10l5 5v15H5zM14 2.5V8h5.5z" opacity=".95"/><path d="M8 11h9v8H8z" fill="#12a05c"/><path d="M8.8 11.8h3.2v2.4H8.8zM13 11.8h3.2v2.4H13zM8.8 15.2h3.2v2.9H8.8zM13 15.2h3.2v2.9H13z"/></svg></div><div class="name">자산<em>133</em></div><div class="desc">목록 불러오기</div></div>
+<div class="mod" style="--c:#12a05c;--d:#17653f" aria-hidden="true"><div class="node"><svg viewBox="0 0 24 24"><path d="M5 2h10l5 5v15H5zM14 2.5V8h5.5z" opacity=".95"/><path d="M8 11h9v8H8z" fill="#12a05c"/><path d="M8.8 11.8h3.2v2.4H8.8zM13 11.8h3.2v2.4H13zM8.8 15.2h3.2v2.9H8.8zM13 15.2h3.2v2.9H13z"/></svg></div><div class="name">Samples<em>192</em></div><div class="desc">Load the list</div></div>
 <div class="link" style="--d:#17653f;--d2:#487635;--j:1" aria-hidden="true"><i></i><i></i><i></i><svg class="wrench" viewBox="0 0 24 24"><path d="M21 6.5a5.5 5.5 0 0 1-7.3 5.2L6 19.4a2 2 0 0 1-2.8-2.8l7.7-7.7A5.5 5.5 0 0 1 17.5 2l-3.3 3.3.9 2.6 2.6.9z"/></svg></div>
-<div class="mod" style="--c:#6cbf47;--d:#487635" aria-hidden="true"><div class="node"><svg viewBox="0 0 24 24"><path d="M9.2 18.6 3.4 12.8l2.5-2.5 3.3 3.3 8.9-8.9 2.5 2.5z"/></svg></div><div class="name">채점<em>6</em></div><div class="desc">6항목 × 5단계</div></div>
+<div class="mod" style="--c:#6cbf47;--d:#487635" aria-hidden="true"><div class="node"><svg viewBox="0 0 24 24"><path d="M9.2 18.6 3.4 12.8l2.5-2.5 3.3 3.3 8.9-8.9 2.5 2.5z"/></svg></div><div class="name">Review<em>6</em></div><div class="desc">6 criteria × 5 levels</div></div>
 <div class="link" style="--d:#487635;--d2:#90302b;--j:2" aria-hidden="true"><i></i><i></i><i></i><svg class="wrench" viewBox="0 0 24 24"><path d="M21 6.5a5.5 5.5 0 0 1-7.3 5.2L6 19.4a2 2 0 0 1-2.8-2.8l7.7-7.7A5.5 5.5 0 0 1 17.5 2l-3.3 3.3.9 2.6 2.6.9z"/></svg></div>
-<div class="mod lock" style="--c:#ef4136;--d:#90302b" aria-hidden="true"><div class="node"><svg viewBox="0 0 24 24"><path d="M7 10V7.5a5 5 0 0 1 10 0V10h1.5a1.5 1.5 0 0 1 1.5 1.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 20.5v-9A1.5 1.5 0 0 1 5.5 10zm2.6 0h4.8V7.5a2.4 2.4 0 0 0-4.8 0zM12 13.5a1.8 1.8 0 0 0-1 3.3V19h2v-2.2a1.8 1.8 0 0 0-1-3.3z"/></svg></div><div class="name">잠금<em>1</em></div><div class="desc">비밀번호 확인</div></div>
+<div class="mod lock" style="--c:#ef4136;--d:#90302b" aria-hidden="true"><div class="node"><svg viewBox="0 0 24 24"><path d="M7 10V7.5a5 5 0 0 1 10 0V10h1.5a1.5 1.5 0 0 1 1.5 1.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 20.5v-9A1.5 1.5 0 0 1 5.5 10zm2.6 0h4.8V7.5a2.4 2.4 0 0 0-4.8 0zM12 13.5a1.8 1.8 0 0 0-1 3.3V19h2v-2.2a1.8 1.8 0 0 0-1-3.3z"/></svg></div><div class="name">Lock<em>1</em></div><div class="desc">Check passcode</div></div>
 </div>
-<div class="to-card" aria-hidden="true"><span class="pill">비밀번호 확인 ▽</span><i></i><i></i><i></i></div>
+<div class="to-card" aria-hidden="true"><span class="pill">Checking passcode ▽</span><i></i><i></i><i></i></div>
 <section class="card">
-<div class="head"><div class="badge" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 10V7.5a5 5 0 0 1 10 0V10h1.5a1.5 1.5 0 0 1 1.5 1.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 20.5v-9A1.5 1.5 0 0 1 5.5 10zm2.6 0h4.8V7.5a2.4 2.4 0 0 0-4.8 0z"/></svg></div><div><h1>웹북 열기</h1><p>잠금 · 소유자 비밀번호</p></div></div>
-<form id="login"><label for="passcode">비밀번호</label><input id="passcode" name="passcode" type="password" autocomplete="current-password" required autofocus><button><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.5.9l12-7.5a1 1 0 0 0 0-1.8l-12-7.5A1 1 0 0 0 7 4.5z"/></svg>실행하고 들어가기</button><p id="message" role="status" aria-live="polite"></p></form>
+<div class="head"><div class="badge" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 10V7.5a5 5 0 0 1 10 0V10h1.5a1.5 1.5 0 0 1 1.5 1.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 20.5v-9A1.5 1.5 0 0 1 5.5 10zm2.6 0h4.8V7.5a2.4 2.4 0 0 0-4.8 0z"/></svg></div><div><h1>Open Webbook</h1><p>Locked · owner passcode</p></div></div>
+<form id="login"><label for="passcode">Passcode</label><input id="passcode" name="passcode" type="password" autocomplete="current-password" required autofocus><button><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15a1 1 0 0 0 1.5.9l12-7.5a1 1 0 0 0 0-1.8l-12-7.5A1 1 0 0 0 7 4.5z"/></svg>Run and enter</button><p id="message" role="status" aria-live="polite"></p></form>
 </section>
 </main>
 <div class="tools" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5M4 9h11a5 5 0 0 1 0 10h-3"/></svg><svg viewBox="0 0 24 24"><path d="m15 14 5-5-5-5M20 9H9a5 5 0 0 0 0 10h3"/></svg><svg viewBox="0 0 24 24"><path d="M6 6h.01M12 6h.01M18 6h.01M6 12h.01M12 12h.01M18 12h.01M6 18h.01M12 18h.01M18 18h.01" stroke-width="3"/></svg><svg viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9V16h7v-2.1A6 6 0 0 0 12 3z"/></svg><svg viewBox="0 0 24 24"><path d="M5 5v14M14 5l-4 14M19 9a3 3 0 1 1 0 6 3 3 0 0 1 0-6z"/></svg><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.4-5.7L4 8.5M4 4v4.5h4.5M12 8v4l3 2"/></svg></div>
 <script>
 const form=document.querySelector('#login'),field=document.querySelector('#passcode'),message=document.querySelector('#message'),button=form.querySelector('button');
-form.addEventListener('submit',async e=>{e.preventDefault();button.disabled=true;message.textContent='';try{const r=await fetch('/b/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({passcode:field.value})});const data=await r.json().catch(()=>({}));if(!r.ok){message.textContent=data.detail||'로그인할 수 없습니다.';return}field.value='';location.reload()}catch{message.textContent='연결을 확인하고 다시 시도하세요.'}finally{button.disabled=false}});
+form.addEventListener('submit',async e=>{e.preventDefault();button.disabled=true;message.textContent='';try{const r=await fetch('/b/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({passcode:field.value})});const data=await r.json().catch(()=>({}));if(!r.ok){message.textContent=data.detail||'Sign-in failed.';return}field.value='';location.reload()}catch{message.textContent='Check your connection and try again.'}finally{button.disabled=false}});
 </script></html>"""
 
 
@@ -248,22 +248,22 @@ async def login(request: Request):
     key = _remote_key(request)
     locked_until = _locked_until(key)
     if locked_until:
-        raise HTTPException(429, '로그인 시도가 많아 잠시 차단되었습니다. 15분 후 다시 시도하세요.', headers={'Retry-After': str(max(1, int(locked_until - time.monotonic())))})
+        raise HTTPException(429, 'Too many attempts. Try again in 15 minutes.', headers={'Retry-After': str(max(1, int(locked_until - time.monotonic())))})
     if request.headers.get('content-type', '').split(';', 1)[0].lower() != 'application/json':
-        raise HTTPException(415, '로그인 요청 형식이 올바르지 않습니다.')
+        raise HTTPException(415, 'Invalid sign-in request.')
     raw = await request.body()
     if len(raw) > 2048:
-        raise HTTPException(413, '로그인 요청이 너무 큽니다.')
+        raise HTTPException(413, 'Sign-in request is too large.')
     try:
         data = json.loads(raw)
     except (ValueError, UnicodeDecodeError):
-        raise HTTPException(400, '로그인 요청 형식이 올바르지 않습니다.')
+        raise HTTPException(400, 'Invalid sign-in request.')
     supplied = data.get('passcode', '') if isinstance(data, dict) else ''
     if not isinstance(supplied, str) or len(supplied) > 1024 or not hmac.compare_digest(_digest(expected), _digest(supplied)):
         retry = _record_failure(key)
         if retry:
-            raise HTTPException(429, '로그인 시도가 많아 잠시 차단되었습니다. 15분 후 다시 시도하세요.', headers={'Retry-After': str(retry)})
-        raise HTTPException(401, '비밀번호가 맞지 않습니다.')
+            raise HTTPException(429, 'Too many attempts. Try again in 15 minutes.', headers={'Retry-After': str(retry)})
+        raise HTTPException(401, 'Wrong passcode.')
     failures.pop(key, None)
     response = JSONResponse({'authenticated': True}, headers={'Cache-Control': 'no-store'})
     response.set_cookie(
