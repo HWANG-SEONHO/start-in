@@ -169,3 +169,31 @@ def test_login_session_and_catalog_stay_no_store(setup):
     response = client.post('/b/auth/login', json={'passcode': 'test-only-passcode'})
     assert response.status_code == 200
     assert response.headers['cache-control'] == 'no-store'
+
+
+def test_same_sha_body_survives_ttl(setup):
+    # 같은 sha면 5분이 지나 목록을 다시 받아도 파일 내용은 다시 받지 않는다
+    client, _, calls = setup
+    client.get('/b/assets/photo.webp')
+    for key, value in list(w.github_cache.items()):
+        if isinstance(value, tuple):
+            w.github_cache[key] = (0, value[1], value[2])
+    w.github_tree_cache.clear()
+    response = client.get('/b/assets/photo.webp')
+    assert response.content == b'photo-content'
+    assert not any('/git/blobs/' in c.url.path for c in calls[2:])
+
+
+def test_large_text_is_gzipped(setup):
+    import gzip
+    client, files, _ = setup
+    body = ('<p>피움</p>' * 400).encode()
+    files['assets/page.html'] = (body, 'page-sha')
+    w.github_tree_cache.clear()
+    response = client.get('/b/assets/page.html', headers={'Accept-Encoding': 'gzip'})
+    assert response.status_code == 200
+    assert response.headers['content-encoding'] == 'gzip'
+    assert response.headers['vary'] == 'Cookie, Accept-Encoding'
+    assert response.content == body  # 받는 쪽이 풀어서 본다
+    raw = client.get('/b/assets/photo.webp', headers={'Accept-Encoding': 'gzip'})
+    assert 'content-encoding' not in raw.headers

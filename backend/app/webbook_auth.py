@@ -360,11 +360,42 @@ def _mime(relative_path: str) -> str:
     }.get(Path(relative_path).suffix.lower(), 'application/octet-stream')
 
 
+_github_clients = {}
+_tree_inflight = {}
+gzip_cache = {}
+GZIP_CACHE_MAX_BYTES = 20 * 1024 * 1024
+COMPRESSIBLE = ('text/', 'application/json', 'image/svg+xml')
+
+
+def _github_client(token: str) -> httpx.AsyncClient:
+    """GitHub 연결을 파일마다 새로 만들면(SSL 준비 0.5초 안팎) 파일 150개짜리 페이지가 20초 넘게 걸린다. 한 번 만든 연결을 다시 쓴다."""
+    loop = asyncio.get_running_loop()
+    saved = _github_clients.get(token)
+    if saved and saved[0] is loop and not saved[1].is_closed:
+        return saved[1]
+    client = httpx.AsyncClient(timeout=30, headers={
+        'Authorization': f'Bearer {token}', 'Accept': 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28',
+    }, limits=httpx.Limits(max_connections=20, max_keepalive_connections=20))
+    _github_clients[token] = (loop, client)
+    return client
+
+
 async def _github_tree(client: httpx.AsyncClient, repo: str, branch: str, fresh: bool = False) -> dict[str, str]:
     key = (repo, branch)
     cached = github_tree_cache.get(key)
     if cached and cached[0] > time.monotonic() and not fresh:
         return cached[1]
+    # 목록이 만료된 순간 들어온 요청 수십 개가 각자 목록을 받지 않게, 하나만 받고 나머지는 그 결과를 기다린다
+    task = _tree_inflight.get(key)
+    if task is None or task.done() or task.get_loop() is not asyncio.get_running_loop():
+        task = asyncio.ensure_future(_fetch_github_tree(client, repo, branch))
+        _tree_inflight[key] = task
+    return await task
+
+
+async def _fetch_github_tree(client: httpx.AsyncClient, repo: str, branch: str) -> dict[str, str]:
+    key = (repo, branch)
     response = await client.get(f'https://api.github.com/repos/{quote(repo, safe="/")}/git/trees/{quote(branch, safe="")}', params={'recursive': '1'})
     if response.status_code != 200:
         raise HTTPException(502, '비공개 웹북 파일 목록을 읽지 못했습니다.')
@@ -423,33 +454,45 @@ async def _github_file(relative_path: str, if_none_match: str = '') -> tuple[byt
         if cached and cached[2] == sha:
             github_cache[key] = github_cache.pop(key)  # 최근에 쓴 것으로 뒤로 보낸다
             return cached[1], _mime(relative_path), etag
-    client = httpx.AsyncClient(timeout=30, headers={
-        'Authorization': f'Bearer {token}', 'Accept': 'application/vnd.github+json',
-        'X-GitHub-Api-Version': '2022-11-28',
-    }, limits=httpx.Limits(max_connections=20, max_keepalive_connections=10))
-    try:
-        tree = await _github_tree(client, repo, branch)
-        sha = tree.get(source_path)
-        if not sha:
-            return None
-        etag = f'"{sha}"'
-        if if_none_match == etag:
-            return Response(status_code=304, headers=_asset_headers(etag))
-        if cached and cached[0] > time.monotonic() and cached[2] == sha:
-            return cached[1], _mime(relative_path), etag
-        response = await client.get(f'https://api.github.com/repos/{quote(repo, safe="/")}/git/blobs/{sha}')
-        if response.status_code == 404:
-            return None
-        if response.status_code != 200:
-            raise HTTPException(502, '비공개 웹북 파일을 가져오지 못했습니다.')
-        data = response.json()
-        if data.get('encoding') != 'base64' or not isinstance(data.get('content'), str):
-            raise HTTPException(502, '웹북 파일 형식이 올바르지 않습니다.')
-        content = base64.b64decode(data['content'])
-        _cache_file(key, content, sha)
-        return content, _mime(relative_path), etag
-    finally:
-        await client.aclose()
+    client = _github_client(token)
+    tree = await _github_tree(client, repo, branch)
+    sha = tree.get(source_path)
+    if not sha:
+        return None
+    etag = f'"{sha}"'
+    if if_none_match == etag:
+        return Response(status_code=304, headers=_asset_headers(etag))
+    # 같은 sha면 내용이 같으므로 시간이 지나도 다시 받지 않는다(메모리 상한으로만 버린다)
+    if cached and cached[2] == sha:
+        github_cache[key] = github_cache.pop(key)
+        return cached[1], _mime(relative_path), etag
+    response = await client.get(f'https://api.github.com/repos/{quote(repo, safe="/")}/git/blobs/{sha}')
+    if response.status_code == 404:
+        return None
+    if response.status_code != 200:
+        raise HTTPException(502, '비공개 웹북 파일을 가져오지 못했습니다.')
+    data = response.json()
+    if data.get('encoding') != 'base64' or not isinstance(data.get('content'), str):
+        raise HTTPException(502, '웹북 파일 형식이 올바르지 않습니다.')
+    content = base64.b64decode(data['content'])
+    _cache_file(key, content, sha)
+    return content, _mime(relative_path), etag
+
+
+def _gzipped(etag: str, content: bytes) -> bytes:
+    """글자 파일(html·js·css·svg)은 gzip으로 보내면 1/3~1/5로 준다. 같은 판은 한 번만 압축한다."""
+    key = (etag, len(content))
+    saved = gzip_cache.get(key)
+    if saved is not None:
+        return saved
+    packed = gzip.compress(content, compresslevel=6)
+    gzip_cache[key] = packed
+    total = sum(len(v) for v in gzip_cache.values())
+    for k in list(gzip_cache):
+        if total <= GZIP_CACHE_MAX_BYTES:
+            break
+        total -= len(gzip_cache.pop(k))
+    return packed
 
 
 async def _github_pushed(client: httpx.AsyncClient, repo: str, branch: str, paths: list[str]) -> dict[str, str]:
@@ -687,6 +730,9 @@ async def webbook_file(request: Request, relative_path: str):
         end = min(end, len(content) - 1)
         headers.update({'Content-Range': f'bytes {start}-{end}/{len(content)}', 'Content-Length': str(end - start + 1)})
         return Response(content[start:end + 1], status_code=206, media_type=mime, headers=headers)
+    if mime.startswith(COMPRESSIBLE) and len(content) > 1024 and 'gzip' in request.headers.get('accept-encoding', ''):
+        content = _gzipped(etag or hashlib.sha1(content).hexdigest(), content)
+        headers.update({'Content-Encoding': 'gzip', 'Vary': 'Cookie, Accept-Encoding'})
     headers['Content-Length'] = str(len(content))
     return Response(content, media_type=mime, headers=headers)
 
