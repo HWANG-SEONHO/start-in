@@ -25,6 +25,9 @@ FAILURE_WINDOW_SECONDS = 15 * 60
 LOCK_SECONDS = 15 * 60
 failures = {}
 github_cache = {}
+# 서버 메모리가 512MB라 기억해 둘 파일의 크기를 묶는다(넘치면 오래 안 쓴 것부터 버린다)
+CACHE_MAX_BYTES = 100 * 1024 * 1024
+CACHE_FILE_MAX_BYTES = 5 * 1024 * 1024
 github_tree_cache = {}
 # 같은 sha의 파일 내용은 바뀌지 않으므로 계속 써도 된다. 목록을 다시 만들 때 바뀐 파일만 받는다.
 github_blob_cache = {}
@@ -373,6 +376,20 @@ async def _github_tree(client: httpx.AsyncClient, repo: str, branch: str, fresh:
     return paths
 
 
+def _cache_file(key: tuple, content: bytes, sha: str) -> None:
+    github_cache.pop(key, None)
+    if len(content) > CACHE_FILE_MAX_BYTES:
+        return  # 큰 영상 등은 기억하지 않는다
+    github_cache[key] = (time.monotonic() + 300, content, sha)
+    files = [(k, v) for k, v in github_cache.items() if isinstance(v, tuple)]
+    total = sum(len(v[1]) for _, v in files)
+    for k, v in files:  # 앞쪽일수록 오래 안 쓴 파일
+        if total <= CACHE_MAX_BYTES:
+            break
+        github_cache.pop(k, None)
+        total -= len(v[1])
+
+
 def _asset_headers(etag: str) -> dict[str, str]:
     return {
         'ETag': etag,
@@ -404,6 +421,7 @@ async def _github_file(relative_path: str, if_none_match: str = '') -> tuple[byt
         if if_none_match == etag:
             return Response(status_code=304, headers=_asset_headers(etag))
         if cached and cached[2] == sha:
+            github_cache[key] = github_cache.pop(key)  # 최근에 쓴 것으로 뒤로 보낸다
             return cached[1], _mime(relative_path), etag
     client = httpx.AsyncClient(timeout=30, headers={
         'Authorization': f'Bearer {token}', 'Accept': 'application/vnd.github+json',
@@ -428,7 +446,7 @@ async def _github_file(relative_path: str, if_none_match: str = '') -> tuple[byt
         if data.get('encoding') != 'base64' or not isinstance(data.get('content'), str):
             raise HTTPException(502, '웹북 파일 형식이 올바르지 않습니다.')
         content = base64.b64decode(data['content'])
-        github_cache[key] = (time.monotonic() + 300, content, sha)
+        _cache_file(key, content, sha)
         return content, _mime(relative_path), etag
     finally:
         await client.aclose()
@@ -638,6 +656,9 @@ async def webbook_file(request: Request, relative_path: str):
         'Vary': 'Cookie',
         'Accept-Ranges': 'bytes',
     }
+    if request.query_params.get('v') and relative_path != 'catalog.json':
+        # 주소에 ?v=가 있으면 고칠 때 값이 바뀌므로, 브라우저가 묻지 않고 받아 둔 것을 쓰게 한다
+        headers['Cache-Control'] = 'private, max-age=31536000, immutable'
     if etag and request.headers.get('if-none-match') == etag:
         return Response(status_code=304, headers=headers)
     if relative_path == 'index.html':
