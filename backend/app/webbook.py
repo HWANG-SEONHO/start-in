@@ -20,7 +20,7 @@ router = APIRouter(prefix='/webbook')
 VERSION = 3
 KEYS = {'first', 'type', 'color', 'layout', 'hero', 'finish'}
 # 이 집합은 webbook/book/rubric.js의 RUBRIC_KEYS와 테스트로 대조한다.
-STATUSES = {'approved', 'review', 'hold'}
+STATUSES = {'approved', 'review', 'hold', 'trash'}
 write_lock = asyncio.Lock()
 asset_cache = {}
 KST = timezone(timedelta(hours=9))
@@ -180,7 +180,7 @@ async def get_score(id: str):
         mine, _ = await gh.read(f'scores/{id}.json')
         claude, _ = await gh.read(f'scores/claude/{id}.json')
     return result({**(mine or {}), **({'claude': claude} if claude else {}),
-                   'asset': {k: meta[k] for k in ('status', 'statusNote', 'updated') if k in meta}})
+                   'asset': {k: meta[k] for k in ('status', 'statusNote', 'trashFrom', 'updated') if k in meta}})
 
 
 @router.post('/scores/{id}')
@@ -216,6 +216,11 @@ async def post_status(id: str, request: Request):
         def transform(meta):
             if not isinstance(meta, dict) or meta.get('id') != id:
                 raise HTTPException(404, '자산을 찾을 수 없습니다.')
+            # 쓰레기통에 넣을 때 넣기 전 상태를 남겨 두고, 꺼내면 지운다
+            if data['status'] == 'trash' and meta.get('status') != 'trash':
+                meta['trashFrom'] = meta.get('status')
+            if data['status'] != 'trash':
+                meta.pop('trashFrom', None)
             meta['status'] = data['status']
             if isinstance(data.get('note'), str):
                 # JS slice와 같은 UTF-16 길이 제한. 잘린 surrogate도 JSON escape로 보존한다.
