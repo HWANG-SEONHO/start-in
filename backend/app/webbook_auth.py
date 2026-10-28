@@ -439,7 +439,11 @@ async def _github_file(relative_path: str, if_none_match: str = '') -> tuple[byt
         return None
     if relative_path == 'catalog.json':
         return await _github_catalog(token, repo, branch)
-    source_path = relative_path if relative_path.startswith('assets/') else f'book/{relative_path}'
+    source_path = (
+        'assets/style/icon/004-svg-symbol-shelf/index.html'
+        if relative_path == 'svg'
+        else relative_path if relative_path.startswith('assets/') else f'book/{relative_path}'
+    )
     key = (repo, branch, source_path)
     cached = github_cache.get(key)
     # 이미 기억한 파일이면 GitHub 연결(SSL 준비에 0.5초 안팎)을 만들지 않고 바로 돌려준다
@@ -453,7 +457,7 @@ async def _github_file(relative_path: str, if_none_match: str = '') -> tuple[byt
             return Response(status_code=304, headers=_asset_headers(etag))
         if cached and cached[2] == sha:
             github_cache[key] = github_cache.pop(key)  # 최근에 쓴 것으로 뒤로 보낸다
-            return cached[1], _mime(relative_path), etag
+            return cached[1], _mime(source_path), etag
     client = _github_client(token)
     tree = await _github_tree(client, repo, branch)
     sha = tree.get(source_path)
@@ -465,7 +469,7 @@ async def _github_file(relative_path: str, if_none_match: str = '') -> tuple[byt
     # 같은 sha면 내용이 같으므로 시간이 지나도 다시 받지 않는다(메모리 상한으로만 버린다)
     if cached and cached[2] == sha:
         github_cache[key] = github_cache.pop(key)
-        return cached[1], _mime(relative_path), etag
+        return cached[1], _mime(source_path), etag
     response = await client.get(f'https://api.github.com/repos/{quote(repo, safe="/")}/git/blobs/{sha}')
     if response.status_code == 404:
         return None
@@ -476,7 +480,7 @@ async def _github_file(relative_path: str, if_none_match: str = '') -> tuple[byt
         raise HTTPException(502, '웹북 파일 형식이 올바르지 않습니다.')
     content = base64.b64decode(data['content'])
     _cache_file(key, content, sha)
-    return content, _mime(relative_path), etag
+    return content, _mime(source_path), etag
 
 
 def _gzipped(etag: str, content: bytes) -> bytes:
@@ -675,6 +679,8 @@ async def webbook_file(request: Request, relative_path: str):
     parts = Path(relative_path).parts
     if any(part in {'..', '.'} or part.startswith('.') for part in parts):
         raise HTTPException(404, '파일을 찾을 수 없습니다.')
+    if relative_path == 'svg':
+        relative_path = 'assets/style/icon/004-svg-symbol-shelf/index.html'
     item = await _local_file(relative_path)
     if item is None:
         item = await _github_file(relative_path, request.headers.get('if-none-match', ''))

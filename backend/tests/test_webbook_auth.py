@@ -24,6 +24,7 @@ def setup(monkeypatch):
         'book/index.html': (b'<meta charset="utf-8">', 'html-sha'),
         'assets/photo.webp': (b'photo-content', 'photo-sha'),
         'assets/taxonomy.json': (b'{"groups": []}', 'taxonomy-sha'),
+        'assets/style/icon/004-svg-symbol-shelf/index.html': (b'<html><title>SVG shelf</title></html>', 'svg-shelf-sha'),
     }
     calls = []
 
@@ -197,3 +198,13 @@ def test_large_text_is_gzipped(setup):
     assert response.content == body  # 받는 쪽이 풀어서 본다
     raw = client.get('/b/assets/photo.webp', headers={'Accept-Encoding': 'gzip'})
     assert 'content-encoding' not in raw.headers
+
+
+def test_svg_shortcut_serves_the_symbol_shelf(setup):
+    client, _, calls = setup
+    response = client.get('/b/svg')
+    assert response.status_code == 200
+    assert response.content == b'<html><title>SVG shelf</title></html>'
+    assert response.headers['content-type'].startswith('text/html')
+    assert response.headers['etag'] == '"svg-shelf-sha"'
+    assert '/git/blobs/svg-shelf-sha' in calls[-1].url.path
