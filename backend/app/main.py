@@ -31,6 +31,7 @@ from sqlalchemy import delete, inspect, select, text
 from sqlalchemy.exc import IntegrityError, OperationalError
 from .webbook import router as webbook_router
 from .webbook_auth import prewarm_catalog, router as webbook_auth_router, valid_cookie
+from .public_files import router as public_files_router
 from sqlalchemy.orm import Session as OrmSession
 
 from .ai_search import (
@@ -209,6 +210,7 @@ app.add_middleware(
 
 app.include_router(webbook_router)
 app.include_router(webbook_auth_router)
+app.include_router(public_files_router)
 
 
 # 데이터를 바꾸는 요청의 출처를 확인하고 기본 보안 header를 붙입니다.
