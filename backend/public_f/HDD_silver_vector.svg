@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1089" height="1444" viewBox="0 0 1089 1444" role="img" aria-labelledby="title desc">
+  <title id="title">Brushed silver hard disk drive</title>
+  <desc id="desc">A transparent-background, editable vector illustration of a hard disk platter, central spindle, actuator arm, silver base plate and six mounting screws.</desc>
+  <defs>
+    <!-- Each visible part is a real vector shape: no embedded bitmap. -->
+    <linearGradient id="chassis" x1="0" y1="0" x2="1" y2="1" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#505258"/>
+      <stop offset=".16" stop-color="#34363c"/>
+      <stop offset=".53" stop-color="#22252b"/>
+      <stop offset=".83" stop-color="#3a3d43"/>
+      <stop offset="1" stop-color="#16191e"/>
+    </linearGradient>
+    <linearGradient id="bezelEdge" x1="0" y1="0" x2="1" y2=".6">
+      <stop offset="0" stop-color="#a4a7ad"/><stop offset=".12" stop-color="#292b2f"/>
+      <stop offset=".62" stop-color="#141619"/><stop offset=".90" stop-color="#55595d"/>
+      <stop offset="1" stop-color="#111317"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="1" y2=".9">
+      <stop offset="0" stop-color="#5e6269"/><stop offset=".49" stop-color="#41454a"/>
+      <stop offset=".9" stop-color="#33363a"/><stop offset="1" stop-color="#45484d"/>
+    </linearGradient>
+    <linearGradient id="plateSilver" x1="0" y1="0" x2="1" y2=".1">
+      <stop offset="0" stop-color="#f0f1f2"/><stop offset=".20" stop-color="#d5d7da"/>
+      <stop offset=".47" stop-color="#f8f9fa"/><stop offset=".70" stop-color="#bec1c6"/>
+      <stop offset="1" stop-color="#e9ebed"/>
+    </linearGradient>
+    <linearGradient id="armSilver" x1=".05" y1=".12" x2=".82" y2=".95">
+      <stop offset="0" stop-color="#fff"/><stop offset=".22" stop-color="#eceef0"/>
+      <stop offset=".53" stop-color="#c2c5c9"/><stop offset=".74" stop-color="#fff"/>
+      <stop offset="1" stop-color="#9da1a6"/>
+    </linearGradient>
+    <linearGradient id="brushed" x1="0" y1="0" x2="1" y2=".13">
+      <stop offset="0" stop-color="#a8adb4"/><stop offset=".17" stop-color="#e8e9eb"/>
+      <stop offset=".35" stop-color="#f8f9f9"/><stop offset=".49" stop-color="#b6bac0"/>
+      <stop offset=".66" stop-color="#fafbfb"/><stop offset=".83" stop-color="#ced1d5"/>
+      <stop offset="1" stop-color="#eceef0"/>
+    </linearGradient>
+    <radialGradient id="platter" cx=".71" cy=".24" r=".91">
+      <stop offset="0" stop-color="#fff"/>
+      <stop offset=".14" stop-color="#f6f7f8"/>
+      <stop offset=".35" stop-color="#e2e4e7"/>
+      <stop offset=".56" stop-color="#f7f8f9"/>
+      <stop offset=".75" stop-color="#bec2c7"/>
+      <stop offset=".94" stop-color="#e8eaec"/>
+      <stop offset="1" stop-color="#a0a4ab"/>
+    </radialGradient>
+    <radialGradient id="hub" cx=".34" cy=".22" r=".92">
+      <stop offset="0" stop-color="#fff"/>
+      <stop offset=".28" stop-color="#dee0e3"/>
+      <stop offset=".48" stop-color="#aeb3b9"/>
+      <stop offset=".64" stop-color="#f6f7f8"/>
+      <stop offset=".91" stop-color="#a3a7ae"/>
+      <stop offset="1" stop-color="#5d6065"/>
+    </radialGradient>
+    <radialGradient id="fastener" cx=".30" cy=".23" r=".76">
+      <stop offset="0" stop-color="#fff"/><stop offset=".36" stop-color="#f0f1f3"/>
+      <stop offset=".60" stop-color="#bbc0c6"/><stop offset=".76" stop-color="#f8f8f8"/>
+      <stop offset="1" stop-color="#6c7278"/>
+    </radialGradient>
+    <radialGradient id="hole" cx=".37" cy=".37" r=".75">
+      <stop offset="0" stop-color="#2c3035"/><stop offset=".6" stop-color="#101215"/>
+      <stop offset=".85" stop-color="#474a4e"/><stop offset="1" stop-color="#060709"/>
+    </radialGradient>
+    <radialGradient id="pivotRing" cx=".27" cy=".23" r=".9">
+      <stop offset="0" stop-color="#fefefe"/><stop offset=".42" stop-color="#d0d3d8"/>
+      <stop offset=".73" stop-color="#8f959b"/><stop offset=".88" stop-color="#fff"/>
+      <stop offset="1" stop-color="#6d7177"/>
+    </radialGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="1" y2=".75">
+      <stop offset="0" stop-color="#26292c"/><stop offset=".26" stop-color="#050608"/>
+      <stop offset=".68" stop-color="#555a61"/><stop offset="1" stop-color="#090b0c"/>
+    </linearGradient>
+    <!-- A very fine metallic grain is clipped to individual parts. -->
+    <filter id="grain" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.68 0.045" numOctaves="2" seed="11" stitchTiles="stitch" result="noise"/>
+      <feColorMatrix in="noise" type="saturate" values="0" result="mono"/>
+      <feComponentTransfer in="mono"><feFuncA type="linear" slope="0.13"/></feComponentTransfer>
+    </filter>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="170%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="8" result="blur"/>
+      <feOffset in="blur" dy="11" result="offset"/>
+      <feComponentTransfer in="offset" result="shade"><feFuncA type="linear" slope="0.42"/></feComponentTransfer>
+      <feMerge><feMergeNode in="shade"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="smallShadow" x="-25%" y="-25%" width="150%" height="165%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3.5" result="b"/>
+      <feOffset in="b" dy="4" result="s"/>
+      <feComponentTransfer in="s" result="o"><feFuncA type="linear" slope=".5"/></feComponentTransfer>
+      <feMerge><feMergeNode in="o"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <clipPath id="platterClip"><circle cx="538" cy="585" r="381"/></clipPath>
+    <clipPath id="plateClip"><path d="M 199 908 L 291 908 Q 357 906 344 965 Q 337 1000 364 1031 C 394 1067 429 1113 480 1115 L 515 1115 Q 546 1115 546 1149 L 546 1210 Q 545 1254 511 1254 L 266 1254 Q 242 1254 223 1238 L 163 1176 Q 149 1162 149 1138 L 149 960 Q 149 908 199 908 Z"/></clipPath>
+    <clipPath id="armClip"><path d="M 397 944 Q 557 849 735 712 Q 753 698 761 709 Q 769 720 755 737 L 529 1088 Q 501 1131 459 1133 C 403 1139 363 1103 359 1052 Q 354 986 397 944 Z"/></clipPath>
+    <g id="mountScrew">
+      <circle r="51" fill="#090b0e" opacity=".86"/>
+      <circle r="43" fill="url(#fastener)" stroke="#14171b" stroke-width="4"/>
+      <circle r="26" fill="none" stroke="#fff" stroke-opacity=".64" stroke-width="2"/>
+      <circle r="15" fill="url(#hole)" stroke="#b8babd" stroke-width="2"/>
+    </g>
+    <g id="hubBolt">
+      <circle r="20" fill="#61656a" opacity=".5"/>
+      <circle r="16.5" fill="url(#fastener)" stroke="#42464b" stroke-width="2.6"/>
+      <circle r="10.5" fill="url(#hole)" stroke="#989da3" stroke-width="1.5"/>
+    </g>
+    <g id="plateHole">
+      <circle r="14" fill="#16181b"/><circle r="10" fill="url(#hole)" stroke="#a6aab0" stroke-width="1"/>
+    </g>
+  </defs>
+
+  <!-- No background rectangle: alpha outside the drive is transparent. -->
+  <g filter="url(#shadow)">
+    <!-- Main shell, under-plate and inside bevel -->
+    <rect x="77" y="137" width="937" height="1188" rx="66" fill="#090b0e"/>
+    <rect x="88" y="145" width="913" height="1167" rx="53" fill="url(#bezelEdge)" stroke="#7a7e84" stroke-width="2"/>
+    <rect x="103" y="159" width="882" height="1134" rx="38" fill="url(#chassis)" stroke="#696d73" stroke-width="3"/>
+    <path d="M 161 173 H 921 Q 980 173 980 232 V 1221 Q 980 1289 925 1289 H 164 Q 112 1289 112 1220 V 232 Q 112 173 161 173 Z"
+          fill="none" stroke="#8b8e92" stroke-opacity=".50" stroke-width="2.5"/>
+    <!-- Dark milled circular pocket -->
+    <circle cx="538" cy="585" r="409" fill="#07090c" stroke="#72767c" stroke-width="4"/>
+    <circle cx="538" cy="585" r="398" fill="url(#rim)"/>
+    <circle cx="538" cy="585" r="389" fill="#0e1012"/>
+    <!-- Rotating silver platter -->
+    <circle cx="538" cy="585" r="381" fill="url(#platter)" stroke="#b8bdc3" stroke-width="3"/>
+    <g clip-path="url(#platterClip)">
+      <ellipse cx="538" cy="585" rx="372" ry="371" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="1"/>
+      <circle cx="538" cy="585" r="328" fill="none" stroke="#bdc1c6" stroke-opacity=".07" stroke-width="8"/>
+      <circle cx="538" cy="585" r="345" fill="none" stroke="#fff" stroke-opacity=".18" stroke-width="4"/>
+      <circle cx="538" cy="585" r="357" fill="none" stroke="#6f747b" stroke-opacity=".07" stroke-width="2"/>
+      <rect x="146" y="192" width="788" height="788" fill="#fff" filter="url(#grain)"/>
+    </g>
+    <!-- Subtle outer edge highlight -->
+    <path d="M 180 579 A 358 358 0 0 1 722 285" fill="none" stroke="#fff" stroke-opacity=".25" stroke-width="3" stroke-linecap="round"/>
+  </g>
+
+  <!-- Top-center spindle assembly. -->
+  <g filter="url(#smallShadow)">
+    <circle cx="538" cy="580" r="159" fill="#2f3338"/>
+    <circle cx="538" cy="568" r="157" fill="url(#hub)" stroke="#41474d" stroke-width="4"/>
+    <circle cx="538" cy="568" r="145" fill="none" stroke="#fff" stroke-opacity=".9" stroke-width="4"/>
+    <circle cx="538" cy="568" r="137" fill="none" stroke="#747981" stroke-width="3"/>
+    <circle cx="538" cy="568" r="124" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="2"/>
+    <use href="#hubBolt" transform="translate(538 464)"/>
+    <use href="#hubBolt" transform="translate(457 512)"/>
+    <use href="#hubBolt" transform="translate(619 512)"/>
+    <use href="#hubBolt" transform="translate(457 609)"/>
+    <use href="#hubBolt" transform="translate(619 609)"/>
+    <use href="#hubBolt" transform="translate(538 659)"/>
+    <circle cx="538" cy="559" r="59" fill="#585d65" opacity=".65"/>
+    <circle cx="538" cy="555" r="57" fill="url(#pivotRing)" stroke="#44494d" stroke-width="3"/>
+    <circle cx="538" cy="555" r="47" fill="none" stroke="#fff" stroke-width="4" stroke-opacity=".8"/>
+    <circle cx="538" cy="555" r="20" fill="url(#hole)" stroke="#b8bbc0" stroke-width="4"/>
+  </g>
+
+  <!-- Lower-left head actuator housing. -->
+  <g>
+    <path d="M 197 894 H 291 Q 362 895 360 964 C 355 1007 386 1044 434 1081 L 521 1099 Q 564 1108 564 1149 L 564 1208 Q 563 1273 507 1273 H 262 Q 232 1273 211 1252 L 151 1187 Q 137 1171 137 1141 V 957 Q 137 894 197 894 Z"
+          fill="#0a0d10" stroke="#666a70" stroke-width="4"/>
+    <path d="M 199 908 L 291 908 Q 357 906 344 965 Q 337 1000 364 1031 C 394 1067 429 1113 480 1115 L 515 1115 Q 546 1115 546 1149 L 546 1210 Q 545 1254 511 1254 L 266 1254 Q 242 1254 223 1238 L 163 1176 Q 149 1162 149 1138 L 149 960 Q 149 908 199 908 Z"
+          fill="url(#plateSilver)" stroke="#f8f9fa" stroke-opacity=".55" stroke-width="3"/>
+    <g clip-path="url(#plateClip)"><rect x="140" y="900" width="420" height="380" fill="#fff" filter="url(#grain)"/></g>
+    <use href="#plateHole" transform="translate(196 1135)"/>
+    <use href="#plateHole" transform="translate(499 1193)"/>
+    <path d="M 164 956 Q 162 923 197 920 L 290 920" fill="none" stroke="#fff" stroke-opacity=".38" stroke-width="3"/>
+  </g>
+
+  <!-- Lower-right dark mechanism plate. -->
+  <g>
+    <path d="M 605 1032 H 869 Q 950 1032 948 1109 V 1208 Q 948 1274 881 1276 H 593 Q 562 1276 552 1249 V 1113 Q 552 1050 605 1032 Z"
+          fill="#0b0c0e" stroke="#101215" stroke-width="10"/>
+    <path d="M 608 1049 H 862 Q 928 1049 929 1111 V 1206 Q 929 1254 882 1257 H 597 Q 561 1257 560 1217 V 1122 Q 560 1062 608 1049 Z"
+          fill="url(#panel)" stroke="#74777a" stroke-opacity=".7" stroke-width="3"/>
+    <path d="M 593 1069 Q 616 1057 642 1058 H 856" stroke="#a4a5a7" stroke-opacity=".2" stroke-width="3" fill="none"/>
+    <circle cx="845" cy="1192" r="17" fill="#111418"/>
+    <circle cx="845" cy="1192" r="11" fill="url(#hole)" stroke="#777a7e" stroke-width="2"/>
+  </g>
+
+  <!-- Arm bevel then one editable vector outline, tapering into the flying head. -->
+  <path d="M 396 946 Q 557 844 734 711 Q 755 692 768 709 Q 782 722 762 748 L 535 1097 Q 499 1152 450 1154 C 386 1161 347 1105 348 1050 Q 348 986 396 946 Z"
+        fill="#111418" opacity=".72"/>
+  <g filter="url(#smallShadow)">
+    <path d="M 397 944 Q 557 849 735 712 Q 753 698 761 709 Q 769 720 755 737 L 529 1088 Q 501 1131 459 1133 C 403 1139 363 1103 359 1052 Q 354 986 397 944 Z"
+          fill="url(#armSilver)" stroke="#44494f" stroke-width="4.5" stroke-linejoin="round"/>
+    <g clip-path="url(#armClip)"><rect x="345" y="697" width="435" height="447" fill="#fff" filter="url(#grain)"/></g>
+    <path d="M 402 948 Q 583 830 741 716" stroke="#fff" stroke-width="3" stroke-opacity=".80" fill="none" stroke-linecap="round"/>
+    <path d="M 523 1084 L 750 733" stroke="#898f95" stroke-width="3" stroke-opacity=".6" fill="none"/>
+    <!-- Slot in the arm -->
+    <rect x="549" y="865" width="76" height="24" rx="12" transform="rotate(-46 549 865)" fill="#45494e" stroke="#d8dadd" stroke-width="3"/>
+    <rect x="555" y="869" width="66" height="14" rx="7" transform="rotate(-46 555 869)" fill="#272b30" opacity=".85"/>
+    <!-- Arm pivot, concentric machined rings -->
+    <circle cx="451" cy="1044" r="95" fill="#14171b" opacity=".23"/>
+    <circle cx="451" cy="1038" r="88" fill="url(#pivotRing)" stroke="#4a4e54" stroke-width="4"/>
+    <circle cx="451" cy="1038" r="75" fill="none" stroke="#fff" stroke-width="4" stroke-opacity=".76"/>
+    <circle cx="451" cy="1038" r="62" fill="url(#fastener)" stroke="#3e4248" stroke-width="5"/>
+    <circle cx="451" cy="1038" r="49" fill="none" stroke="#fff" stroke-opacity=".8" stroke-width="4"/>
+    <circle cx="451" cy="1038" r="35" fill="url(#pivotRing)" stroke="#555a60" stroke-width="3"/>
+  </g>
+
+  <!-- Six chassis retaining rings. The upper, middle and bottom rows are intentional. -->
+  <use href="#mountScrew" transform="translate(145 206)"/>
+  <use href="#mountScrew" transform="translate(940 205)"/>
+  <use href="#mountScrew" transform="translate(145 809)"/>
+  <use href="#mountScrew" transform="translate(940 811)"/>
+  <use href="#mountScrew" transform="translate(145 1249)"/>
+  <use href="#mountScrew" transform="translate(941 1249)"/>
+
+  <!-- Thin specular top and lower casing accents -->
+  <path d="M 190 153 H 896" stroke="#c3c7cc" opacity=".46" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 198 1308 H 906" stroke="#d1d4d6" opacity=".28" stroke-width="2.5" stroke-linecap="round"/>
+</svg>
