@@ -405,6 +405,8 @@ async def _fetch_github_tree(client: httpx.AsyncClient, repo: str, branch: str) 
         except ValueError:
             payload = {}
         message = payload.get('message', '') if isinstance(payload, dict) else ''
+        if not isinstance(message, str):
+            message = str(message)
         logger.error(
             'GitHub webbook tree request failed: status=%s repo=%s branch=%s request_id=%s rate_remaining=%s rate_reset=%s retry_after=%s message=%r',
             response.status_code,
