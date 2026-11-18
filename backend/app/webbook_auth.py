@@ -6,6 +6,7 @@ import gzip
 import hashlib
 import hmac
 import json
+import logging
 import os
 import re
 import secrets
@@ -18,6 +19,7 @@ from fastapi import APIRouter, HTTPException, Request, Response
 from fastapi.responses import HTMLResponse, JSONResponse
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 COOKIE_NAME = 'webbook_access'
 SESSION_SECONDS = 24 * 60 * 60
 MAX_FAILURES = 5
@@ -398,6 +400,24 @@ async def _fetch_github_tree(client: httpx.AsyncClient, repo: str, branch: str) 
     key = (repo, branch)
     response = await client.get(f'https://api.github.com/repos/{quote(repo, safe="/")}/git/trees/{quote(branch, safe="")}', params={'recursive': '1'})
     if response.status_code != 200:
+        try:
+            payload = response.json()
+        except ValueError:
+            payload = {}
+        message = payload.get('message', '') if isinstance(payload, dict) else ''
+        if not isinstance(message, str):
+            message = str(message)
+        logger.error(
+            'GitHub webbook tree request failed: status=%s repo=%s branch=%s request_id=%s rate_remaining=%s rate_reset=%s retry_after=%s message=%r',
+            response.status_code,
+            repo,
+            branch,
+            response.headers.get('x-github-request-id', ''),
+            response.headers.get('x-ratelimit-remaining', ''),
+            response.headers.get('x-ratelimit-reset', ''),
+            response.headers.get('retry-after', ''),
+            message[:240],
+        )
         raise HTTPException(502, '비공개 웹북 파일 목록을 읽지 못했습니다.')
     tree = response.json()
     if tree.get('truncated'):
